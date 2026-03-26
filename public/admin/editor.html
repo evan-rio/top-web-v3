@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面装修 - ZHAMIT 后台</title>
+    
+    <!-- 登录检查 -->
+    <script>
+        (function() {
+            if (window.location.pathname.includes('/login.html')) return;
+            const hasCookie = document.cookie.split(';').some(c => c.trim().startsWith('zhamit_admin=1'));
+            if (!hasCookie) {
+                window.location.href = '/admin/login.html';
+            }
+        })();
+    </script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            overflow: hidden;
+        }
+        
+        /* 顶部栏 */
+        .top-bar {
+            background: #1a1a1a;
+            color: white;
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        .top-bar h2 { font-size: 1.25rem; }
+        .top-bar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .top-bar a:hover { opacity: 0.8; }
+        
+        /* 主布局 */
+        .editor-container {
+            display: flex;
+            margin-top: 56px;
+            height: calc(100vh - 56px);
+        }
+        
+        /* 左侧编辑区 */
+        .editor-sidebar {
+            width: 45%;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .editor-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #eee;
+            background: #fafafa;
+        }
+        .editor-header input {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+        .editor-header input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+        .home-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .home-checkbox input {
+            width: auto;
+            margin-bottom: 0;
+        }
+        .home-checkbox label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* 代码编辑区 */
+        .code-area {
+            flex: 1;
+            padding: 1rem;
+            overflow: auto;
+        }
+        .code-area textarea {
+            width: 100%;
+            height: 100%;
+            font-family: 'Monaco', 'Menlo', 'Cascadia Code', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1rem;
+            resize: none;
+            background: #fefefe;
+        }
+        .code-area textarea:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+        
+        /* 底部按钮 */
+        .editor-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 0.75rem;
+            background: #fafafa;
+        }
+        .btn {
+            padding: 0.6rem 1.2rem;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn-primary {
+            background: #2e7d32;
+        }
+        .btn-primary:hover {
+            background: #1b5e20;
+        }
+        .btn-danger {
+            background: #d32f2f;
+        }
+        .btn-danger:hover {
+            background: #c62828;
+        }
+        .btn-secondary {
+            background: #666;
+        }
+        
+        /* 右侧预览区 */
+        .preview-area {
+            width: 55%;
+            display: flex;
+            flex-direction: column;
+            background: #e4e6e9;
+        }
+        .preview-header {
+            padding: 0.6rem 1rem;
+            background: #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+        }
+        .preview-header span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .preview-header a {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .preview-frame {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+        
+        /* 提示消息 */
+        .status-bar {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            display: none;
+            z-index: 200;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success {
+            background: #2e7d32;
+            color: white;
+            display: block;
+        }
+        .error {
+            background: #d32f2f;
+            color: white;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container { flex-direction: column; }
+            .editor-sidebar { width: 100%; height: 50%; }
+            .preview-area { width: 100%; height: 50%; }
+            .top-bar { flex-direction: column; gap: 0.5rem; padding: 0.75rem; }
+            .top-bar div { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+            .top-bar a { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h2>ZHAMIT 管理后台</h2>
+        <div>
+            <a href="/admin/pages.html">页面管理</a>
+            <a href="/admin/nav.html">导航菜单</a>
+            <a href="/admin/editor.html">页面装修</a>
+            <a href="/admin/settings.html">站点设置</a>
+        </div>
+    </div>
+    
+    <div class="editor-container">
+        <div class="editor-sidebar">
+            <div class="editor-header">
+                <input type="text" id="pagePath" placeholder="页面路径 (例如 /about)">
+                <input type="text" id="pageTitle" placeholder="页面标题 (英文)">
+                <div class="home-checkbox">
+                    <input type="checkbox" id="isHomepage">
+                    <label for="isHomepage">🏠 设为首页（原首页将自动变为 /old-home）</label>
+                </div>
+            </div>
+            <div class="code-area">
+                <textarea id="pageContent" placeholder="输入 HTML/CSS/JS 代码..."></textarea>
+            </div>
+            <div class="editor-footer">
+                <button class="btn btn-primary" id="saveBtn">💾 保存</button>
+                <button class="btn" id="previewBtn">🔄 刷新预览</button>
+                <button class="btn btn-danger" id="deleteBtn">🗑️ 删除页面</button>
+                <button class="btn-secondary btn" id="backBtn">← 返回列表</button>
+            </div>
+        </div>
+        <div class="preview-area">
+            <div class="preview-header">
+                <span>📱 实时预览</span>
+                <a href="#" id="openPreview" target="_blank">🔗 在新窗口打开 ↗</a>
+            </div>
+            <iframe id="previewFrame" class="preview-frame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+        </div>
+    </div>
+    
+    <div id="statusMsg" class="status-bar"></div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageId = urlParams.get('id');
+        let currentPage = null;
+        
+        async function loadPage() {
+            if (!pageId) {
+                // 新建模式
+                document.getElementById('pagePath').value = '';
+                document.getElementById('pageTitle').value = '';
+                document.getElementById('pageContent').value = '';
+                document.getElementById('isHomepage').checked = false;
+                document.getElementById('deleteBtn').style.display = 'none';
+                updatePreview();
+                return;
+            }
+            
+            document.getElementById('deleteBtn').style.display = 'block';
+            
+            try {
+                const res = await fetch(`/api/pages?id=${pageId}`);
+                currentPage = await res.json();
+                document.getElementById('pagePath').value = currentPage.path || '';
+                document.getElementById('pageTitle').value = currentPage.title_en || '';
+                document.getElementById('pageContent').value = currentPage.content || '';
+                document.getElementById('isHomepage').checked = (currentPage.path === '/');
+                updatePreview();
+            } catch(e) {
+                showStatus('加载失败', 'error');
+            }
+        }
+        
+        function updatePreview() {
+            const content = document.getElementById('pageContent').value;
+            const previewFrame = document.getElementById('previewFrame');
+            const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            previewDoc.open();
+            previewDoc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <base target="_blank">
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            font-family: system-ui, -apple-system, sans-serif;
+                            line-height: 1.6;
+                        }
+                        .preview-placeholder {
+                            color: #999;
+                            text-align: center;
+                            padding: 40px 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${content || '<div class="preview-placeholder">✨ 在左侧编辑器中输入 HTML/CSS/JS 代码<br>预览区会实时显示效果</div>'}
+                </body>
+                </html>
+            `);
+            previewDoc.close();
+        }
+        
+        async function savePage() {
+            const path = document.getElementById('pagePath').value.trim();
+            const title = document.getElementById('pageTitle').value.trim();
+            const content = document.getElementById('pageContent').value;
+            const isHomepage = document.getElementById('isHomepage').checked;
+            
+            if (!path) {
+                showStatus('请填写页面路径', 'error');
+                return;
+            }
+            
+            let finalPath = path;
+            let originalHomePath = null;
+            
+            if (isHomepage && path !== '/') {
+                finalPath = '/';
+                originalHomePath = path;
+            } else if (!isHomepage && path === '/') {
+                showStatus('首页路径不能设为 /，如需设为首页请勾选"设为首页"', 'error');
+                return;
+            }
+            
+            const data = {
+                id: pageId || null,
+                path: finalPath,
+                title_en: title,
+                content: content,
+                status: 1
+            };
+            
+            try {
+                // 保存当前页面
+                const res = await fetch('/api/pages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!res.ok) throw new Error('保存失败');
+                
+                // 如果需要交换首页
+                if (isHomepage && originalHomePath) {
+                    // 获取原首页
+                    const oldHomeRes = await fetch('/api/pages?path=/');
+                    const oldHome = await oldHomeRes.json();
+                    if (oldHome && oldHome.id) {
+                        // 将原首页路径改为 originalHomePath
+                        await fetch('/api/pages', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id: oldHome.id,
+                                path: originalHomePath,
+                                title_en: oldHome.title_en || 'Old Home',
+                                content: oldHome.content || '',
+                                status: 1
+                            })
+                        });
+                    }
+                }
+                
+                showStatus('保存成功！正在跳转...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/admin/pages.html';
+                }, 1200);
+            } catch(e) {
+                showStatus('保存失败: ' + e.message, 'error');
+            }
+        }
+        
+        async function deletePage() {
+            if (!pageId) return;
+            if (!confirm('确定删除这个页面吗？删除后无法恢复。')) return;
+            
+            try {
+                await fetch('/api/pages', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: parseInt(pageId) })
+                });
+                showStatus('删除成功，正在返回...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/admin/pages.html';
+                }, 1000);
+            } catch(e) {
+                showStatus('删除失败', 'error');
+            }
+        }
+        
+        function showStatus(msg, type) {
+            const el = document.getElementById('statusMsg');
+            el.textContent = msg;
+            el.className = `status-bar ${type}`;
+            setTimeout(() => {
+                el.className = 'status-bar';
+            }, 2500);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPage();
+            document.getElementById('previewBtn').addEventListener('click', updatePreview);
+            document.getElementById('saveBtn').addEventListener('click', savePage);
+            document.getElementById('deleteBtn').addEventListener('click', deletePage);
+            document.getElementById('backBtn').addEventListener('click', () => {
+                window.location.href = '/admin/pages.html';
+            });
+            document.getElementById('openPreview').addEventListener('click', (e) => {
+                e.preventDefault();
+                const content = document.getElementById('pageContent').value;
+                const blob = new Blob([content], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            });
+            
+            // 实时预览（防抖）
+            let debounceTimer;
+            document.getElementById('pageContent').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(updatePreview, 300);
+            });
+        });
+    </script>
+</body>
+</html>
