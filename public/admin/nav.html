@@ -1,1 +1,125 @@
-
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导航菜单 - ZHAMIT 后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: #f5f5f5; }
+        .top-bar { background: #1a1a1a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .top-bar a { color: white; text-decoration: none; margin-left: 1rem; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; }
+        input, select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; }
+        .btn { padding: 0.5rem 1rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem; }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; background: #666; }
+        .btn-danger { background: #d32f2f; }
+        .status-bar { margin-top: 1rem; padding: 0.5rem; border-radius: 6px; display: none; }
+        .success { background: #e8f5e9; color: #2e7d32; display: block; }
+        .error { background: #ffebee; color: #c62828; display: block; }
+        .child-row { background: #f9f9f9; }
+        .child-row td:first-child { padding-left: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h2>ZHAMIT 管理后台</h2>
+        <div>
+            <a href="/admin/pages.html">页面管理</a>
+            <a href="/admin/nav.html">导航菜单</a>
+            <a href="/admin/settings.html">站点设置</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1>导航菜单</h1>
+        <div class="card">
+            <button class="btn" id="addParentBtn">+ 添加主菜单</button>
+            <button class="btn" id="addChildBtn" style="background:#666;">+ 添加子菜单</button>
+            <table id="navTable" style="margin-top: 1rem;">
+                <thead><tr><th>名称</th><th>链接</th><th>排序</th><th>父级</th><th>操作</th></tr></thead>
+                <tbody></tbody>
+            </table>
+            <button class="btn" id="saveAllBtn" style="margin-top: 1rem;">保存全部</button>
+            <div id="statusMsg" class="status-bar"></div>
+        </div>
+    </div>
+    <script>
+        let items = [];
+        async function loadNav() {
+            const res = await fetch('/api/nav');
+            items = await res.json();
+            renderTable();
+        }
+        function renderTable() {
+            const tbody = document.querySelector('#navTable tbody');
+            let html = '';
+            const parents = items.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+            for (const parent of parents) {
+                html += `<tr>
+                    <td><input type="text" class="name" data-id="${parent.id}" value="${escapeHtml(parent.name)}"></td>
+                    <td><input type="text" class="url" data-id="${parent.id}" value="${escapeHtml(parent.url)}"></td>
+                    <td><input type="number" class="sort" data-id="${parent.id}" value="${parent.sort_order}" style="width:80px"></td>
+                    <td><select class="parent" data-id="${parent.id}"><option value="0">无 (主菜单)</option></select></td>
+                    <td><button class="delBtn" data-id="${parent.id}">删除</button></td>
+                </tr>`;
+                const children = items.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                for (const child of children) {
+                    html += `<tr class="child-row">
+                        <td><input type="text" class="name" data-id="${child.id}" value="${escapeHtml(child.name)}"></td>
+                        <td><input type="text" class="url" data-id="${child.id}" value="${escapeHtml(child.url)}"></td>
+                        <td><input type="number" class="sort" data-id="${child.id}" value="${child.sort_order}" style="width:80px"></td>
+                        <td><select class="parent" data-id="${child.id}"><option value="${parent.id}" selected>${escapeHtml(parent.name)}</option></select></td>
+                        <td><button class="delBtn" data-id="${child.id}">删除</button></td>
+                    </tr>`;
+                }
+            }
+            tbody.innerHTML = html;
+            document.querySelectorAll('.name').forEach(inp => inp.addEventListener('change', function() { updateItem(parseInt(this.dataset.id), 'name', this.value); }));
+            document.querySelectorAll('.url').forEach(inp => inp.addEventListener('change', function() { updateItem(parseInt(this.dataset.id), 'url', this.value); }));
+            document.querySelectorAll('.sort').forEach(inp => inp.addEventListener('change', function() { updateItem(parseInt(this.dataset.id), 'sort_order', parseInt(this.value)); }));
+            document.querySelectorAll('.delBtn').forEach(btn => btn.addEventListener('click', function() { deleteItem(parseInt(this.dataset.id)); }));
+        }
+        function updateItem(id, field, value) {
+            const item = items.find(i => i.id === id);
+            if (item) item[field] = value;
+        }
+        function deleteItem(id) {
+            items = items.filter(i => i.id !== id);
+            renderTable();
+        }
+        function addParent() {
+            const newId = Date.now();
+            items.push({ id: newId, name: '新菜单', url: '/', parent_id: 0, sort_order: items.length, target: '_self', status: 1 });
+            renderTable();
+        }
+        function addChild() {
+            const parents = items.filter(i => i.parent_id === 0);
+            if (parents.length === 0) { alert('请先添加主菜单'); return; }
+            const newId = Date.now();
+            items.push({ id: newId, name: '新子菜单', url: '/', parent_id: parents[0].id, sort_order: items.length, target: '_self', status: 1 });
+            renderTable();
+        }
+        async function saveAll() {
+            const res = await fetch('/api/nav', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(items) });
+            if (res.ok) { showStatus('保存成功！', 'success'); } else { showStatus('保存失败', 'error'); }
+        }
+        function showStatus(msg, type) {
+            const el = document.getElementById('statusMsg');
+            el.textContent = msg;
+            el.className = `status-bar ${type}`;
+            setTimeout(() => el.className = 'status-bar', 3000);
+        }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNav();
+            document.getElementById('addParentBtn').addEventListener('click', addParent);
+            document.getElementById('addChildBtn').addEventListener('click', addChild);
+            document.getElementById('saveAllBtn').addEventListener('click', saveAll);
+        });
+    </script>
+</body>
+</html>
