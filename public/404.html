@@ -3,33 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZHAMIT</title>
+    <title id="pageTitle">ZHAMIT</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: system-ui, sans-serif; line-height: 1.6; color: #1a1a1a; background: #fff; }
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #1a1a1a; background: #fff; }
+        
+        /* 顶部导航 */
         .top-nav { background: #1a1a1a; color: white; padding: 0 2rem; position: sticky; top: 0; z-index: 100; }
         .top-nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; min-height: 70px; }
         .logo-area { display: flex; align-items: center; gap: 8px; }
         .logo-text { font-size: 24px; font-weight: 600; color: white; }
-        .top-nav-menu { display: flex; list-style: none; gap: 2rem; }
-        .top-nav-menu a { color: white; text-decoration: none; font-weight: 500; }
+        .logo-img { height: 40px; width: auto; }
+        .top-nav-menu { display: flex; list-style: none; gap: 2rem; position: relative; }
+        .top-nav-menu > li { position: relative; }
+        .top-nav-menu > li > a { color: white; text-decoration: none; font-weight: 500; display: block; padding: 1rem 0; }
+        .top-nav-menu > li > a:hover { color: #ccc; }
+        
+        /* 下拉菜单 */
+        .dropdown { position: absolute; top: 100%; left: 0; background: white; min-width: 180px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; opacity: 0; visibility: hidden; transition: all 0.2s; z-index: 100; }
+        .top-nav-menu > li:hover .dropdown { opacity: 1; visibility: visible; }
+        .dropdown li { list-style: none; }
+        .dropdown a { display: block; padding: 0.75rem 1rem; color: #333; text-decoration: none; }
+        .dropdown a:hover { background: #f5f5f5; }
+        
+        /* 底部导航 */
         .bottom-nav { background: #f5f5f5; padding: 3rem 2rem; margin-top: 4rem; }
         .bottom-nav-container { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 3rem; }
         .bottom-nav-col { flex: 1; min-width: 150px; }
-        .bottom-nav-col h4 { margin-bottom: 1rem; }
-        .bottom-nav-col a { display: block; color: #666; text-decoration: none; margin-bottom: 0.5rem; }
+        .bottom-nav-col h4 { margin-bottom: 1rem; color: #333; }
+        .bottom-nav-col a { display: block; color: #666; text-decoration: none; margin-bottom: 0.5rem; font-size: 0.875rem; }
+        .bottom-nav-col a:hover { color: #1a1a1a; }
         .copyright { text-align: center; padding: 1rem; background: #eaeaea; font-size: 0.75rem; color: #666; }
+        
+        /* 主内容 */
         main { min-height: 50vh; padding: 2rem; max-width: 1280px; margin: 0 auto; }
+        
         @media (max-width: 768px) {
             .top-nav-container { flex-direction: column; padding: 1rem; gap: 1rem; }
-            .top-nav-menu { flex-wrap: wrap; justify-content: center; }
+            .top-nav-menu { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+            .dropdown { position: static; box-shadow: none; padding-left: 1rem; opacity: 1; visibility: visible; background: transparent; }
+            .dropdown a { color: #ccc; }
         }
     </style>
 </head>
 <body>
     <nav class="top-nav">
         <div class="top-nav-container">
-            <div class="logo-area">
+            <div class="logo-area" id="logoArea">
                 <span class="logo-text">ZHAMIT</span>
             </div>
             <ul class="top-nav-menu" id="navMenu"></ul>
@@ -71,31 +91,42 @@
         
         async function loadNav() {
             try {
-                const res = await fetch('/api/nav');
-                const items = await res.json();
-                const topItems = items.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+                // 加载顶部导航
+                const topRes = await fetch('/api/nav?location=top');
+                const topItems = await topRes.json();
+                const topParents = topItems.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
                 const navMenu = document.getElementById('navMenu');
-                if (topItems.length) {
-                    navMenu.innerHTML = topItems.map(item => `<li><a href="${item.url}">${item.name}</a></li>`).join('');
+                if (topParents.length) {
+                    navMenu.innerHTML = topParents.map(parent => {
+                        const children = topItems.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                        if (children.length) {
+                            return `<li class="has-dropdown">
+                                <a href="${parent.url}">${escapeHtml(parent.name)}</a>
+                                <ul class="dropdown">${children.map(child => `<li><a href="${child.url}">${escapeHtml(child.name)}</a></li>`).join('')}</ul>
+                            </li>`;
+                        }
+                        return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
+                    }).join('');
                 } else {
                     navMenu.innerHTML = '<li><a href="/">Home</a></li><li><a href="/about">About</a></li><li><a href="/contact">Contact</a></li>';
                 }
                 
-                const groups = {};
-                topItems.forEach(item => { groups[item.id] = { name: item.name, children: [] }; });
-                items.forEach(item => {
-                    if (item.parent_id && groups[item.parent_id]) {
-                        groups[item.parent_id].children.push(item);
-                    }
-                });
+                // 加载底部导航
+                const bottomRes = await fetch('/api/nav?location=bottom');
+                const bottomItems = await bottomRes.json();
+                const bottomParents = bottomItems.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
                 const bottomNav = document.getElementById('bottomNav');
-                if (Object.keys(groups).length) {
-                    bottomNav.innerHTML = Object.values(groups).map(group => `
-                        <div class="bottom-nav-col">
-                            <h4>${group.name}</h4>
-                            ${group.children.map(child => `<a href="${child.url}">${child.name}</a>`).join('')}
-                        </div>
-                    `).join('');
+                if (bottomParents.length) {
+                    bottomNav.innerHTML = bottomParents.map(parent => {
+                        const children = bottomItems.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                        if (children.length) {
+                            return `<div class="bottom-nav-col">
+                                <h4>${escapeHtml(parent.name)}</h4>
+                                ${children.map(child => `<a href="${child.url}">${escapeHtml(child.name)}</a>`).join('')}
+                            </div>`;
+                        }
+                        return `<div class="bottom-nav-col"><h4>${escapeHtml(parent.name)}</h4><a href="${parent.url}">${escapeHtml(parent.name)}</a></div>`;
+                    }).join('');
                 } else {
                     bottomNav.innerHTML = '<div class="bottom-nav-col"><h4>ZHAMIT</h4><a href="/">Home</a><a href="/about">About</a><a href="/contact">Contact</a></div>';
                 }
@@ -104,8 +135,33 @@
             }
         }
         
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/settings');
+                const settings = await res.json();
+                const logoArea = document.getElementById('logoArea');
+                if (settings.logo_type === 'image' && settings.logo_url) {
+                    logoArea.innerHTML = `<img src="${settings.logo_url}" alt="${settings.logo_alt}" class="logo-img">`;
+                } else {
+                    const text = settings.brand_text || 'ZHAMIT';
+                    const font = settings.brand_text_font || 'Arial';
+                    const size = settings.brand_text_size || '24px';
+                    const transform = settings.brand_text_transform || 'none';
+                    logoArea.innerHTML = `<span class="logo-text" style="font-family:${font}; font-size:${size}; text-transform:${transform}">${text}</span>`;
+                }
+            } catch(e) {
+                console.error('加载设置失败:', e);
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+        
         loadPage();
         loadNav();
+        loadSettings();
     </script>
 </body>
 </html>
