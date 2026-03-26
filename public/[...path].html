@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">ZHAMIT</title>
+    <title>ZHAMIT</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #1a1a1a; background: #fff; }
+        body { font-family: system-ui, sans-serif; line-height: 1.6; color: #1a1a1a; background: #fff; }
         .top-nav { background: #1a1a1a; color: white; padding: 0 2rem; position: sticky; top: 0; z-index: 100; }
         .top-nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; min-height: 70px; }
         .logo-area { display: flex; align-items: center; gap: 8px; }
-        .logo-text { font-size: 24px; font-weight: 600; }
-        .logo-img { height: 40px; width: auto; }
+        .logo-text { font-size: 24px; font-weight: 600; color: white; }
         .top-nav-menu { display: flex; list-style: none; gap: 2rem; }
         .top-nav-menu a { color: white; text-decoration: none; font-weight: 500; }
         .bottom-nav { background: #f5f5f5; padding: 3rem 2rem; margin-top: 4rem; }
@@ -30,7 +29,7 @@
 <body>
     <nav class="top-nav">
         <div class="top-nav-container">
-            <div class="logo-area" id="logoArea">
+            <div class="logo-area">
                 <span class="logo-text">ZHAMIT</span>
             </div>
             <ul class="top-nav-menu" id="navMenu"></ul>
@@ -38,7 +37,7 @@
     </nav>
     
     <main id="pageContent">
-        加载中...
+        <div style="text-align: center; padding: 2rem;">加载中...</div>
     </main>
     
     <div class="bottom-nav">
@@ -49,10 +48,8 @@
     </div>
     
     <script>
-        // 获取当前路径
         const currentPath = window.location.pathname;
         
-        // 加载页面内容
         async function loadPage() {
             try {
                 const res = await fetch(`/api/pages?path=${encodeURIComponent(currentPath)}`);
@@ -72,14 +69,17 @@
             }
         }
         
-        // 加载导航菜单
         async function loadNav() {
             try {
                 const res = await fetch('/api/nav');
                 const items = await res.json();
                 const topItems = items.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
                 const navMenu = document.getElementById('navMenu');
-                navMenu.innerHTML = topItems.map(item => `<li><a href="${item.url}">${item.name}</a></li>`).join('');
+                if (topItems.length) {
+                    navMenu.innerHTML = topItems.map(item => `<li><a href="${item.url}">${item.name}</a></li>`).join('');
+                } else {
+                    navMenu.innerHTML = '<li><a href="/">Home</a></li><li><a href="/about">About</a></li><li><a href="/contact">Contact</a></li>';
+                }
                 
                 const groups = {};
                 topItems.forEach(item => { groups[item.id] = { name: item.name, children: [] }; });
@@ -89,39 +89,23 @@
                     }
                 });
                 const bottomNav = document.getElementById('bottomNav');
-                bottomNav.innerHTML = Object.values(groups).map(group => `
-                    <div class="bottom-nav-col">
-                        <h4>${group.name}</h4>
-                        ${group.children.map(child => `<a href="${child.url}">${child.name}</a>`).join('')}
-                    </div>
-                `).join('');
+                if (Object.keys(groups).length) {
+                    bottomNav.innerHTML = Object.values(groups).map(group => `
+                        <div class="bottom-nav-col">
+                            <h4>${group.name}</h4>
+                            ${group.children.map(child => `<a href="${child.url}">${child.name}</a>`).join('')}
+                        </div>
+                    `).join('');
+                } else {
+                    bottomNav.innerHTML = '<div class="bottom-nav-col"><h4>ZHAMIT</h4><a href="/">Home</a><a href="/about">About</a><a href="/contact">Contact</a></div>';
+                }
             } catch(e) {
                 console.error('加载导航失败:', e);
             }
         }
         
-        async function loadSettings() {
-            try {
-                const res = await fetch('/api/settings');
-                const settings = await res.json();
-                const logoArea = document.getElementById('logoArea');
-                if (settings.logo_type === 'image' && settings.logo_url) {
-                    logoArea.innerHTML = `<img src="${settings.logo_url}" alt="${settings.logo_alt}" class="logo-img">`;
-                } else {
-                    const text = settings.brand_text || 'ZHAMIT';
-                    const font = settings.brand_text_font || 'Arial';
-                    const size = settings.brand_text_size || '24px';
-                    const transform = settings.brand_text_transform || 'none';
-                    logoArea.innerHTML = `<span class="logo-text" style="font-family:${font}; font-size:${size}; text-transform:${transform}">${text}</span>`;
-                }
-            } catch(e) {
-                console.error('加载设置失败:', e);
-            }
-        }
-        
         loadPage();
         loadNav();
-        // loadSettings();  // 暂时禁用，等待 settings.js 修复
     </script>
 </body>
 </html>
