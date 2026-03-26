@@ -11,16 +11,18 @@
         .top-bar a { color: white; text-decoration: none; margin-left: 1rem; }
         .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
         .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        h2 { margin-bottom: 1rem; font-size: 1.25rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        input, select, textarea { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px; }
+        h2 { margin-bottom: 1rem; font-size: 1.25rem; border-left: 4px solid #1a1a1a; padding-left: 0.75rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; }
+        input, select, textarea { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.875rem; }
         .row { display: flex; gap: 1rem; }
         .row > div { flex: 1; }
-        .btn { padding: 0.75rem 1.5rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .btn { padding: 0.75rem 1.5rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
         .status-bar { margin-top: 1rem; padding: 0.5rem; border-radius: 6px; display: none; }
         .success { background: #e8f5e9; color: #2e7d32; display: block; }
         .error { background: #ffebee; color: #c62828; display: block; }
-        .preview { background: #f5f5f5; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem; }
+        .preview { background: #f5f5f5; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem; border: 1px solid #e0e0e0; }
+        .preview span { display: inline-block; }
+        hr { margin: 1rem 0; border: none; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -94,47 +96,59 @@
                 <span id="previewText" style="font-weight: 600;">ZHAMIT</span>
             </div>
         </div>
-        <div class="card">
-            <h2>联系方式</h2>
-            <label>联系邮箱</label>
-            <input type="email" id="contact_email">
-            <label>联系电话</label>
-            <input type="text" id="contact_phone">
-            <label>公司地址</label>
-            <textarea id="contact_address" rows="2"></textarea>
-        </div>
+        
         <div class="card">
             <h2>Favicon</h2>
             <label>Favicon URL</label>
             <input type="text" id="favicon_url" placeholder="/favicon.ico">
+            <p style="font-size: 0.75rem; color: #666; margin-top: -0.5rem;">建议尺寸：32x32px，格式：.ico 或 .png</p>
         </div>
+        
+        <div class="card">
+            <h2>联系方式</h2>
+            <label>联系邮箱</label>
+            <input type="email" id="contact_email" placeholder="info@zhamit.com">
+            <label>联系电话</label>
+            <input type="text" id="contact_phone" placeholder="+86 579 12345678">
+            <label>公司地址</label>
+            <textarea id="contact_address" rows="2" placeholder="Yiwu, Zhejiang, China"></textarea>
+        </div>
+        
         <button class="btn" id="saveBtn">保存所有设置</button>
         <div id="statusMsg" class="status-bar"></div>
     </div>
+
     <script>
         async function loadSettings() {
-            const res = await fetch('/api/settings');
-            const data = await res.json();
-            document.getElementById('logo_type').value = data.logo_type || 'text';
-            document.getElementById('brand_text').value = data.brand_text || 'ZHAMIT';
-            document.getElementById('brand_text_font').value = data.brand_text_font || 'Arial';
-            document.getElementById('brand_text_size').value = data.brand_text_size || '24px';
-            document.getElementById('brand_text_transform').value = data.brand_text_transform || 'none';
-            document.getElementById('brand_text_position').value = data.brand_text_position || 'right';
-            document.getElementById('logo_url').value = data.logo_url || '';
-            document.getElementById('logo_alt').value = data.logo_alt || 'ZHAMIT';
-            document.getElementById('contact_email').value = data.contact_email || '';
-            document.getElementById('contact_phone').value = data.contact_phone || '';
-            document.getElementById('contact_address').value = data.contact_address || '';
-            document.getElementById('favicon_url').value = data.favicon_url || '/favicon.ico';
-            toggleImageLogo();
-            updatePreview();
+            try {
+                const res = await fetch('/api/settings');
+                const data = await res.json();
+                document.getElementById('logo_type').value = data.logo_type || 'text';
+                document.getElementById('brand_text').value = data.brand_text || 'ZHAMIT';
+                document.getElementById('brand_text_font').value = data.brand_text_font || 'Arial';
+                document.getElementById('brand_text_size').value = data.brand_text_size || '24px';
+                document.getElementById('brand_text_transform').value = data.brand_text_transform || 'none';
+                document.getElementById('brand_text_position').value = data.brand_text_position || 'right';
+                document.getElementById('logo_url').value = data.logo_url || '';
+                document.getElementById('logo_alt').value = data.logo_alt || 'ZHAMIT';
+                document.getElementById('favicon_url').value = data.favicon_url || '/favicon.ico';
+                document.getElementById('contact_email').value = data.contact_email || '';
+                document.getElementById('contact_phone').value = data.contact_phone || '';
+                document.getElementById('contact_address').value = data.contact_address || '';
+                toggleImageLogo();
+                updatePreview();
+            } catch(e) {
+                console.error('加载设置失败:', e);
+                showStatus('加载设置失败', 'error');
+            }
         }
+        
         function toggleImageLogo() {
             const type = document.getElementById('logo_type').value;
             const showImage = type === 'image';
             document.getElementById('imageLogoSection').style.display = showImage ? 'block' : 'none';
         }
+        
         function updatePreview() {
             const type = document.getElementById('logo_type').value;
             const text = document.getElementById('brand_text').value || 'ZHAMIT';
@@ -142,6 +156,7 @@
             const size = document.getElementById('brand_text_size').value;
             const transform = document.getElementById('brand_text_transform').value;
             const previewSpan = document.getElementById('previewText');
+            
             if (type === 'image') {
                 const url = document.getElementById('logo_url').value;
                 if (url) {
@@ -154,8 +169,10 @@
                 previewSpan.style.fontFamily = font;
                 previewSpan.style.fontSize = size;
                 previewSpan.style.textTransform = transform;
+                previewSpan.style.fontWeight = '600';
             }
         }
+        
         async function saveSettings() {
             const data = {
                 logo_type: document.getElementById('logo_type').value,
@@ -166,23 +183,41 @@
                 brand_text_position: document.getElementById('brand_text_position').value,
                 logo_url: document.getElementById('logo_url').value,
                 logo_alt: document.getElementById('logo_alt').value,
+                favicon_url: document.getElementById('favicon_url').value,
                 contact_email: document.getElementById('contact_email').value,
                 contact_phone: document.getElementById('contact_phone').value,
-                contact_address: document.getElementById('contact_address').value,
-                favicon_url: document.getElementById('favicon_url').value
+                contact_address: document.getElementById('contact_address').value
             };
-            const res = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            if (res.ok) { showStatus('保存成功！', 'success'); } else { showStatus('保存失败', 'error'); }
+            
+            try {
+                const res = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    showStatus('保存成功！', 'success');
+                } else {
+                    showStatus('保存失败', 'error');
+                }
+            } catch(e) {
+                showStatus('保存失败: ' + e.message, 'error');
+            }
         }
+        
         function showStatus(msg, type) {
             const el = document.getElementById('statusMsg');
             el.textContent = msg;
             el.className = `status-bar ${type}`;
             setTimeout(() => el.className = 'status-bar', 3000);
         }
+        
         document.addEventListener('DOMContentLoaded', () => {
             loadSettings();
-            document.getElementById('logo_type').addEventListener('change', () => { toggleImageLogo(); updatePreview(); });
+            document.getElementById('logo_type').addEventListener('change', () => {
+                toggleImageLogo();
+                updatePreview();
+            });
             document.getElementById('brand_text').addEventListener('input', updatePreview);
             document.getElementById('brand_text_font').addEventListener('change', updatePreview);
             document.getElementById('brand_text_size').addEventListener('input', updatePreview);
