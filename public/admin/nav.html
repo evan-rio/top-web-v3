@@ -12,19 +12,22 @@
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
         .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         h2 { margin-bottom: 1rem; font-size: 1.25rem; border-left: 4px solid #1a1a1a; padding-left: 0.75rem; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; vertical-align: middle; }
         input, select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; }
-        .btn { padding: 0.5rem 1rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem; }
-        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; background: #666; }
-        .btn-danger { background: #d32f2f; }
+        .btn { padding: 0.5rem 1rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+        .btn-add-child { background: #2e7d32; }
+        .btn-up { background: #1976d2; }
+        .btn-down { background: #1976d2; }
+        .btn-delete { background: #d32f2f; }
+        .child-row { background: #f9f9f9; }
+        .child-row td:first-child { padding-left: 2rem; }
+        .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .status-bar { margin-top: 1rem; padding: 0.5rem; border-radius: 6px; display: none; }
         .success { background: #e8f5e9; color: #2e7d32; display: block; }
         .error { background: #ffebee; color: #c62828; display: block; }
-        .nav-section { margin-bottom: 2rem; }
-        .child-row { background: #f9f9f9; }
-        .child-row td:first-child { padding-left: 2rem; }
-        .actions { display: flex; gap: 0.5rem; }
+        .sort-controls { display: flex; gap: 0.25rem; }
     </style>
 </head>
 <body>
@@ -40,26 +43,24 @@
     <div class="container">
         <div class="card">
             <h2>顶部导航</h2>
-            <div class="nav-section">
-                <button class="btn add-top-parent">+ 添加顶部主菜单</button>
-                <button class="btn add-top-child" style="background:#666;">+ 添加顶部子菜单</button>
-                <table id="topNavTable" class="nav-table">
-                    <thead><tr><th>名称</th><th>链接</th><th>排序</th><th>操作</th></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <button class="btn add-parent" data-location="top">+ 添加顶部主菜单</button>
+            <table id="topNavTable" class="nav-table">
+                <thead>
+                    <tr><th>名称</th><th>链接</th><th>排序</th><th>操作</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
         
         <div class="card">
             <h2>底部导航</h2>
-            <div class="nav-section">
-                <button class="btn add-bottom-parent">+ 添加底部主菜单</button>
-                <button class="btn add-bottom-child" style="background:#666;">+ 添加底部子菜单</button>
-                <table id="bottomNavTable" class="nav-table">
-                    <thead><tr><th>名称</th><th>链接</th><th>排序</th><th>操作</th></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <button class="btn add-parent" data-location="bottom">+ 添加底部主菜单</button>
+            <table id="bottomNavTable" class="nav-table">
+                <thead>
+                    <tr><th>名称</th><th>链接</th><th>排序</th><th>操作</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
         
         <button class="btn" id="saveAllBtn">保存全部更改</button>
@@ -76,82 +77,178 @@
         }
         
         function renderTables() {
-            // 顶部导航
-            const topItems = allItems.filter(i => i.location === 'top');
-            const topParents = topItems.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-            renderNavTable('topNavTable', topParents, topItems, 'top');
-            
-            // 底部导航
-            const bottomItems = allItems.filter(i => i.location === 'bottom');
-            const bottomParents = bottomItems.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-            renderNavTable('bottomNavTable', bottomParents, bottomItems, 'bottom');
+            renderNavTable('top', 'topNavTable');
+            renderNavTable('bottom', 'bottomNavTable');
         }
         
-        function renderNavTable(tableId, parents, allItemsInLocation, location) {
+        function renderNavTable(location, tableId) {
+            const locationItems = allItems.filter(i => i.location === location);
+            const parents = locationItems.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             const tbody = document.querySelector(`#${tableId} tbody`);
             let html = '';
-            for (const parent of parents) {
-                html += `<tr data-id="${parent.id}" data-location="${location}">
+            
+            for (let idx = 0; idx < parents.length; idx++) {
+                const parent = parents[idx];
+                html += `<tr data-id="${parent.id}" data-location="${location}" data-type="parent">
                     <td><input type="text" class="name" value="${escapeHtml(parent.name)}" data-id="${parent.id}" data-field="name"></td>
                     <td><input type="text" class="url" value="${escapeHtml(parent.url)}" data-id="${parent.id}" data-field="url"></td>
-                    <td><input type="number" class="sort" value="${parent.sort_order}" data-id="${parent.id}" data-field="sort_order" style="width:80px"></td>
-                    <td><button class="btn-sm delete-item" data-id="${parent.id}">删除</button></td>
+                    <td>
+                        <div class="sort-controls">
+                            <button class="btn-sm btn-up" data-id="${parent.id}" data-location="${location}" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                            <span style="width: 40px; text-align: center;">${parent.sort_order}</span>
+                            <button class="btn-sm btn-down" data-id="${parent.id}" data-location="${location}" ${idx === parents.length-1 ? 'disabled' : ''}>↓</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-sm btn-add-child" data-parent-id="${parent.id}" data-location="${location}">+ 子菜单</button>
+                            <button class="btn-sm btn-delete" data-id="${parent.id}">删除</button>
+                        </div>
+                    </td>
                 </tr>`;
-                const children = allItemsInLocation.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                for (const child of children) {
-                    html += `<tr class="child-row" data-id="${child.id}" data-location="${location}">
+                
+                const children = locationItems.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                for (let cIdx = 0; cIdx < children.length; cIdx++) {
+                    const child = children[cIdx];
+                    html += `<tr class="child-row" data-id="${child.id}" data-location="${location}" data-type="child" data-parent-id="${parent.id}">
                         <td><input type="text" class="name" value="${escapeHtml(child.name)}" data-id="${child.id}" data-field="name"></td>
                         <td><input type="text" class="url" value="${escapeHtml(child.url)}" data-id="${child.id}" data-field="url"></td>
-                        <td><input type="number" class="sort" value="${child.sort_order}" data-id="${child.id}" data-field="sort_order" style="width:80px"></td>
-                        <td><button class="btn-sm delete-item" data-id="${child.id}">删除</button></td>
+                        <td>
+                            <div class="sort-controls">
+                                <button class="btn-sm btn-up-child" data-id="${child.id}" data-parent-id="${parent.id}" ${cIdx === 0 ? 'disabled' : ''}>↑</button>
+                                <span style="width: 40px; text-align: center;">${child.sort_order}</span>
+                                <button class="btn-sm btn-down-child" data-id="${child.id}" data-parent-id="${parent.id}" ${cIdx === children.length-1 ? 'disabled' : ''}>↓</button>
+                            </div>
+                        </td>
+                        <td><button class="btn-sm btn-delete" data-id="${child.id}">删除</button></td>
                     </tr>`;
                 }
             }
             tbody.innerHTML = html;
             
             // 绑定输入事件
-            document.querySelectorAll(`#${tableId} .name`).forEach(inp => {
-                inp.addEventListener('change', function() { updateItem(parseInt(this.dataset.id), 'name', this.value); });
-            });
-            document.querySelectorAll(`#${tableId} .url`).forEach(inp => {
-                inp.addEventListener('change', function() { updateItem(parseInt(this.dataset.id), 'url', this.value); });
-            });
-            document.querySelectorAll(`#${tableId} .sort`).forEach(inp => {
-                inp.addEventListener('change', function() { updateItem(parseInt(this.dataset.id), 'sort_order', parseInt(this.value)); });
-            });
-            document.querySelectorAll(`#${tableId} .delete-item`).forEach(btn => {
-                btn.addEventListener('click', function() { deleteItem(parseInt(this.dataset.id)); });
+            bindInputEvents();
+            // 绑定按钮事件
+            bindButtonEvents(location);
+        }
+        
+        function bindInputEvents() {
+            document.querySelectorAll('.name, .url').forEach(inp => {
+                inp.removeEventListener('change', handleInputChange);
+                inp.addEventListener('change', handleInputChange);
             });
         }
         
-        function updateItem(id, field, value) {
+        function handleInputChange(e) {
+            const id = parseInt(this.dataset.id);
+            const field = this.dataset.field;
             const item = allItems.find(i => i.id === id);
-            if (item) item[field] = value;
+            if (item) item[field] = this.value;
         }
         
-        function deleteItem(id) {
-            allItems = allItems.filter(i => i.id !== id);
+        function bindButtonEvents(location) {
+            // 主菜单上下移动
+            document.querySelectorAll(`.btn-up, .btn-down`).forEach(btn => {
+                btn.removeEventListener('click', handleMove);
+                btn.addEventListener('click', handleMove);
+            });
+            // 子菜单上下移动
+            document.querySelectorAll(`.btn-up-child, .btn-down-child`).forEach(btn => {
+                btn.removeEventListener('click', handleChildMove);
+                btn.addEventListener('click', handleChildMove);
+            });
+            // 添加子菜单
+            document.querySelectorAll(`.btn-add-child`).forEach(btn => {
+                btn.removeEventListener('click', handleAddChild);
+                btn.addEventListener('click', handleAddChild);
+            });
+            // 删除
+            document.querySelectorAll(`.btn-delete`).forEach(btn => {
+                btn.removeEventListener('click', handleDelete);
+                btn.addEventListener('click', handleDelete);
+            });
+        }
+        
+        function handleMove(e) {
+            const btn = e.currentTarget;
+            const id = parseInt(btn.dataset.id);
+            const location = btn.dataset.location;
+            const isUp = btn.classList.contains('btn-up');
+            
+            const parents = allItems.filter(i => i.location === location && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+            const idx = parents.findIndex(p => p.id === id);
+            if (isUp && idx > 0) {
+                [parents[idx].sort_order, parents[idx-1].sort_order] = [parents[idx-1].sort_order, parents[idx].sort_order];
+            } else if (!isUp && idx < parents.length-1) {
+                [parents[idx].sort_order, parents[idx+1].sort_order] = [parents[idx+1].sort_order, parents[idx].sort_order];
+            }
             renderTables();
         }
         
-        function addItem(location, parentId = 0) {
+        function handleChildMove(e) {
+            const btn = e.currentTarget;
+            const id = parseInt(btn.dataset.id);
+            const parentId = parseInt(btn.dataset.parentId);
+            const isUp = btn.classList.contains('btn-up-child');
+            
+            const children = allItems.filter(i => i.parent_id === parentId).sort((a,b) => a.sort_order - b.sort_order);
+            const idx = children.findIndex(c => c.id === id);
+            if (isUp && idx > 0) {
+                [children[idx].sort_order, children[idx-1].sort_order] = [children[idx-1].sort_order, children[idx].sort_order];
+            } else if (!isUp && idx < children.length-1) {
+                [children[idx].sort_order, children[idx+1].sort_order] = [children[idx+1].sort_order, children[idx].sort_order];
+            }
+            renderTables();
+        }
+        
+        function handleAddChild(e) {
+            const parentId = parseInt(e.currentTarget.dataset.parentId);
+            const location = e.currentTarget.dataset.location;
+            const parent = allItems.find(i => i.id === parentId);
+            if (!parent) return;
+            
+            const existingChildren = allItems.filter(i => i.parent_id === parentId);
+            const newSortOrder = existingChildren.length;
             const newId = Date.now() + Math.floor(Math.random() * 1000);
-            const newItem = {
+            
+            allItems.push({
                 id: newId,
-                name: parentId === 0 ? '新菜单' : '新子菜单',
+                name: '新子菜单',
                 url: '/',
                 target: '_self',
-                sort_order: allItems.filter(i => i.location === location && i.parent_id === parentId).length,
+                sort_order: newSortOrder,
                 status: 1,
                 parent_id: parentId,
                 location: location
-            };
-            allItems.push(newItem);
+            });
+            renderTables();
+        }
+        
+        function handleDelete(e) {
+            const id = parseInt(e.currentTarget.dataset.id);
+            // 删除该菜单及其所有子菜单
+            allItems = allItems.filter(i => i.id !== id && i.parent_id !== id);
+            renderTables();
+        }
+        
+        function addParent(location) {
+            const existingParents = allItems.filter(i => i.location === location && i.parent_id === 0);
+            const newSortOrder = existingParents.length;
+            const newId = Date.now() + Math.floor(Math.random() * 1000);
+            allItems.push({
+                id: newId,
+                name: '新菜单',
+                url: '/',
+                target: '_self',
+                sort_order: newSortOrder,
+                status: 1,
+                parent_id: 0,
+                location: location
+            });
             renderTables();
         }
         
         async function saveAll() {
-            // 清理数据，确保每个项目都有必要的字段
             const itemsToSave = allItems.map(item => ({
                 id: item.id,
                 name: item.name,
@@ -171,7 +268,7 @@
             
             if (res.ok) {
                 showStatus('保存成功！', 'success');
-                loadNav(); // 重新加载以获取服务器端排序
+                loadNav();
             } else {
                 showStatus('保存失败', 'error');
             }
@@ -189,27 +286,10 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
         
-        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             loadNav();
-            
-            document.querySelector('.add-top-parent').addEventListener('click', () => addItem('top', 0));
-            document.querySelector('.add-top-child').addEventListener('click', () => {
-                const parents = allItems.filter(i => i.location === 'top' && i.parent_id === 0);
-                if (parents.length === 0) {
-                    alert('请先添加顶部主菜单');
-                    return;
-                }
-                addItem('top', parents[0].id);
-            });
-            document.querySelector('.add-bottom-parent').addEventListener('click', () => addItem('bottom', 0));
-            document.querySelector('.add-bottom-child').addEventListener('click', () => {
-                const parents = allItems.filter(i => i.location === 'bottom' && i.parent_id === 0);
-                if (parents.length === 0) {
-                    alert('请先添加底部主菜单');
-                    return;
-                }
-                addItem('bottom', parents[0].id);
+            document.querySelectorAll('.add-parent').forEach(btn => {
+                btn.addEventListener('click', () => addParent(btn.dataset.location));
             });
             document.getElementById('saveAllBtn').addEventListener('click', saveAll);
         });
