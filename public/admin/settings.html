@@ -19,6 +19,18 @@ checkAuth();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>站点设置 - ZHAMIT 后台</title>
+
+    <!-- 登录检查 - 立即执行，在页面渲染前 -->
+    <script>
+        (function() {
+            // 检查 Cookie 中是否有登录标记
+            const hasCookie = document.cookie.split(';').some(c => c.trim().startsWith('zhamit_admin=1'));
+            if (!hasCookie) {
+                window.location.href = '/admin/login.html';
+            }
+        })();
+    </script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; background: #f5f5f5; }
