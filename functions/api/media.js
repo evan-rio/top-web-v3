@@ -1,31 +1,22 @@
-// functions/api/media.js - 完整稳定版
+// functions/api/media.js - 完整错误捕获版
 export async function onRequest(context) {
-  const { request, env } = context;
-  
-  // 检查登录（暂时注释，先测试上传）
-  // const cookies = request.headers.get('Cookie') || '';
-  // const isLoggedIn = cookies.includes('zhamit_admin=1');
-  // if (!isLoggedIn) {
-  //   return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  // }
-  
-  const url = new URL(request.url);
-  const method = request.method;
-  
-  // GET - 获取图片列表
-  if (method === 'GET') {
-    try {
+  try {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const method = request.method;
+    
+    // GET 请求 - 获取图片列表
+    if (method === 'GET') {
+      // 先测试数据库连接
+      const test = await env.DB.prepare('SELECT 1 as test').first();
+      console.log('DB test:', test);
+      
       const rows = await env.DB.prepare('SELECT * FROM media ORDER BY created_at DESC').all();
       return Response.json(rows.results || []);
-    } catch (err) {
-      console.error('GET error:', err);
-      return Response.json({ error: err.message }, { status: 500 });
     }
-  }
-  
-  // POST - 上传图片
-  if (method === 'POST') {
-    try {
+    
+    // POST 请求 - 上传图片
+    if (method === 'POST') {
       const formData = await request.formData();
       const file = formData.get('file');
       
@@ -33,9 +24,8 @@ export async function onRequest(context) {
         return Response.json({ error: 'No file uploaded' }, { status: 400 });
       }
       
-      // 检查 R2 绑定
       if (!env.ASSETS) {
-        return Response.json({ error: 'Storage not configured' }, { status: 500 });
+        return Response.json({ error: 'ASSETS binding not found' }, { status: 500 });
       }
       
       const timestamp = Date.now();
@@ -45,36 +35,22 @@ export async function onRequest(context) {
       const key = `media/${filename}`;
       
       const bytes = await file.arrayBuffer();
-      
-      // 上传到 R2
       await env.ASSETS.put(key, bytes, {
         httpMetadata: { contentType: file.type }
       });
       
       const fileUrl = `/${key}`;
-      
-      // 保存到数据库
       const now = new Date().toISOString();
+      
       await env.DB.prepare(
         'INSERT INTO media (filename, original_name, url, size, mime_type, created_at) VALUES (?, ?, ?, ?, ?, ?)'
       ).bind(filename, originalName, fileUrl, file.size, file.type, now).run();
       
-      return Response.json({ 
-        success: true, 
-        url: fileUrl,
-        filename: filename,
-        original_name: originalName
-      });
-      
-    } catch (err) {
-      console.error('Upload error:', err);
-      return Response.json({ error: err.message }, { status: 500 });
+      return Response.json({ success: true, url: fileUrl });
     }
-  }
-  
-  // DELETE - 删除图片
-  if (method === 'DELETE') {
-    try {
+    
+    // DELETE 请求 - 删除图片
+    if (method === 'DELETE') {
       const { id, filename } = await request.json();
       
       if (env.ASSETS) {
@@ -84,10 +60,17 @@ export async function onRequest(context) {
       await env.DB.prepare('DELETE FROM media WHERE id = ?').bind(id).run();
       
       return Response.json({ success: true });
-    } catch (err) {
-      return Response.json({ error: err.message }, { status: 500 });
     }
+    
+    return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    
+  } catch (err) {
+    // 捕获所有错误并返回详细信息
+    console.error('Media API error:', err);
+    return Response.json({ 
+      error: err.message,
+      stack: err.stack,
+      name: err.name
+    }, { status: 500 });
   }
-  
-  return Response.json({ error: 'Method not allowed' }, { status: 405 });
 }
