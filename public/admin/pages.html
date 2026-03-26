@@ -35,6 +35,31 @@
         .preview { background: #f5f5f5; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem; border: 1px solid #e0e0e0; }
         .preview span { display: inline-block; }
         hr { margin: 1rem 0; border: none; border-top: 1px solid #eee; }
+        /* 让页面管理表格更宽 */
+.pages-table-container {
+    overflow-x: auto;
+}
+.pages-table {
+    width: 100%;
+    min-width: 600px;
+}
+.pages-table th, .pages-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+/* 新建弹窗输入框宽度合理 */
+.modal-content {
+    max-width: 800px;
+    width: 90%;
+}
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
     </style>
 </head>
 <body>
