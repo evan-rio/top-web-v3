@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>站点设置 - ZHAMIT 后台</title>
+    <title>页面管理 - ZHAMIT 后台</title>
     
     <!-- 登录检查 - 立即执行 -->
     <script>
@@ -18,48 +18,236 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: system-ui, sans-serif; background: #f5f5f5; }
-        .top-bar { background: #1a1a1a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .top-bar a { color: white; text-decoration: none; margin-left: 1rem; }
-        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        h2 { margin-bottom: 1rem; font-size: 1.25rem; border-left: 4px solid #1a1a1a; padding-left: 0.75rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; }
-        input, select, textarea { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.875rem; }
-        .row { display: flex; gap: 1rem; }
-        .row > div { flex: 1; }
-        .btn { padding: 0.75rem 1.5rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
-        .status-bar { margin-top: 1rem; padding: 0.5rem; border-radius: 6px; display: none; }
-        .success { background: #e8f5e9; color: #2e7d32; display: block; }
-        .error { background: #ffebee; color: #c62828; display: block; }
-        .preview { background: #f5f5f5; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem; border: 1px solid #e0e0e0; }
-        .preview span { display: inline-block; }
-        hr { margin: 1rem 0; border: none; border-top: 1px solid #eee; }
-        /* 让页面管理表格更宽 */
-.pages-table-container {
-    overflow-x: auto;
-}
-.pages-table {
-    width: 100%;
-    min-width: 600px;
-}
-.pages-table th, .pages-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-}
-/* 新建弹窗输入框宽度合理 */
-.modal-content {
-    max-width: 800px;
-    width: 90%;
-}
-.modal-content input,
-.modal-content select,
-.modal-content textarea {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-}
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; }
+        
+        /* 顶部栏 */
+        .top-bar {
+            background: #1a1a1a;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .top-bar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .top-bar a:hover { opacity: 0.8; }
+        
+        /* 容器 */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        /* 头部 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        /* 卡片 */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        /* 表格样式 - 宽松舒适 */
+        .pages-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .pages-table th,
+        .pages-table td {
+            padding: 1rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .pages-table th {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+        .pages-table td {
+            font-size: 0.9rem;
+            color: #333;
+            vertical-align: middle;
+        }
+        .pages-table tr:hover {
+            background: #fafafa;
+        }
+        
+        /* 状态标签 */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .published {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .draft {
+            background: #fff3e0;
+            color: #ed6c02;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #333;
+        }
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-edit {
+            background: #1976d2;
+            color: white;
+            margin-right: 0.5rem;
+        }
+        .btn-edit:hover {
+            background: #1565c0;
+        }
+        .btn-delete {
+            background: #d32f2f;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: #c62828;
+        }
+        
+        /* 弹窗 - 居中且宽度合理 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        .modal-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border 0.2s;
+        }
+        .modal-content input:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+        .modal-content textarea {
+            min-height: 250px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.85rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+            }
+            .top-bar div {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.75rem;
+            }
+            .top-bar a {
+                margin-left: 0;
+            }
+            .container {
+                padding: 0 1rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            .pages-table th,
+            .pages-table td {
+                padding: 0.75rem 0.5rem;
+            }
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -68,75 +256,112 @@
         <div>
             <a href="/admin/pages.html">页面管理</a>
             <a href="/admin/nav.html">导航菜单</a>
-            <a href="/admin/media.html">图片空间</a>
+            <a href="/admin/editor.html">页面装修</a>
             <a href="/admin/settings.html">站点设置</a>
         </div>
     </div>
+    
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div class="header">
             <h1>页面管理</h1>
             <button class="btn" id="newPageBtn">+ 新建页面</button>
         </div>
+        
         <div class="card">
-            <table id="pagesTable">
-                <thead><tr><th>路径</th><th>标题</th><th>状态</th><th>操作</th></tr></thead>
+            <table class="pages-table" id="pagesTable">
+                <thead>
+                    <tr>
+                        <th>路径</th>
+                        <th>标题</th>
+                        <th>状态</th>
+                        <th style="width: 140px;">操作</th>
+                    </tr>
+                </thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
 
+    <!-- 新建/编辑弹窗 -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle">新建页面</h3>
             <input type="hidden" id="pageId">
-            <input type="text" id="pagePath" placeholder="路径 (例如 /about)">
-            <input type="text" id="pageTitleEn" placeholder="标题 (英文)">
+            <input type="text" id="pagePath" placeholder="路径 (例如 /about)" autocomplete="off">
+            <input type="text" id="pageTitleEn" placeholder="标题 (英文)" autocomplete="off">
             <select id="pageStatus">
                 <option value="1">已发布</option>
                 <option value="0">草稿</option>
             </select>
             <label>页面内容 (HTML/CSS/JS 代码)</label>
             <textarea id="pageContent" placeholder="输入你的 HTML 代码..."></textarea>
-            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <div class="modal-buttons">
                 <button class="btn" id="savePageBtn">保存</button>
                 <button class="btn" id="cancelModalBtn" style="background:#ccc; color:#333;">取消</button>
             </div>
         </div>
     </div>
 
-    <script>        
+    <script>
         let pages = [];
+        
         async function loadPages() {
-            const res = await fetch('/api/pages');
-            pages = await res.json();
+            try {
+                const res = await fetch('/api/pages');
+                pages = await res.json();
+                renderTable();
+            } catch(e) {
+                console.error('加载页面失败:', e);
+            }
+        }
+        
+        function renderTable() {
             const tbody = document.querySelector('#pagesTable tbody');
+            if (!pages.length) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:2rem; color:#999;">暂无页面，点击"新建页面"创建</td></tr>';
+                return;
+            }
+            
             tbody.innerHTML = pages.map(p => `
                 <tr>
-                    <td>${escapeHtml(p.path)}</td>
-                    <td>${escapeHtml(p.title_en)}</td>
+                    <td><code style="background:#f5f5f5; padding:0.2rem 0.5rem; border-radius:4px;">${escapeHtml(p.path)}</code></td>
+                    <td>${escapeHtml(p.title_en || '—')}</td>
                     <td><span class="status-badge ${p.status === 1 ? 'published' : 'draft'}">${p.status === 1 ? '已发布' : '草稿'}</span></td>
-                    <td><button class="btn-sm editBtn" data-id="${p.id}">编辑</button> <button class="btn-sm btn-danger deleteBtn" data-id="${p.id}">删除</button></td>
+                    <td>
+                        <button class="btn-sm btn-edit" data-id="${p.id}">编辑</button>
+                        <button class="btn-sm btn-delete" data-id="${p.id}">删除</button>
+                    </td>
                 </tr>
             `).join('');
-            document.querySelectorAll('.editBtn').forEach(btn => btn.addEventListener('click', () => editPage(parseInt(btn.dataset.id))));
-            document.querySelectorAll('.deleteBtn').forEach(btn => btn.addEventListener('click', () => deletePage(parseInt(btn.dataset.id))));
+            
+            // 绑定编辑按钮事件
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    window.location.href = `/admin/editor.html?id=${id}`;
+                });
+            });
+            
+            // 绑定删除按钮事件
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', () => deletePage(parseInt(btn.getAttribute('data-id'))));
+            });
         }
-        async function editPage(id) {
-            const res = await fetch(`/api/pages?id=${id}`);
-            const page = await res.json();
-            document.getElementById('modalTitle').textContent = '编辑页面';
-            document.getElementById('pageId').value = page.id;
-            document.getElementById('pagePath').value = page.path;
-            document.getElementById('pageTitleEn').value = page.title_en || '';
-            document.getElementById('pageStatus').value = page.status;
-            document.getElementById('pageContent').value = page.content || '';
-            document.getElementById('modal').style.display = 'flex';
-        }
+        
         async function deletePage(id) {
-            if (!confirm('确定删除这个页面吗？')) return;
-            await fetch('/api/pages', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-            loadPages();
+            if (!confirm('确定删除这个页面吗？删除后无法恢复。')) return;
+            try {
+                await fetch('/api/pages', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                loadPages();
+            } catch(e) {
+                alert('删除失败');
+            }
         }
+        
         function openNewModal() {
             document.getElementById('modalTitle').textContent = '新建页面';
             document.getElementById('pageId').value = '';
@@ -146,7 +371,11 @@
             document.getElementById('pageContent').value = '';
             document.getElementById('modal').style.display = 'flex';
         }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        
         async function savePage() {
             const data = {
                 id: document.getElementById('pageId').value || null,
@@ -155,11 +384,30 @@
                 status: parseInt(document.getElementById('pageStatus').value),
                 content: document.getElementById('pageContent').value
             };
-            await fetch('/api/pages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            closeModal();
-            loadPages();
+            
+            if (!data.path) {
+                alert('请填写页面路径');
+                return;
+            }
+            
+            try {
+                await fetch('/api/pages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                closeModal();
+                loadPages();
+            } catch(e) {
+                alert('保存失败');
+            }
         }
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             loadPages();
             document.getElementById('newPageBtn').addEventListener('click', openNewModal);
