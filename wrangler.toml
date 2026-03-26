@@ -1,21 +1,17 @@
 # wrangler.toml for Cloudflare Pages
 name = "top-web-v3"
 compatibility_date = "2024-01-01"
-
-# 这个配置告诉 Pages 你的静态文件在哪里.
 pages_build_output_dir = "public"
 
-# D1 数据库绑定（变量名必须是大写 DB）
-[[d1_databases]]
-binding = "DB"
-database_name = "zhamit-db"
-database_id = "3743c3c4-acc3-48e9-8ce4-0f12be848a99"
+# 暂时注释掉 D1 和 R2 配置，改用手动绑定
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "zhamit-db"
+# database_id = "3743c3c4-acc3-48e9-8ce4-0f12be848a99"
 
-# R2 存储绑定
-[[r2_buckets]]
-binding = "ASSETS"
-bucket_name = "zhamit-assets"
+# [[r2_buckets]]
+# binding = "ASSETS"
+# bucket_name = "zhamit-assets"
 
-# 环境变量（生产环境）
 [env.production]
 vars = { ADMIN_PASSWORD = "zhamit2025" }
