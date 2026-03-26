@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片空间 - ZHAMIT 后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: #f5f5f5; }
+        .top-bar { background: #1a1a1a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .top-bar a { color: white; text-decoration: none; margin-left: 1rem; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 1rem; }
+        
+        /* 上传区域 */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1.5rem;
+        }
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: #1a1a1a;
+            background: #fafafa;
+        }
+        .upload-area input { display: none; }
+        
+        /* 图片网格 */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .media-item {
+            background: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            transition: transform 0.2s;
+        }
+        .media-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .media-item img { width: 100%; height: 150px; object-fit: cover; display: block; }
+        .media-info { padding: 0.75rem; font-size: 0.75rem; }
+        .media-name { color: #333; margin-bottom: 0.25rem; word-break: break-all; }
+        .media-size { color: #999; font-size: 0.7rem; margin-bottom: 0.5rem; }
+        .media-actions { display: flex; gap: 0.5rem; }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.7rem; cursor: pointer; border: none; border-radius: 4px; }
+        .btn-copy { background: #1a1a1a; color: white; }
+        .btn-delete { background: #d32f2f; color: white; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #1a1a1a; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; display: none; z-index: 1000; }
+        .loading { text-align: center; padding: 2rem; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h2>ZHAMIT 管理后台</h2>
+        <div>
+            <a href="/admin/pages.html">页面管理</a>
+            <a href="/admin/nav.html">导航菜单</a>
+            <a href="/admin/media.html">图片空间</a>
+            <a href="/admin/settings.html">站点设置</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1>图片空间</h1>
+        <div class="card">
+            <div class="upload-area" id="uploadArea">
+                <p>📸 点击或拖拽图片到此区域上传</p>
+                <p style="font-size: 0.8rem; color: #999; margin-top: 0.5rem;">支持 JPG, PNG, GIF, WebP，单张不超过 10MB</p>
+                <input type="file" id="fileInput" accept="image/*" multiple>
+            </div>
+            
+            <div id="mediaGrid" class="media-grid">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast">链接已复制</div>
+    
+    <script>
+        let mediaList = [];
+        
+        // 加载图片列表
+        async function loadMedia() {
+            const grid = document.getElementById('mediaGrid');
+            grid.innerHTML = '<div class="loading">加载中...</div>';
+            try {
+                const res = await fetch('/api/media');
+                mediaList = await res.json();
+                renderGrid();
+            } catch(e) {
+                grid.innerHTML = '<div class="loading">加载失败，请刷新重试</div>';
+            }
+        }
+        
+        // 渲染图片网格
+        function renderGrid() {
+            const grid = document.getElementById('mediaGrid');
+            if (mediaList.length === 0) {
+                grid.innerHTML = '<div class="loading">暂无图片，点击上方区域上传</div>';
+                return;
+            }
+            
+            grid.innerHTML = mediaList.map(item => `
+                <div class="media-item" data-id="${item.id}" data-filename="${item.filename}" data-url="${item.url}">
+                    <img src="${item.url}" alt="${item.original_name}" loading="lazy">
+                    <div class="media-info">
+                        <div class="media-name" title="${item.original_name}">${item.original_name.substring(0, 30)}${item.original_name.length > 30 ? '...' : ''}</div>
+                        <div class="media-size">${formatSize(item.size)}</div>
+                        <div class="media-actions">
+                            <button class="btn-sm btn-copy" onclick="copyUrl('${item.url}')">复制链接</button>
+                            <button class="btn-sm btn-delete" onclick="deleteMedia(${item.id}, '${item.filename}')">删除</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 复制链接
+        function copyUrl(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2000);
+            });
+        }
+        
+        // 删除图片
+        async function deleteMedia(id, filename) {
+            if (!confirm('确定删除这张图片吗？')) return;
+            const res = await fetch('/api/media', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, filename })
+            });
+            if (res.ok) {
+                loadMedia();
+            } else {
+                alert('删除失败');
+            }
+        }
+        
+        // 上传图片
+        async function uploadFiles(files) {
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) {
+                    alert(`文件 ${file.name} 不是图片格式`);
+                    continue;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`文件 ${file.name} 超过 10MB`);
+                    continue;
+                }
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const res = await fetch('/api/media', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (res.ok) {
+                        loadMedia();
+                    } else {
+                        alert(`上传 ${file.name} 失败`);
+                    }
+                } catch(e) {
+                    alert(`上传 ${file.name} 失败`);
+                }
+            }
+        }
+        
+        // 格式化文件大小
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        // 拖拽上传
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = Array.from(e.dataTransfer.files);
+            uploadFiles(files);
+        });
+        fileInput.addEventListener('change', (e) => {
+            uploadFiles(Array.from(e.target.files));
+            fileInput.value = '';
+        });
+        
+        // 初始化
+        loadMedia();
+    </script>
+</body>
+</html>
