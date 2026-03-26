@@ -2,7 +2,7 @@
 name = "top-web-v3"
 compatibility_date = "2024-01-01"
 
-# 这个配置告诉 Pages 你的静态文件在哪里
+# 这个配置告诉 Pages 你的静态文件在哪里.
 pages_build_output_dir = "public"
 
 # D1 数据库绑定（变量名必须是大写 DB）
