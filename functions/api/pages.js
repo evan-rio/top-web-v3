@@ -10,16 +10,37 @@ export async function onRequest(context) {
   const method = request.method;
   
   // GET 请求 - 获取页面列表
-  if (method === 'GET') {
-    try {
-      const stmt = env.DB.prepare('SELECT id, path, title_en, status FROM pages ORDER BY created_at DESC');
-      const rows = await stmt.all();
-      return Response.json(rows.results || []);
-    } catch (err) {
-      console.error('GET pages error:', err);
-      return Response.json({ error: err.message }, { status: 500 });
+  // GET 请求 - 获取页面列表或单个页面
+if (method === 'GET') {
+  const url = new URL(request.url);
+  const id = url.searchParams.get('id');
+  const path = url.searchParams.get('path');
+  
+  try {
+    // 按 ID 查询
+    if (id) {
+      const stmt = env.DB.prepare('SELECT * FROM pages WHERE id = ?');
+      const page = await stmt.bind(parseInt(id)).first();
+      return Response.json(page);
     }
+    
+    // 按路径查询
+    if (path) {
+      const stmt = env.DB.prepare('SELECT * FROM pages WHERE path = ?');
+      const page = await stmt.bind(path).first();
+      return Response.json(page);
+    }
+    
+    // 获取所有页面列表
+    const stmt = env.DB.prepare('SELECT id, path, title_en, status FROM pages ORDER BY created_at DESC');
+    const rows = await stmt.all();
+    return Response.json(rows.results || []);
+    
+  } catch (err) {
+    console.error('GET pages error:', err);
+    return Response.json({ error: err.message }, { status: 500 });
   }
+}
   
   // POST 请求 - 创建或更新页面（需要登录）
   if (method === 'POST') {
