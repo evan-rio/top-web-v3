@@ -9,7 +9,7 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "zhamit-db"
-database_id = "你的 D1 数据库 ID"
+database_id = "3743c3c4-acc3-48e9-8ce4-0f12be848a99"
 
 # R2 存储绑定
 [[r2_buckets]]
