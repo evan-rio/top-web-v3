@@ -1,4 +1,18 @@
-<!DOCTYPE html>
+
+// 检查登录状态
+async function checkAuth() {
+    try {
+        const res = await fetch('/api/auth/check');  // 我们会创建这个 API
+        if (!res.ok) {
+            window.location.href = '/admin/login.html';
+        }
+    } catch(e) {
+        window.location.href = '/admin/login.html';
+    }
+}
+
+// 页面加载时检查
+checkAuth();<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
