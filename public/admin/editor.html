@@ -27,7 +27,6 @@
             overflow: hidden;
         }
         
-        /* 顶部栏 */
         .top-bar {
             background: #fff;
             border-bottom: 1px solid #e8e8e8;
@@ -78,14 +77,12 @@
         }
         .btn-primary:hover { background: #4096ff; }
         
-        /* 主布局 */
         .editor-layout {
             display: flex;
             margin-top: 56px;
             height: calc(100vh - 56px);
         }
         
-        /* 左侧模块库 */
         .module-library {
             width: 260px;
             background: #fff;
@@ -121,7 +118,6 @@
         .module-icon { font-size: 24px; margin-bottom: 8px; }
         .module-name { font-size: 12px; color: #666; }
         
-        /* 中间画布区 */
         .canvas-area {
             flex: 1;
             display: flex;
@@ -156,7 +152,6 @@
             padding: 24px;
         }
         
-        /* 模块样式 */
         .module-item {
             position: relative;
             margin-bottom: 20px;
@@ -202,7 +197,6 @@
             cursor: pointer;
         }
         
-        /* 编辑弹窗 */
         .modal {
             display: none;
             position: fixed;
@@ -275,7 +269,6 @@
             margin-bottom: 12px;
         }
         
-        /* 提示消息 */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -311,7 +304,6 @@
     </div>
     
     <div class="editor-layout">
-        <!-- 左侧模块库 -->
         <div class="module-library">
             <div class="library-title">📦 模块库（拖拽添加）</div>
             <div class="module-grid">
@@ -324,7 +316,6 @@
             </div>
         </div>
         
-        <!-- 中间画布区 -->
         <div class="canvas-area">
             <div class="canvas-toolbar">
                 <span>✨ 鼠标悬停模块显示操作栏</span>
@@ -336,7 +327,7 @@
         </div>
     </div>
     
-    <!-- 编辑弹窗（样式编辑） -->
+    <!-- 样式编辑弹窗 -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle">编辑模块</h3>
@@ -348,7 +339,7 @@
         </div>
     </div>
     
-    <!-- 代码编辑弹窗（单独模块的源代码） -->
+    <!-- 代码编辑弹窗 -->
     <div id="codeModal" class="modal">
         <div class="modal-content">
             <h3>编辑模块源代码</h3>
@@ -377,7 +368,6 @@
         let currentCodeIndex = null;
         let sortable = null;
         
-        // 模块模板
         const templates = {
             text: { type: 'text', content: '双击编辑文字', styles: { color: '#333', fontSize: '14px', fontWeight: 'normal', textDecoration: 'none' } },
             heading: { type: 'heading', content: '新标题', level: 'h2', styles: { color: '#333', fontSize: '24px', fontWeight: 'bold' } },
@@ -387,8 +377,11 @@
             richText: { type: 'richText', content: '<p>这里是富文本内容，支持<strong>加粗</strong>和<em>斜体</em></p>' }
         };
         
-        // 生成模块HTML
-        function renderModuleContent(mod) {
+        // 生成模块HTML - 优先使用 customHtml
+        function getModuleHtml(mod) {
+            if (mod.customHtml) {
+                return mod.customHtml;
+            }
             switch(mod.type) {
                 case 'text':
                     return `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '14px'}; font-weight:${mod.styles?.fontWeight || 'normal'}; text-decoration:${mod.styles?.textDecoration || 'none'};">${escapeHtml(mod.content || '')}</div>`;
@@ -408,6 +401,13 @@
             }
         }
         
+        // 从 HTML 字符串中解析图片的宽度（用于编辑弹窗回显）
+        function extractWidthFromHtml(html) {
+            const match = html.match(/width:\s*([^;]+)/);
+            if (match) return match[1].trim();
+            return '100%';
+        }
+        
         // 渲染画布
         function renderCanvas() {
             const canvas = document.getElementById('canvas');
@@ -417,7 +417,7 @@
             }
             
             canvas.innerHTML = modules.map((mod, idx) => {
-                const contentHtml = renderModuleContent(mod);
+                const contentHtml = getModuleHtml(mod);
                 return `<div class="module-item" data-index="${idx}">
                     <div class="module-toolbar">
                         <button class="toolbar-edit" data-index="${idx}" data-action="edit">✏️ 样式</button>
@@ -433,7 +433,6 @@
                 </div>`;
             }).join('');
             
-            // 绑定工具栏事件
             document.querySelectorAll('.module-toolbar button').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -443,7 +442,6 @@
                 });
             });
             
-            // 点击模块内容也可编辑样式
             document.querySelectorAll('.module-content').forEach(el => {
                 el.addEventListener('click', (e) => {
                     const idx = parseInt(el.dataset.index);
@@ -451,7 +449,6 @@
                 });
             });
             
-            // 初始化拖拽排序
             if (sortable) sortable.destroy();
             sortable = new Sortable(canvas, {
                 animation: 150,
@@ -468,7 +465,6 @@
             });
         }
         
-        // 模块操作
         function handleModuleAction(idx, action) {
             if (action === 'edit') {
                 openEditModal(idx);
@@ -476,6 +472,8 @@
                 openCodeModal(idx);
             } else if (action === 'copy') {
                 const newModule = JSON.parse(JSON.stringify(modules[idx]));
+                // 复制时清除 customHtml，让它重新用模板生成
+                delete newModule.customHtml;
                 if (newModule.type === 'text' || newModule.type === 'heading') {
                     newModule.content = (newModule.content || '') + ' (副本)';
                 } else if (newModule.type === 'button') {
@@ -497,7 +495,6 @@
             }
         }
         
-        // 打开样式编辑弹窗
         function openEditModal(index) {
             currentEditIndex = index;
             const mod = modules[index];
@@ -521,10 +518,15 @@
                     html += `<div class="form-group"><label>标题级别</label><select id="editLevel"><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option></select></div>`;
                 }
             } else if (mod.type === 'image') {
+                // 如果有 customHtml，尝试从中提取宽度
+                let currentWidth = mod.width || '100%';
+                if (mod.customHtml) {
+                    currentWidth = extractWidthFromHtml(mod.customHtml);
+                }
                 html = `
                     <div class="form-group"><label>图片地址</label><input type="text" id="editSrc" value="${escapeHtml(mod.src || '')}"></div>
                     <div class="form-group"><label>替代文字</label><input type="text" id="editAlt" value="${escapeHtml(mod.alt || '')}"></div>
-                    <div class="form-group"><label>宽度</label><input type="text" id="editWidth" value="${mod.width || '100%'}"></div>`;
+                    <div class="form-group"><label>宽度</label><input type="text" id="editWidth" value="${currentWidth}"></div>`;
             } else if (mod.type === 'button') {
                 html = `
                     <div class="form-group"><label>按钮文字</label><input type="text" id="editText" value="${escapeHtml(mod.text || '')}"></div>
@@ -541,7 +543,6 @@
             
             fieldsDiv.innerHTML = html;
             
-            // 设置当前值
             setTimeout(() => {
                 if (mod.type === 'text' || mod.type === 'heading') {
                     if (document.getElementById('editFontWeight')) document.getElementById('editFontWeight').value = mod.styles?.fontWeight || 'normal';
@@ -553,16 +554,14 @@
             document.getElementById('editModal').style.display = 'flex';
         }
         
-        // 打开代码编辑弹窗（单独模块的源代码）
         function openCodeModal(index) {
             currentCodeIndex = index;
             const mod = modules[index];
-            const currentHtml = renderModuleContent(mod);
+            const currentHtml = getModuleHtml(mod);
             document.getElementById('codeEditorContent').value = currentHtml;
             document.getElementById('codeModal').style.display = 'flex';
         }
         
-        // 保存样式编辑
         function saveModuleEdit() {
             if (currentEditIndex === null) return;
             const mod = modules[currentEditIndex];
@@ -578,10 +577,13 @@
                 if (mod.type === 'heading') {
                     mod.level = document.getElementById('editLevel')?.value || 'h2';
                 }
+                // 样式编辑后清除 customHtml，使用模板渲染
+                delete mod.customHtml;
             } else if (mod.type === 'image') {
                 mod.src = document.getElementById('editSrc')?.value || '';
                 mod.alt = document.getElementById('editAlt')?.value || '';
                 mod.width = document.getElementById('editWidth')?.value || '100%';
+                delete mod.customHtml;
             } else if (mod.type === 'button') {
                 mod.text = document.getElementById('editText')?.value || '';
                 mod.url = document.getElementById('editUrl')?.value || '#';
@@ -591,10 +593,13 @@
                     padding: '8px 20px',
                     borderRadius: '6px'
                 };
+                delete mod.customHtml;
             } else if (mod.type === 'richText') {
                 mod.content = document.getElementById('editRichContent')?.value || '';
+                delete mod.customHtml;
             } else if (mod.type === 'divider') {
                 mod.styles.backgroundColor = document.getElementById('editDividerColor')?.value || '#e8e8e8';
+                delete mod.customHtml;
             }
             
             closeEditModal();
@@ -602,17 +607,21 @@
             showToast('模块已更新');
         }
         
-        // 保存代码编辑
         function saveCodeEdit() {
             if (currentCodeIndex === null) return;
             const newHtml = document.getElementById('codeEditorContent').value;
             const mod = modules[currentCodeIndex];
             
-            // 将模块标记为自定义HTML模式
-            mod.isCustomHtml = true;
+            // 保存自定义 HTML
             mod.customHtml = newHtml;
-            // 同时更新渲染方式
-            mod.rawHtml = newHtml;
+            
+            // 如果是图片模块，尝试从 HTML 中提取 src 和 width 以便下次编辑时回显
+            if (mod.type === 'image') {
+                const srcMatch = newHtml.match(/src="([^"]+)"/);
+                if (srcMatch) mod.src = srcMatch[1];
+                const widthMatch = newHtml.match(/width:\s*([^;]+)/);
+                if (widthMatch) mod.width = widthMatch[1].trim();
+            }
             
             closeCodeModal();
             renderCanvas();
@@ -629,7 +638,6 @@
             currentCodeIndex = null;
         }
         
-        // 添加模块
         function addModule(type) {
             const newModule = JSON.parse(JSON.stringify(templates[type]));
             modules.push(newModule);
@@ -637,7 +645,6 @@
             showToast(`已添加${type === 'text' ? '文字' : type === 'heading' ? '标题' : type === 'image' ? '图片' : type === 'button' ? '按钮' : type === 'divider' ? '分隔线' : '富文本'}模块`);
         }
         
-        // 拖拽添加
         function setupDragDrop() {
             const draggables = document.querySelectorAll('[draggable="true"]');
             draggables.forEach(el => {
@@ -654,17 +661,10 @@
             });
         }
         
-        // 生成最终HTML
         function modulesToHtml() {
-            return modules.map(mod => {
-                if (mod.isCustomHtml && mod.customHtml) {
-                    return mod.customHtml;
-                }
-                return renderModuleContent(mod);
-            }).join('\n');
+            return modules.map(mod => getModuleHtml(mod)).join('\n');
         }
         
-        // 预览
         function preview() {
             const modal = document.getElementById('previewModal');
             const iframe = document.getElementById('previewFrame');
@@ -673,7 +673,6 @@
             modal.style.display = 'block';
         }
         
-        // 保存
         async function savePage() {
             const content = modulesToHtml();
             const urlParams = new URLSearchParams(window.location.search);
@@ -721,7 +720,6 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
         
-        // 加载已有页面内容
         async function loadExistingPage() {
             const urlParams = new URLSearchParams(window.location.search);
             const pageId = urlParams.get('id');
@@ -730,13 +728,11 @@
                 const res = await fetch(`/api/pages?id=${pageId}`);
                 const page = await res.json();
                 if (page && page.content) {
-                    // 简单解析：如果是HTML，可以尝试解析成模块，这里先保留原内容
                     showToast('已加载页面，当前编辑器新建内容会覆盖原有内容');
                 }
             } catch(e) {}
         }
         
-        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             loadExistingPage();
             setupDragDrop();
