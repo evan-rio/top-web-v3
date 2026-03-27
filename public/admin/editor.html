@@ -662,16 +662,72 @@
         }
         
         function modulesToHtml() {
-            return modules.map(mod => getModuleHtml(mod)).join('\n');
-        }
+    const modulesHtml = modules.map(mod => getModuleHtml(mod)).join('\n');
+    
+    // 包裹响应式容器
+    return `
+    <div class="zhamit-page-container" style="max-width: 100%; margin: 0 auto; padding: 0 16px; box-sizing: border-box;">
+        <style>
+            .zhamit-page-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 16px;
+                box-sizing: border-box;
+            }
+            .zhamit-page-container img {
+                max-width: 100%;
+                height: auto;
+            }
+            .zhamit-page-container .rich-text {
+                overflow-x: auto;
+            }
+            @media (max-width: 768px) {
+                .zhamit-page-container {
+                    padding: 0 12px;
+                }
+                .zhamit-page-container [style*="width:"] {
+                        max-width: 100% !important;
+                    }
+                }
+            }
+        </style>
+        ${modulesHtml}
+    </div>
+    `;
+}
         
         function preview() {
-            const modal = document.getElementById('previewModal');
-            const iframe = document.getElementById('previewFrame');
-            const content = modulesToHtml();
-            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0; padding:20px; font-family:system-ui;}</style></head><body>${content || '<p>暂无内容</p>'}</body></html>`;
-            modal.style.display = 'block';
-        }
+    const modal = document.getElementById('previewModal');
+    const iframe = document.getElementById('previewFrame');
+    const content = modulesToHtml();
+    iframe.srcdoc = `<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                line-height: 1.5;
+                background: #fff;
+            }
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+        </style>
+    </head>
+    <body>
+        ${content || '<p style="text-align:center; padding:40px; color:#999;">暂无内容</p>'}
+    </body>
+    </html>`;
+    modal.style.display = 'block';
+}
         
         async function savePage() {
             const content = modulesToHtml();
