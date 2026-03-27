@@ -41,10 +41,6 @@
                 height: 80px;
             }
 
-            .logo-area {
-                flex-shrink: 0;
-            }
-
             .company-name {
                 font-size: 24px;
                 font-weight: 700;
@@ -149,6 +145,7 @@
                 color: #333;
                 text-decoration: none;
                 font-size: 14px;
+                cursor: pointer;
             }
 
             .lang-menu a:hover {
@@ -202,7 +199,6 @@
                 padding: 6px 0;
             }
 
-            /* 下导航 - 参考 TAKT 风格 */
             .footer-nav {
                 background: #f8f8f8;
                 padding: 60px 40px 40px;
@@ -407,7 +403,6 @@
                 fill: none;
             }
 
-            /* 侧滑菜单 */
             .side-menu {
                 position: fixed;
                 top: 0;
@@ -551,7 +546,6 @@
                 font-size: 13px;
             }
 
-            /* 手机端底部导航 - 参考 TAKT 风格 */
             .footer-nav {
                 background: #f8f8f8;
                 padding: 40px 20px 24px;
@@ -623,10 +617,10 @@
                             🌐 <span id="currentLangDesktop">EN</span>
                         </button>
                         <div class="lang-menu" id="langMenuDesktop">
-                            <a href="#" data-lang="en">English</a>
-                            <a href="#" data-lang="zh">中文</a>
-                            <a href="#" data-lang="es">Español</a>
-                            <a href="#" data-lang="ar">العربية</a>
+                            <a data-lang="en">English</a>
+                            <a data-lang="zh">中文</a>
+                            <a data-lang="es">Español</a>
+                            <a data-lang="ar">العربية</a>
                         </div>
                     </div>
                     <div class="search-wrapper">
@@ -732,7 +726,8 @@
                     contact: 'Contact',
                     email: 'info@zhamit.com',
                     phone: '+86 579 12345678'
-                }
+                },
+                searchPlaceholder: 'Search...'
             },
             zh: {
                 company: '哲觅贸易',
@@ -751,7 +746,8 @@
                     contact: '联系方式',
                     email: 'info@zhamit.com',
                     phone: '+86 579 12345678'
-                }
+                },
+                searchPlaceholder: '搜索...'
             },
             es: {
                 company: 'ZHAMIT',
@@ -770,7 +766,8 @@
                     contact: 'Contacto',
                     email: 'info@zhamit.com',
                     phone: '+86 579 12345678'
-                }
+                },
+                searchPlaceholder: 'Buscar...'
             },
             ar: {
                 company: 'ZHAMIT',
@@ -789,39 +786,40 @@
                     contact: 'اتصل بنا',
                     email: 'info@zhamit.com',
                     phone: '+86 579 12345678'
-                }
+                },
+                searchPlaceholder: 'بحث...'
             }
         };
 
         let currentLang = 'en';
         let navData = [];
 
-        // 获取当前语言（从 URL 路径或 Cookie）
+        // 检测浏览器语言
         function detectLanguage() {
-            const path = window.location.pathname;
-            const pathMatch = path.match(/^\/(en|zh|es|ar)\//);
-            if (pathMatch) {
-                return pathMatch[1];
-            }
             const cookieMatch = document.cookie.match(/lang=([^;]+)/);
             if (cookieMatch && translations[cookieMatch[1]]) {
                 return cookieMatch[1];
             }
-            // 根据浏览器语言自动检测
             const browserLang = navigator.language.split('-')[0];
             if (translations[browserLang]) return browserLang;
             return 'en';
         }
 
-        // 切换语言
+        // 切换语言（不改变 URL）
         function setLanguage(lang) {
+            if (!translations[lang]) return;
             currentLang = lang;
             document.cookie = `lang=${lang}; path=/; max-age=2592000`;
-            
-            // 更新 URL 路径（保持当前页面路径）
-            let newPath = `/${lang}${window.location.pathname.replace(/^\/[a-z]{2}\//, '/')}`;
-            if (newPath === `/${lang}/`) newPath = `/${lang}`;
-            window.location.href = newPath;
+            renderContent();
+            renderNavMenus(); // 重新渲染导航（因为导航链接可能需要语言前缀）
+            updateSearchPlaceholder();
+        }
+
+        // 更新搜索框占位符
+        function updateSearchPlaceholder() {
+            const t = translations[currentLang];
+            const desktopInput = document.getElementById('searchInputDesktop');
+            if (desktopInput) desktopInput.placeholder = t.searchPlaceholder || 'Search...';
         }
 
         // 渲染所有内容
@@ -868,8 +866,8 @@
                         </div>
                         <div class="footer-col">
                             <h4>${escapeHtml(t.footer.quickLinks)}</h4>
-                            <a href="/${currentLang}/about">${escapeHtml(t.footer.about)}</a>
-                            <a href="/${currentLang}/contact">${escapeHtml(t.footer.contact)}</a>
+                            <a href="/about">${escapeHtml(t.footer.about)}</a>
+                            <a href="/contact">${escapeHtml(t.footer.contact)}</a>
                         </div>
                         <div class="footer-col">
                             <h4>${escapeHtml(t.footer.contact)}</h4>
@@ -885,7 +883,7 @@
             langDisplays.forEach(el => { if (el) el.textContent = currentLang.toUpperCase(); });
         }
 
-        // 渲染导航菜单（从 API 加载）
+        // 渲染导航菜单
         async function loadNavData() {
             try {
                 const res = await fetch('/api/nav');
@@ -894,18 +892,19 @@
             } catch(e) {
                 // 默认导航
                 navData = [
-                    { id: 1, name: 'Home', url: `/${currentLang}`, parent_id: 0, sort_order: 1, location: 'top' },
+                    { id: 1, name: 'Home', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
                     { id: 2, name: 'Products', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
-                    { id: 3, name: 'Home Goods', url: `/${currentLang}/category/home`, parent_id: 2, sort_order: 1, location: 'top' },
-                    { id: 4, name: 'Kitchenware', url: `/${currentLang}/category/kitchen`, parent_id: 2, sort_order: 2, location: 'top' },
-                    { id: 5, name: 'About', url: `/${currentLang}/about`, parent_id: 0, sort_order: 3, location: 'top' },
-                    { id: 6, name: 'Contact', url: `/${currentLang}/contact`, parent_id: 0, sort_order: 4, location: 'top' }
+                    { id: 3, name: 'Home Goods', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
+                    { id: 4, name: 'Kitchenware', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
+                    { id: 5, name: 'About', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
+                    { id: 6, name: 'Contact', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' }
                 ];
                 renderNavMenus();
             }
         }
 
         function renderNavMenus() {
+            const t = translations[currentLang];
             // 电脑端顶部导航
             const desktopNav = document.getElementById('navMenu');
             if (desktopNav) {
@@ -956,7 +955,7 @@
             }
         }
 
-        // 手机端语言选择弹窗
+        // 手机端语言选择（弹窗）
         function setupMobileLang() {
             const mobileLangBtn = document.getElementById('mobileLangBtn');
             if (mobileLangBtn) {
@@ -979,7 +978,7 @@
             
             const doSearch = (query) => {
                 if (query && query.trim()) {
-                    window.location.href = `/${currentLang}/search?q=${encodeURIComponent(query.trim())}`;
+                    window.location.href = `/search?q=${encodeURIComponent(query.trim())}`;
                 }
             };
             
@@ -990,14 +989,15 @@
                 const searchIcon = document.getElementById('searchIconDesktop');
                 if (searchIcon) {
                     searchIcon.addEventListener('click', () => {
-                        const input = document.querySelector('#searchInputDesktop');
+                        const input = document.getElementById('searchInputDesktop');
                         if (input) doSearch(input.value);
                     });
                 }
             }
             if (mobileSearchBtn) {
                 mobileSearchBtn.addEventListener('click', () => {
-                    const query = prompt(translations[currentLang]?.searchPrompt || 'Search:');
+                    const t = translations[currentLang];
+                    const query = prompt(t.searchPlaceholder || 'Search:');
                     if (query) doSearch(query);
                 });
             }
@@ -1038,6 +1038,7 @@
         setupSearch();
         setupMobileMenu();
         setupDesktopLang();
+        updateSearchPlaceholder();
     </script>
 </body>
 </html>
