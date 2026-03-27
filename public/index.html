@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             line-height: 1.5;
             color: #1a1a1a;
             background: #fff;
@@ -20,12 +20,10 @@
 
         /* ========== 电脑端样式 (宽度 >= 768px) ========== */
         @media (min-width: 768px) {
-            /* 隐藏手机端元素 */
             .mobile-only {
                 display: none !important;
             }
 
-            /* 上导航 */
             .top-nav {
                 background: #1a1a1a;
                 position: sticky;
@@ -40,20 +38,20 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                height: 70px;
+                height: 80px;
             }
 
             .logo-area {
                 flex-shrink: 0;
             }
 
-            .logo-text {
-                font-size: 20px;
-                font-weight: 600;
+            .company-name {
+                font-size: 24px;
+                font-weight: 700;
                 color: white;
+                letter-spacing: 1px;
             }
 
-            /* 导航菜单 - 靠右排列 */
             .nav-menu {
                 display: flex;
                 gap: 32px;
@@ -69,18 +67,18 @@
             .nav-menu > li > a {
                 color: white;
                 text-decoration: none;
-                font-size: 15px;
+                font-size: 16px;
+                font-weight: 500;
                 padding: 8px 0;
                 display: block;
             }
 
-            /* 下拉菜单 */
             .nav-menu .dropdown {
                 position: absolute;
                 top: 100%;
                 left: 0;
                 background: white;
-                min-width: 160px;
+                min-width: 180px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                 border-radius: 8px;
                 opacity: 0;
@@ -96,7 +94,7 @@
 
             .dropdown a {
                 display: block;
-                padding: 10px 16px;
+                padding: 12px 16px;
                 color: #333;
                 text-decoration: none;
                 font-size: 14px;
@@ -106,26 +104,27 @@
                 background: #f5f5f5;
             }
 
-            /* 右侧工具栏 */
             .toolbar {
                 display: flex;
                 align-items: center;
-                gap: 16px;
+                gap: 20px;
             }
 
-            .lang-btn, .search-btn {
+            .lang-selector {
+                position: relative;
+            }
+
+            .lang-btn {
                 background: none;
                 border: none;
                 color: white;
                 cursor: pointer;
-                font-size: 18px;
-                padding: 6px;
+                font-size: 14px;
                 display: flex;
                 align-items: center;
-            }
-
-            .lang-dropdown {
-                position: relative;
+                gap: 6px;
+                padding: 6px 8px;
+                font-weight: 500;
             }
 
             .lang-menu {
@@ -137,129 +136,183 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                 display: none;
                 z-index: 100;
-                min-width: 100px;
+                min-width: 120px;
             }
 
-            .lang-dropdown:hover .lang-menu {
+            .lang-selector:hover .lang-menu {
                 display: block;
             }
 
             .lang-menu a {
                 display: block;
-                padding: 8px 16px;
+                padding: 10px 16px;
                 color: #333;
                 text-decoration: none;
-                font-size: 13px;
+                font-size: 14px;
             }
 
             .lang-menu a:hover {
                 background: #f5f5f5;
             }
 
-            .search-box {
+            .search-wrapper {
                 position: relative;
             }
 
-            .search-input {
+            .search-icon {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 6px;
+                display: flex;
+                align-items: center;
+            }
+
+            .search-icon svg {
+                width: 20px;
+                height: 20px;
+                stroke: white;
+                stroke-width: 1.5;
+                fill: none;
+            }
+
+            .search-input-container {
                 position: absolute;
                 right: 0;
                 top: 100%;
                 background: white;
-                border: 1px solid #ddd;
+                border: 1px solid #e0e0e0;
                 border-radius: 30px;
                 padding: 8px 16px;
-                width: 200px;
+                width: 240px;
                 display: none;
                 margin-top: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
 
-            .search-box:hover .search-input {
+            .search-wrapper:hover .search-input-container {
                 display: block;
             }
 
-            .search-input input {
+            .search-input-container input {
                 border: none;
                 outline: none;
                 width: 100%;
                 font-size: 14px;
+                padding: 6px 0;
             }
 
-            /* 下导航 */
-            .bottom-nav {
+            /* 下导航 - 参考 TAKT 风格 */
+            .footer-nav {
                 background: #f8f8f8;
-                padding: 40px 40px 20px;
-                margin-top: 60px;
+                padding: 60px 40px 40px;
+                margin-top: 80px;
                 border-top: 1px solid #e8e8e8;
             }
 
-            .bottom-nav .container {
+            .footer-nav .container {
                 max-width: 1400px;
                 margin: 0 auto;
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-start;
-            }
-
-            .bottom-logo span {
-                font-size: 18px;
-                font-weight: 600;
-                color: #333;
-            }
-
-            .bottom-menu {
-                display: flex;
+                flex-wrap: wrap;
                 gap: 48px;
-                list-style: none;
             }
 
-            .bottom-menu > li > a {
-                color: #333;
-                text-decoration: none;
-                font-weight: 500;
+            .footer-col {
+                flex: 1;
+                min-width: 160px;
+            }
+
+            .footer-col .footer-logo {
+                font-size: 20px;
+                font-weight: 700;
+                color: #1a1a1a;
+                margin-bottom: 16px;
+                display: inline-block;
+            }
+
+            .footer-col p {
+                color: #666;
                 font-size: 14px;
-            }
-
-            .bottom-submenu {
+                line-height: 1.6;
                 margin-top: 8px;
             }
 
-            .bottom-submenu a {
+            .footer-col h4 {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 16px;
+            }
+
+            .footer-col a {
                 display: block;
                 color: #666;
                 text-decoration: none;
-                font-size: 12px;
-                margin-top: 8px;
+                font-size: 14px;
+                margin-bottom: 12px;
+                transition: color 0.2s;
             }
 
-            /* 内容区 */
+            .footer-col a:hover {
+                color: #1a1a1a;
+            }
+
+            .footer-bottom {
+                max-width: 1400px;
+                margin: 40px auto 0;
+                padding-top: 24px;
+                border-top: 1px solid #e8e8e8;
+                text-align: center;
+                font-size: 13px;
+                color: #999;
+            }
+
             .hero {
-                padding: 80px 20px;
+                padding: 100px 20px;
                 text-align: center;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
             }
 
-            .hero h1 { font-size: 48px; margin-bottom: 16px; }
-            .hero p { font-size: 18px; }
+            .hero h1 {
+                font-size: 56px;
+                font-weight: 700;
+                margin-bottom: 20px;
+                letter-spacing: -0.5px;
+            }
+
+            .hero p {
+                font-size: 18px;
+                opacity: 0.9;
+                max-width: 600px;
+                margin: 0 auto;
+            }
 
             .products {
-                padding: 60px 40px;
+                padding: 80px 40px;
                 max-width: 1400px;
                 margin: 0 auto;
             }
 
-            .products h2 { text-align: center; margin-bottom: 40px; font-size: 32px; }
+            .products h2 {
+                text-align: center;
+                font-size: 36px;
+                font-weight: 600;
+                margin-bottom: 48px;
+            }
 
             .product-grid {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
-                gap: 30px;
+                gap: 40px;
             }
 
             .product-card {
                 background: #f9f9f9;
-                border-radius: 12px;
-                padding: 32px 24px;
+                border-radius: 16px;
+                padding: 40px 24px;
                 text-align: center;
                 transition: transform 0.2s;
             }
@@ -268,27 +321,24 @@
                 transform: translateY(-4px);
             }
 
-            .product-card h3 { font-size: 20px; margin-bottom: 12px; }
-            .product-card p { color: #666; font-size: 14px; }
+            .product-card h3 {
+                font-size: 22px;
+                font-weight: 600;
+                margin-bottom: 12px;
+            }
 
-            .copyright {
-                text-align: center;
-                padding: 20px;
-                font-size: 12px;
-                color: #999;
-                background: #f8f8f8;
-                border-top: 1px solid #e8e8e8;
+            .product-card p {
+                color: #666;
+                font-size: 15px;
             }
         }
 
-        /* ========== 手机端样式 (宽度 <= 767px) ========== */
+        /* ========== 手机端样式 ========== */
         @media (max-width: 767px) {
-            /* 隐藏电脑端元素 */
             .desktop-only {
                 display: none !important;
             }
 
-            /* 上导航 */
             .top-nav {
                 background: #1a1a1a;
                 position: sticky;
@@ -322,14 +372,14 @@
             }
 
             .mobile-logo {
-                font-size: 18px;
-                font-weight: 600;
+                font-size: 20px;
+                font-weight: 700;
                 color: white;
             }
 
             .mobile-toolbar {
                 display: flex;
-                gap: 12px;
+                gap: 16px;
                 align-items: center;
             }
 
@@ -337,9 +387,24 @@
                 background: none;
                 border: none;
                 color: white;
-                font-size: 18px;
                 cursor: pointer;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
                 padding: 4px;
+            }
+
+            .mobile-lang-btn span {
+                font-size: 12px;
+            }
+
+            .mobile-search-btn svg {
+                width: 18px;
+                height: 18px;
+                stroke: white;
+                stroke-width: 1.5;
+                fill: none;
             }
 
             /* 侧滑菜单 */
@@ -438,54 +503,105 @@
                 font-size: 16px;
             }
 
-            /* 内容区 */
             .hero {
-                padding: 40px 20px;
+                padding: 60px 20px;
                 text-align: center;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
             }
 
-            .hero h1 { font-size: 28px; margin-bottom: 12px; }
-            .hero p { font-size: 14px; }
+            .hero h1 {
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 12px;
+            }
+
+            .hero p {
+                font-size: 14px;
+                opacity: 0.9;
+            }
 
             .products {
-                padding: 32px 16px;
+                padding: 48px 16px;
             }
 
             .products h2 {
                 text-align: center;
+                font-size: 24px;
+                font-weight: 600;
                 margin-bottom: 24px;
-                font-size: 20px;
             }
 
             .product-card {
                 background: #f9f9f9;
                 border-radius: 12px;
-                padding: 20px;
+                padding: 24px 16px;
                 margin-bottom: 16px;
                 text-align: center;
             }
 
             .product-card h3 {
+                font-size: 18px;
+                font-weight: 600;
                 margin-bottom: 8px;
             }
 
             .product-card p {
                 color: #666;
-                font-size: 14px;
+                font-size: 13px;
             }
 
-            /* 手机端底部 - 只有备案信息 */
-            .mobile-bottom {
+            /* 手机端底部导航 - 参考 TAKT 风格 */
+            .footer-nav {
                 background: #f8f8f8;
-                padding: 20px 16px;
-                margin-top: 40px;
-                text-align: center;
-                border-top: 1px solid #e8e8e8;
+                padding: 40px 20px 24px;
+                margin-top: 48px;
             }
 
-            .mobile-bottom .copyright {
+            .footer-nav .container {
+                display: flex;
+                flex-direction: column;
+                gap: 32px;
+            }
+
+            .footer-col {
+                text-align: center;
+            }
+
+            .footer-col .footer-logo {
+                font-size: 20px;
+                font-weight: 700;
+                color: #1a1a1a;
+                margin-bottom: 12px;
+                display: inline-block;
+            }
+
+            .footer-col p {
+                color: #666;
+                font-size: 13px;
+                margin-top: 4px;
+            }
+
+            .footer-col h4 {
+                font-size: 15px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 12px;
+            }
+
+            .footer-col a {
+                display: block;
+                color: #666;
+                text-decoration: none;
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+
+            .footer-bottom {
+                text-align: center;
+                padding-top: 24px;
+                margin-top: 24px;
+                border-top: 1px solid #e8e8e8;
                 font-size: 11px;
                 color: #999;
             }
@@ -493,83 +609,82 @@
     </style>
 </head>
 <body>
-    <!-- ========== 电脑端内容 ========== -->
+    <!-- ========== 电脑端 ========== -->
     <div class="desktop-only">
-        <!-- 上导航 -->
         <div class="top-nav">
             <div class="container">
-                <div class="logo-area" id="desktopLogo">
-                    <span class="logo-text">ZHAMIT</span>
+                <div class="logo-area">
+                    <span class="company-name" id="companyName">ZHAMIT</span>
                 </div>
-                <ul class="nav-menu" id="desktopNavMenu"></ul>
+                <ul class="nav-menu" id="navMenu"></ul>
                 <div class="toolbar">
-                    <div class="lang-dropdown">
-                        <button class="lang-btn">🌐</button>
-                        <div class="lang-menu">
+                    <div class="lang-selector">
+                        <button class="lang-btn" id="langBtnDesktop">
+                            🌐 <span id="currentLangDesktop">EN</span>
+                        </button>
+                        <div class="lang-menu" id="langMenuDesktop">
                             <a href="#" data-lang="en">English</a>
+                            <a href="#" data-lang="zh">中文</a>
                             <a href="#" data-lang="es">Español</a>
                             <a href="#" data-lang="ar">العربية</a>
                         </div>
                     </div>
-                    <div class="search-box">
-                        <button class="search-btn">🔍</button>
-                        <div class="search-input">
-                            <input type="text" id="desktopSearchInput" placeholder="搜索...">
+                    <div class="search-wrapper">
+                        <button class="search-icon" id="searchIconDesktop">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none">
+                                <circle cx="10" cy="10" r="7" />
+                                <line x1="15" y1="15" x2="21" y2="21" />
+                            </svg>
+                        </button>
+                        <div class="search-input-container">
+                            <input type="text" id="searchInputDesktop" placeholder="Search...">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 主内容 -->
         <main>
             <section class="hero">
-                <h1>ZHAMIT</h1>
-                <p>专业家居贸易公司 · 源自中国义乌</p>
+                <h1 id="heroTitle">ZHAMIT</h1>
+                <p id="heroSubtitle">专业家居贸易公司 · 源自中国义乌</p>
             </section>
             <section class="products">
-                <h2>精选产品</h2>
-                <div class="product-grid">
-                    <div class="product-card"><h3>家居用品</h3><p>高品质家居好物，现货供应</p></div>
-                    <div class="product-card"><h3>厨房用品</h3><p>实用美观，可定制包装</p></div>
-                    <div class="product-card"><h3>装饰摆件</h3><p>限量款式，每周更新</p></div>
-                </div>
+                <h2 id="productsTitle">精选产品</h2>
+                <div class="product-grid" id="productGrid"></div>
             </section>
         </main>
 
-        <!-- 下导航 -->
-        <div class="bottom-nav">
-            <div class="container">
-                <div class="bottom-logo" id="desktopBottomLogo">
-                    <span>ZHAMIT</span>
-                </div>
-                <ul class="bottom-menu" id="desktopBottomMenu"></ul>
+        <div class="footer-nav">
+            <div class="container" id="footerNav"></div>
+            <div class="footer-bottom" id="footerCopyright">
+                © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
             </div>
-        </div>
-
-        <!-- 版权 -->
-        <div class="copyright">
-            © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
         </div>
     </div>
 
-    <!-- ========== 手机端内容 ========== -->
+    <!-- ========== 手机端 ========== -->
     <div class="mobile-only">
-        <!-- 上导航 -->
         <div class="top-nav">
             <button class="hamburger" id="hamburgerBtn">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <div class="mobile-logo" id="mobileLogo">ZHAMIT</div>
+            <div class="mobile-logo" id="mobileCompanyName">ZHAMIT</div>
             <div class="mobile-toolbar">
-                <button class="mobile-lang-btn" id="mobileLangBtn">🌐</button>
-                <button class="mobile-search-btn" id="mobileSearchBtn">🔍</button>
+                <button class="mobile-lang-btn" id="mobileLangBtn">
+                    🌐 <span id="mobileCurrentLang">EN</span>
+                </button>
+                <button class="mobile-search-btn" id="mobileSearchBtn">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none">
+                        <circle cx="10" cy="10" r="7" />
+                        <line x1="15" y1="15" x2="21" y2="21" />
+                    </svg>
+                </button>
             </div>
         </div>
 
-        <!-- 侧滑菜单 -->
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
                 <h3>菜单</h3>
@@ -578,140 +693,317 @@
             <div class="menu-list" id="mobileMenuList"></div>
         </div>
 
-        <!-- 主内容 -->
         <main>
             <section class="hero">
-                <h1>ZHAMIT</h1>
-                <p>专业家居贸易公司 · 源自中国义乌</p>
+                <h1 id="mobileHeroTitle">ZHAMIT</h1>
+                <p id="mobileHeroSubtitle">专业家居贸易公司 · 源自中国义乌</p>
             </section>
             <section class="products">
-                <h2>精选产品</h2>
-                <div class="product-grid">
-                    <div class="product-card"><h3>家居用品</h3><p>高品质家居好物，现货供应</p></div>
-                    <div class="product-card"><h3>厨房用品</h3><p>实用美观，可定制包装</p></div>
-                    <div class="product-card"><h3>装饰摆件</h3><p>限量款式，每周更新</p></div>
-                </div>
+                <h2 id="mobileProductsTitle">精选产品</h2>
+                <div class="product-grid" id="mobileProductGrid"></div>
             </section>
         </main>
 
-        <!-- 手机端底部 - 只有备案信息 -->
-        <div class="mobile-bottom">
-            <div class="copyright">
+        <div class="footer-nav">
+            <div class="container" id="mobileFooterNav"></div>
+            <div class="footer-bottom" id="mobileFooterCopyright">
                 © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
             </div>
         </div>
     </div>
 
     <script>
+        // 多语言文案
+        const translations = {
+            en: {
+                company: 'ZHAMIT',
+                heroTitle: 'ZHAMIT',
+                heroSubtitle: 'Professional Trading Company · From Yiwu, China',
+                productsTitle: 'Featured Products',
+                products: [
+                    { name: 'Home Goods', desc: 'High-quality home goods, in stock' },
+                    { name: 'Kitchenware', desc: 'Practical & beautiful, custom packaging available' },
+                    { name: 'Decorations', desc: 'Limited editions, updated weekly' }
+                ],
+                footer: {
+                    about: 'About ZHAMIT',
+                    aboutText: 'Professional trading company based in Yiwu, China',
+                    quickLinks: 'Quick Links',
+                    contact: 'Contact',
+                    email: 'info@zhamit.com',
+                    phone: '+86 579 12345678'
+                }
+            },
+            zh: {
+                company: '哲觅贸易',
+                heroTitle: '哲觅贸易',
+                heroSubtitle: '专业家居贸易公司 · 源自中国义乌',
+                productsTitle: '精选产品',
+                products: [
+                    { name: '家居用品', desc: '高品质家居好物，现货供应' },
+                    { name: '厨房用品', desc: '实用美观，可定制包装' },
+                    { name: '装饰摆件', desc: '限量款式，每周更新' }
+                ],
+                footer: {
+                    about: '关于哲觅',
+                    aboutText: '专业家居贸易公司，总部位于中国义乌',
+                    quickLinks: '快速链接',
+                    contact: '联系方式',
+                    email: 'info@zhamit.com',
+                    phone: '+86 579 12345678'
+                }
+            },
+            es: {
+                company: 'ZHAMIT',
+                heroTitle: 'ZHAMIT',
+                heroSubtitle: 'Empresa Comercial Profesional · Desde Yiwu, China',
+                productsTitle: 'Productos Destacados',
+                products: [
+                    { name: 'Artículos para el hogar', desc: 'Productos de alta calidad, en stock' },
+                    { name: 'Utensilios de cocina', desc: 'Prácticos y hermosos, embalaje personalizado' },
+                    { name: 'Decoraciones', desc: 'Ediciones limitadas, actualizadas semanalmente' }
+                ],
+                footer: {
+                    about: 'Sobre ZHAMIT',
+                    aboutText: 'Empresa comercial profesional con sede en Yiwu, China',
+                    quickLinks: 'Enlaces Rápidos',
+                    contact: 'Contacto',
+                    email: 'info@zhamit.com',
+                    phone: '+86 579 12345678'
+                }
+            },
+            ar: {
+                company: 'ZHAMIT',
+                heroTitle: 'ZHAMIT',
+                heroSubtitle: 'شركة تجارية محترفة · من ييوو، الصين',
+                productsTitle: 'المنتجات المميزة',
+                products: [
+                    { name: 'أدوات منزلية', desc: 'منتجات عالية الجودة، متوفرة في المخزون' },
+                    { name: 'أدوات المطبخ', desc: 'عملية وجميلة، تغليف مخصص' },
+                    { name: 'ديكورات', desc: 'إصدارات محدودة، تحديث أسبوعي' }
+                ],
+                footer: {
+                    about: 'عن ZHAMIT',
+                    aboutText: 'شركة تجارية محترفة مقرها ييوو، الصين',
+                    quickLinks: 'روابط سريعة',
+                    contact: 'اتصل بنا',
+                    email: 'info@zhamit.com',
+                    phone: '+86 579 12345678'
+                }
+            }
+        };
+
+        let currentLang = 'en';
         let navData = [];
 
+        // 获取当前语言（从 URL 路径或 Cookie）
+        function detectLanguage() {
+            const path = window.location.pathname;
+            const pathMatch = path.match(/^\/(en|zh|es|ar)\//);
+            if (pathMatch) {
+                return pathMatch[1];
+            }
+            const cookieMatch = document.cookie.match(/lang=([^;]+)/);
+            if (cookieMatch && translations[cookieMatch[1]]) {
+                return cookieMatch[1];
+            }
+            // 根据浏览器语言自动检测
+            const browserLang = navigator.language.split('-')[0];
+            if (translations[browserLang]) return browserLang;
+            return 'en';
+        }
+
+        // 切换语言
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.cookie = `lang=${lang}; path=/; max-age=2592000`;
+            
+            // 更新 URL 路径（保持当前页面路径）
+            let newPath = `/${lang}${window.location.pathname.replace(/^\/[a-z]{2}\//, '/')}`;
+            if (newPath === `/${lang}/`) newPath = `/${lang}`;
+            window.location.href = newPath;
+        }
+
+        // 渲染所有内容
+        function renderContent() {
+            const t = translations[currentLang];
+            if (!t) return;
+            
+            // 更新公司名称
+            document.querySelectorAll('#companyName, #mobileCompanyName').forEach(el => {
+                if (el) el.textContent = t.company;
+            });
+            
+            // 更新英雄区
+            const heroTitles = document.querySelectorAll('#heroTitle, #mobileHeroTitle');
+            const heroSubtitles = document.querySelectorAll('#heroSubtitle, #mobileHeroSubtitle');
+            heroTitles.forEach(el => { if (el) el.textContent = t.heroTitle; });
+            heroSubtitles.forEach(el => { if (el) el.textContent = t.heroSubtitle; });
+            
+            // 更新产品标题
+            const productsTitles = document.querySelectorAll('#productsTitle, #mobileProductsTitle');
+            productsTitles.forEach(el => { if (el) el.textContent = t.productsTitle; });
+            
+            // 更新产品列表
+            const productGrids = [document.getElementById('productGrid'), document.getElementById('mobileProductGrid')];
+            productGrids.forEach(grid => {
+                if (grid) {
+                    grid.innerHTML = t.products.map(p => `
+                        <div class="product-card">
+                            <h3>${escapeHtml(p.name)}</h3>
+                            <p>${escapeHtml(p.desc)}</p>
+                        </div>
+                    `).join('');
+                }
+            });
+            
+            // 更新底部导航
+            const footerContainers = [document.getElementById('footerNav'), document.getElementById('mobileFooterNav')];
+            footerContainers.forEach(container => {
+                if (container) {
+                    container.innerHTML = `
+                        <div class="footer-col">
+                            <div class="footer-logo">${escapeHtml(t.company)}</div>
+                            <p>${escapeHtml(t.footer.aboutText)}</p>
+                        </div>
+                        <div class="footer-col">
+                            <h4>${escapeHtml(t.footer.quickLinks)}</h4>
+                            <a href="/${currentLang}/about">${escapeHtml(t.footer.about)}</a>
+                            <a href="/${currentLang}/contact">${escapeHtml(t.footer.contact)}</a>
+                        </div>
+                        <div class="footer-col">
+                            <h4>${escapeHtml(t.footer.contact)}</h4>
+                            <a href="mailto:${t.footer.email}">${t.footer.email}</a>
+                            <a href="tel:${t.footer.phone}">${t.footer.phone}</a>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 更新当前语言显示
+            const langDisplays = document.querySelectorAll('#currentLangDesktop, #mobileCurrentLang');
+            langDisplays.forEach(el => { if (el) el.textContent = currentLang.toUpperCase(); });
+        }
+
+        // 渲染导航菜单（从 API 加载）
         async function loadNavData() {
             try {
                 const res = await fetch('/api/nav');
                 navData = await res.json();
-                renderAllNav();
+                renderNavMenus();
             } catch(e) {
-                // 默认导航数据
+                // 默认导航
                 navData = [
-                    { id: 1, name: '首页', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
-                    { id: 2, name: '产品', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
-                    { id: 3, name: '家居用品', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
-                    { id: 4, name: '厨房用品', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
-                    { id: 5, name: '关于', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
-                    { id: 6, name: '联系', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' },
-                    { id: 10, name: '关于我们', url: '/about', parent_id: 0, sort_order: 1, location: 'bottom' },
-                    { id: 11, name: '联系方式', url: '/contact', parent_id: 0, sort_order: 2, location: 'bottom' },
-                    { id: 12, name: '公司简介', url: '/about', parent_id: 10, sort_order: 1, location: 'bottom' }
+                    { id: 1, name: 'Home', url: `/${currentLang}`, parent_id: 0, sort_order: 1, location: 'top' },
+                    { id: 2, name: 'Products', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
+                    { id: 3, name: 'Home Goods', url: `/${currentLang}/category/home`, parent_id: 2, sort_order: 1, location: 'top' },
+                    { id: 4, name: 'Kitchenware', url: `/${currentLang}/category/kitchen`, parent_id: 2, sort_order: 2, location: 'top' },
+                    { id: 5, name: 'About', url: `/${currentLang}/about`, parent_id: 0, sort_order: 3, location: 'top' },
+                    { id: 6, name: 'Contact', url: `/${currentLang}/contact`, parent_id: 0, sort_order: 4, location: 'top' }
                 ];
-                renderAllNav();
+                renderNavMenus();
             }
         }
 
-        function renderAllNav() {
-            renderDesktopTopNav();
-            renderDesktopBottomNav();
-            renderMobileMenu();
-        }
-
-        function renderDesktopTopNav() {
-            const container = document.getElementById('desktopNavMenu');
-            if (!container) return;
-            const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-            container.innerHTML = topItems.map(parent => {
-                const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                if (children.length) {
-                    return `<li>
-                        <a href="${parent.url}">${escapeHtml(parent.name)}</a>
-                        <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
-                    </li>`;
-                }
-                return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
-            }).join('');
-        }
-
-        function renderDesktopBottomNav() {
-            const container = document.getElementById('desktopBottomMenu');
-            if (!container) return;
-            const bottomItems = navData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-            container.innerHTML = bottomItems.map(parent => {
-                const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                if (children.length) {
-                    return `<li>
-                        <a href="${parent.url}">${escapeHtml(parent.name)}</a>
-                        <div class="bottom-submenu">${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
-                    </li>`;
-                }
-                return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
-            }).join('');
-        }
-
-        function renderMobileMenu() {
-            const container = document.getElementById('mobileMenuList');
-            if (!container) return;
-            const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-            container.innerHTML = topItems.map(parent => {
-                const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                if (children.length) {
-                    return `<div class="menu-item">
-                        <div class="menu-parent">
-                            <span>${escapeHtml(parent.name)}</span>
-                            <button class="toggle-sub" data-parent="${parent.id}">+</button>
-                        </div>
-                        <div class="submenu" data-sub="${parent.id}">
-                            ${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
-                        </div>
-                    </div>`;
-                }
-                return `<a href="${parent.url}" class="menu-single">${escapeHtml(parent.name)}</a>`;
-            }).join('');
+        function renderNavMenus() {
+            // 电脑端顶部导航
+            const desktopNav = document.getElementById('navMenu');
+            if (desktopNav) {
+                const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+                desktopNav.innerHTML = topItems.map(parent => {
+                    const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                    if (children.length) {
+                        return `<li>
+                            <a href="${parent.url}">${escapeHtml(parent.name)}</a>
+                            <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
+                        </li>`;
+                    }
+                    return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
+                }).join('');
+            }
             
-            document.querySelectorAll('.toggle-sub').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const parentId = btn.dataset.parent;
-                    const sub = document.querySelector(`.submenu[data-sub="${parentId}"]`);
-                    if (sub) {
-                        sub.classList.toggle('open');
-                        btn.textContent = sub.classList.contains('open') ? '−' : '+';
+            // 手机端侧滑菜单
+            const mobileMenu = document.getElementById('mobileMenuList');
+            if (mobileMenu) {
+                const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+                mobileMenu.innerHTML = topItems.map(parent => {
+                    const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                    if (children.length) {
+                        return `<div class="menu-item">
+                            <div class="menu-parent">
+                                <span>${escapeHtml(parent.name)}</span>
+                                <button class="toggle-sub" data-parent="${parent.id}">+</button>
+                            </div>
+                            <div class="submenu" data-sub="${parent.id}">
+                                ${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
+                            </div>
+                        </div>`;
+                    }
+                    return `<a href="${parent.url}" class="menu-single">${escapeHtml(parent.name)}</a>`;
+                }).join('');
+                
+                document.querySelectorAll('.toggle-sub').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const parentId = btn.dataset.parent;
+                        const sub = document.querySelector(`.submenu[data-sub="${parentId}"]`);
+                        if (sub) {
+                            sub.classList.toggle('open');
+                            btn.textContent = sub.classList.contains('open') ? '−' : '+';
+                        }
+                    });
+                });
+            }
+        }
+
+        // 手机端语言选择弹窗
+        function setupMobileLang() {
+            const mobileLangBtn = document.getElementById('mobileLangBtn');
+            if (mobileLangBtn) {
+                mobileLangBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const langOptions = ['en', 'zh', 'es', 'ar'];
+                    const langNames = { en: 'English', zh: '中文', es: 'Español', ar: 'العربية' };
+                    const selected = prompt('选择语言 / Select Language:\n' + langOptions.map(l => `${l.toUpperCase()} - ${langNames[l]}`).join('\n'));
+                    if (selected && langOptions.includes(selected.toLowerCase())) {
+                        setLanguage(selected.toLowerCase());
                     }
                 });
-            });
+            }
         }
 
-        async function loadSettings() {
-            try {
-                const res = await fetch('/api/settings');
-                const settings = await res.json();
-                const logoText = settings.brand_text || 'ZHAMIT';
-                const desktopLogo = document.getElementById('desktopLogo');
-                const mobileLogo = document.getElementById('mobileLogo');
-                const desktopBottomLogo = document.getElementById('desktopBottomLogo');
-                if (desktopLogo) desktopLogo.innerHTML = `<span class="logo-text">${escapeHtml(logoText)}</span>`;
-                if (mobileLogo) mobileLogo.textContent = logoText;
-                if (desktopBottomLogo) desktopBottomLogo.innerHTML = `<span>${escapeHtml(logoText)}</span>`;
-            } catch(e) {}
+        // 搜索功能
+        function setupSearch() {
+            const desktopSearchInput = document.getElementById('searchInputDesktop');
+            const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+            
+            const doSearch = (query) => {
+                if (query && query.trim()) {
+                    window.location.href = `/${currentLang}/search?q=${encodeURIComponent(query.trim())}`;
+                }
+            };
+            
+            if (desktopSearchInput) {
+                desktopSearchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') doSearch(e.target.value);
+                });
+                const searchIcon = document.getElementById('searchIconDesktop');
+                if (searchIcon) {
+                    searchIcon.addEventListener('click', () => {
+                        const input = document.querySelector('#searchInputDesktop');
+                        if (input) doSearch(input.value);
+                    });
+                }
+            }
+            if (mobileSearchBtn) {
+                mobileSearchBtn.addEventListener('click', () => {
+                    const query = prompt(translations[currentLang]?.searchPrompt || 'Search:');
+                    if (query) doSearch(query);
+                });
+            }
         }
 
+        // 手机端侧滑菜单控制
         function setupMobileMenu() {
             const hamburger = document.getElementById('hamburgerBtn');
             const sideMenu = document.getElementById('sideMenu');
@@ -723,45 +1015,14 @@
             }
         }
 
-        function setupLanguage() {
-            const setLang = (lang) => {
-                document.cookie = `lang=${lang}; path=/; max-age=2592000`;
-                location.reload();
-            };
-            document.querySelectorAll('[data-lang]').forEach(link => {
+        // 电脑端语言选择
+        function setupDesktopLang() {
+            document.querySelectorAll('#langMenuDesktop a').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    setLang(link.dataset.lang);
+                    setLanguage(link.dataset.lang);
                 });
             });
-        }
-
-        function setupSearch() {
-            const desktopSearchInput = document.getElementById('desktopSearchInput');
-            const mobileSearchBtn = document.getElementById('mobileSearchBtn');
-            
-            const doSearch = (query) => {
-                if (query && query.trim()) {
-                    window.location.href = `/search?q=${encodeURIComponent(query.trim())}`;
-                }
-            };
-            
-            if (desktopSearchInput) {
-                desktopSearchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') doSearch(e.target.value);
-                });
-                // 搜索按钮
-                const searchBtn = document.querySelector('.search-box .search-btn');
-                if (searchBtn) {
-                    searchBtn.addEventListener('click', () => doSearch(desktopSearchInput.value));
-                }
-            }
-            if (mobileSearchBtn) {
-                mobileSearchBtn.addEventListener('click', () => {
-                    const query = prompt('搜索内容：');
-                    if (query) doSearch(query);
-                });
-            }
         }
 
         function escapeHtml(str) {
@@ -769,11 +1030,14 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
+        // 初始化
+        currentLang = detectLanguage();
+        renderContent();
         loadNavData();
-        loadSettings();
-        setupMobileMenu();
-        setupLanguage();
+        setupMobileLang();
         setupSearch();
+        setupMobileMenu();
+        setupDesktopLang();
     </script>
 </body>
 </html>
