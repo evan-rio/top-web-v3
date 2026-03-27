@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ZHAMIT - 专业家居贸易</title>
     <style>
-        /* 样式部分保持不变，省略重复代码 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; line-height: 1.5; color: #1a1a1a; background: #fff; }
 
@@ -224,7 +223,7 @@
     </div>
 
     <script>
-        // ========== 多语言文案 ==========
+        // ========== 多语言文案（包含完整的翻译映射） ==========
         const translations = {
             en: {
                 company: 'ZHAMIT',
@@ -237,8 +236,6 @@
                     { name: 'Decorations', desc: 'Limited editions, updated weekly' }
                 ],
                 menuTitle: 'Menu',
-                nav: {},  // 动态从数据库获取，不预设翻译
-                footer: {}, // 底部导航从数据库获取，不预设
                 searchPlaceholder: 'Search...'
             },
             zh: {
@@ -252,8 +249,6 @@
                     { name: '装饰摆件', desc: '限量款式，每周更新' }
                 ],
                 menuTitle: '菜单',
-                nav: {},
-                footer: {},
                 searchPlaceholder: '搜索...'
             },
             es: {
@@ -267,8 +262,6 @@
                     { name: 'Decoraciones', desc: 'Ediciones limitadas, actualizadas semanalmente' }
                 ],
                 menuTitle: 'Menú',
-                nav: {},
-                footer: {},
                 searchPlaceholder: 'Buscar...'
             },
             ar: {
@@ -282,15 +275,115 @@
                     { name: 'ديكورات', desc: 'إصدارات محدودة، تحديث أسبوعي' }
                 ],
                 menuTitle: 'القائمة',
-                nav: {},
-                footer: {},
                 searchPlaceholder: 'بحث...'
             }
         };
 
+        // 完整的导航翻译映射表（覆盖所有可能的中英文菜单名）
+        const navTranslationMap = {
+            en: {
+                // 主菜单
+                '首页': 'Home',
+                '产品': 'Products',
+                '关于我们': 'About Us',
+                '联系我们': 'Contact Us',
+                '公司简介': 'Company Profile',
+                '发展历程': 'History',
+                '家居用品': 'Home Goods',
+                '厨房用品': 'Kitchenware',
+                '装饰摆件': 'Decorations',
+                // 英文到英文（保持不变）
+                'Home': 'Home',
+                'Products': 'Products',
+                'About': 'About',
+                'Contact': 'Contact',
+                'About Us': 'About Us',
+                'Contact Us': 'Contact Us',
+                'Home Goods': 'Home Goods',
+                'Kitchenware': 'Kitchenware',
+                'Decorations': 'Decorations',
+                'Company Profile': 'Company Profile',
+                'History': 'History'
+            },
+            zh: {
+                'Home': '首页',
+                'Products': '产品',
+                'About': '关于我们',
+                'Contact': '联系我们',
+                'About Us': '关于我们',
+                'Contact Us': '联系我们',
+                'Home Goods': '家居用品',
+                'Kitchenware': '厨房用品',
+                'Decorations': '装饰摆件',
+                'Company Profile': '公司简介',
+                'History': '发展历程',
+                // 中文到中文（保持不变）
+                '首页': '首页',
+                '产品': '产品',
+                '关于我们': '关于我们',
+                '联系我们': '联系我们',
+                '公司简介': '公司简介',
+                '发展历程': '发展历程',
+                '家居用品': '家居用品',
+                '厨房用品': '厨房用品',
+                '装饰摆件': '装饰摆件'
+            },
+            es: {
+                'Home': 'Inicio',
+                'Products': 'Productos',
+                'About': 'Sobre Nosotros',
+                'Contact': 'Contacto',
+                'About Us': 'Sobre Nosotros',
+                'Contact Us': 'Contacto',
+                'Home Goods': 'Artículos para el hogar',
+                'Kitchenware': 'Utensilios de cocina',
+                'Decorations': 'Decoraciones',
+                'Company Profile': 'Perfil de la empresa',
+                'History': 'Historia',
+                '首页': 'Inicio',
+                '产品': 'Productos',
+                '关于我们': 'Sobre Nosotros',
+                '联系我们': 'Contacto',
+                '公司简介': 'Perfil de la empresa',
+                '发展历程': 'Historia',
+                '家居用品': 'Artículos para el hogar',
+                '厨房用品': 'Utensilios de cocina',
+                '装饰摆件': 'Decoraciones'
+            },
+            ar: {
+                'Home': 'الرئيسية',
+                'Products': 'المنتجات',
+                'About': 'معلومات عنا',
+                'Contact': 'اتصل بنا',
+                'About Us': 'معلومات عنا',
+                'Contact Us': 'اتصل بنا',
+                'Home Goods': 'أدوات منزلية',
+                'Kitchenware': 'أدوات المطبخ',
+                'Decorations': 'ديكورات',
+                'Company Profile': 'ملف الشركة',
+                'History': 'التاريخ',
+                '首页': 'الرئيسية',
+                '产品': 'المنتجات',
+                '关于我们': 'معلومات عنا',
+                '联系我们': 'اتصل بنا',
+                '公司简介': 'ملف الشركة',
+                '发展历程': 'التاريخ',
+                '家居用品': 'أدوات منزلية',
+                '厨房用品': 'أدوات المطبخ',
+                '装饰摆件': 'ديكورات'
+            }
+        };
+
+        function translateNavItem(originalName) {
+            if (!originalName) return '';
+            const map = navTranslationMap[currentLang];
+            if (map && map[originalName]) return map[originalName];
+            // 如果找不到翻译，返回原词
+            return originalName;
+        }
+
         let currentLang = 'en';
-        let rawNavData = [];      // 从 API 获取的完整导航数据
-        let rawFooterData = [];   // 底部导航数据（location='bottom'）
+        let rawNavData = [];
 
         function detectLanguage() {
             const cookieMatch = document.cookie.match(/lang=([^;]+)/);
@@ -298,56 +391,6 @@
             const browserLang = navigator.language.split('-')[0];
             if (translations[browserLang]) return browserLang;
             return 'en';
-        }
-
-        // 翻译菜单项（使用数据库中的 name 作为 key，但数据库里存的是英文，所以需要翻译）
-        // 这里我们直接用数据库的原始 name，然后根据当前语言映射
-        // 由于数据库 name 可能是英文，我们需要一个翻译映射表
-        // 但更简单的方式是：让用户在后台把多语言名称存在数据库里
-        // 目前先使用一个简单的映射
-        const navTranslationMap = {
-            en: {
-                'Home': 'Home',
-                'Products': 'Products',
-                'About': 'About',
-                'Contact': 'Contact',
-                '家居用品': 'Home Goods',
-                '厨房用品': 'Kitchenware',
-                '装饰摆件': 'Decorations'
-            },
-            zh: {
-                'Home': '首页',
-                'Products': '产品',
-                'About': '关于我们',
-                'Contact': '联系我们',
-                'Home Goods': '家居用品',
-                'Kitchenware': '厨房用品',
-                'Decorations': '装饰摆件'
-            },
-            es: {
-                'Home': 'Inicio',
-                'Products': 'Productos',
-                'About': 'Sobre',
-                'Contact': 'Contacto',
-                'Home Goods': 'Artículos para el hogar',
-                'Kitchenware': 'Utensilios de cocina',
-                'Decorations': 'Decoraciones'
-            },
-            ar: {
-                'Home': 'الرئيسية',
-                'Products': 'المنتجات',
-                'About': 'معلومات عنا',
-                'Contact': 'اتصل بنا',
-                'Home Goods': 'أدوات منزلية',
-                'Kitchenware': 'أدوات المطبخ',
-                'Decorations': 'ديكورات'
-            }
-        };
-
-        function translateNavItem(originalName) {
-            const map = navTranslationMap[currentLang];
-            if (map && map[originalName]) return map[originalName];
-            return originalName;
         }
 
         function setLanguage(lang) {
@@ -381,9 +424,6 @@
                 }
             });
             
-            // 底部导航由数据库数据渲染，不在 renderContent 中硬编码
-            renderFooterNav();
-            
             document.querySelectorAll('#currentLangDesktop, #mobileCurrentLang').forEach(el => { if (el) el.textContent = currentLang.toUpperCase(); });
             
             const desktopInput = document.getElementById('searchInputDesktop');
@@ -392,42 +432,65 @@
             if (mobileSearchInput) mobileSearchInput.placeholder = t.searchPlaceholder || 'Search...';
         }
 
-        // 渲染底部导航（从数据库数据）
+        // 渲染底部导航（保持之前的好看布局：左侧公司名+描述，右侧菜单）
         function renderFooterNav() {
             const footerContainer = document.getElementById('footerNav');
             const mobileFooterContainer = document.getElementById('mobileFooterNav');
             
             if (!footerContainer && !mobileFooterContainer) return;
             
-            const bottomItems = rawNavData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+            // 获取公司名称
+            const companyName = translations[currentLang]?.company || 'ZHAMIT';
+            const companyDesc = translations[currentLang]?.heroSubtitle || 'Professional trading company based in Yiwu, China';
             
-            if (!bottomItems.length) {
-                // 如果没有底部导航数据，显示默认的简单信息
-                const defaultFooter = `<div class="footer-col"><div class="footer-logo">ZHAMIT</div><p>Professional trading company based in Yiwu, China</p></div>`;
-                if (footerContainer) footerContainer.innerHTML = defaultFooter;
-                if (mobileFooterContainer) mobileFooterContainer.innerHTML = defaultFooter;
-                return;
+            // 获取底部导航数据（location='bottom' 且 parent_id=0 的为主菜单）
+            const bottomParents = rawNavData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+            
+            let leftColumnHtml = `<div class="footer-col">
+                <div class="footer-logo">${escapeHtml(companyName)}</div>
+                <p>${escapeHtml(companyDesc)}</p>
+            </div>`;
+            
+            let rightColumnsHtml = '';
+            
+            if (bottomParents.length) {
+                // 有底部导航数据，显示它们
+                rightColumnsHtml = bottomParents.map(parent => {
+                    const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                    const translatedName = translateNavItem(parent.name);
+                    if (children.length) {
+                        return `<div class="footer-col">
+                            <h4>${escapeHtml(translatedName)}</h4>
+                            ${children.map(child => `<a href="${child.url}">${escapeHtml(translateNavItem(child.name))}</a>`).join('')}
+                        </div>`;
+                    }
+                    return `<div class="footer-col">
+                        <h4>${escapeHtml(translatedName)}</h4>
+                    </div>`;
+                }).join('');
+            } else {
+                // 默认底部导航（如果没有数据）
+                rightColumnsHtml = `
+                    <div class="footer-col">
+                        <h4>Quick Links</h4>
+                        <a href="/about">About</a>
+                        <a href="/contact">Contact</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Contact</h4>
+                        <a href="mailto:info@zhamit.com">info@zhamit.com</a>
+                        <a href="tel:+8657912345678">+86 579 12345678</a>
+                    </div>
+                `;
             }
             
-            const footerHtml = bottomItems.map(parent => {
-                const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                if (children.length) {
-                    return `<div class="footer-col">
-                        <h4>${escapeHtml(translateNavItem(parent.name))}</h4>
-                        ${children.map(child => `<a href="${child.url}">${escapeHtml(translateNavItem(child.name))}</a>`).join('')}
-                    </div>`;
-                }
-                return `<div class="footer-col">
-                    <div class="footer-logo">${escapeHtml(translateNavItem(parent.name))}</div>
-                    <p>${escapeHtml(parent.url === '/about' ? 'About us' : '')}</p>
-                </div>`;
-            }).join('');
+            const footerHtml = leftColumnHtml + rightColumnsHtml;
             
             if (footerContainer) footerContainer.innerHTML = footerHtml;
             if (mobileFooterContainer) mobileFooterContainer.innerHTML = footerHtml;
         }
 
-        // 渲染顶部导航（电脑端和手机端）
+        // 渲染顶部导航
         function renderNavMenus() {
             const desktopNav = document.getElementById('navMenu');
             const mobileMenu = document.getElementById('mobileMenuList');
@@ -491,7 +554,6 @@
             }
         }
 
-        // 从 API 加载导航数据
         async function loadNavData() {
             try {
                 const res = await fetch('/api/nav');
@@ -499,22 +561,15 @@
                 renderNavMenus();
                 renderFooterNav();
             } catch(e) {
-                console.error('加载导航失败，使用默认数据', e);
+                console.error('加载导航失败', e);
                 // 默认导航数据
                 rawNavData = [
-                    { id: 1, name: 'Home', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
-                    { id: 2, name: 'Products', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
-                    { id: 3, name: 'Home Goods', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
-                    { id: 4, name: 'Kitchenware', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
-                    { id: 5, name: 'About', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
-                    { id: 6, name: 'Contact', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' },
-                    { id: 10, name: 'ZHAMIT', url: '/', parent_id: 0, sort_order: 1, location: 'bottom' },
-                    { id: 11, name: 'Quick Links', url: '#', parent_id: 0, sort_order: 2, location: 'bottom' },
-                    { id: 12, name: 'About', url: '/about', parent_id: 11, sort_order: 1, location: 'bottom' },
-                    { id: 13, name: 'Contact', url: '/contact', parent_id: 11, sort_order: 2, location: 'bottom' },
-                    { id: 14, name: 'Contact Info', url: '#', parent_id: 0, sort_order: 3, location: 'bottom' },
-                    { id: 15, name: 'info@zhamit.com', url: 'mailto:info@zhamit.com', parent_id: 14, sort_order: 1, location: 'bottom' },
-                    { id: 16, name: '+86 579 12345678', url: 'tel:+8657912345678', parent_id: 14, sort_order: 2, location: 'bottom' }
+                    { id: 1, name: '首页', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
+                    { id: 2, name: '产品', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
+                    { id: 3, name: '家居用品', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
+                    { id: 4, name: '厨房用品', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
+                    { id: 5, name: '关于我们', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
+                    { id: 6, name: '联系我们', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' }
                 ];
                 renderNavMenus();
                 renderFooterNav();
@@ -546,7 +601,6 @@
             }
         }
 
-        // 手机端搜索
         function setupMobileSearch() {
             const searchBtn = document.getElementById('mobileSearchBtn');
             const searchModal = document.getElementById('searchModal');
@@ -610,10 +664,9 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
-        // 初始化
         currentLang = detectLanguage();
         renderContent();
-        loadNavData();      // 从 API 加载导航，会自动渲染顶部和底部
+        loadNavData();
         setupDesktopLang();
         setupMobileLang();
         setupMobileSearch();
