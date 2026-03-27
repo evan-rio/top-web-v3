@@ -377,7 +377,6 @@
             richText: { type: 'richText', content: '<p>这里是富文本内容，支持<strong>加粗</strong>和<em>斜体</em></p>' }
         };
         
-        // 生成模块HTML - 优先使用 customHtml
         function getModuleHtml(mod) {
             if (mod.customHtml) {
                 return mod.customHtml;
@@ -401,14 +400,12 @@
             }
         }
         
-        // 从 HTML 字符串中解析图片的宽度（用于编辑弹窗回显）
         function extractWidthFromHtml(html) {
             const match = html.match(/width:\s*([^;]+)/);
             if (match) return match[1].trim();
             return '100%';
         }
         
-        // 渲染画布
         function renderCanvas() {
             const canvas = document.getElementById('canvas');
             if (!modules.length) {
@@ -472,7 +469,6 @@
                 openCodeModal(idx);
             } else if (action === 'copy') {
                 const newModule = JSON.parse(JSON.stringify(modules[idx]));
-                // 复制时清除 customHtml，让它重新用模板生成
                 delete newModule.customHtml;
                 if (newModule.type === 'text' || newModule.type === 'heading') {
                     newModule.content = (newModule.content || '') + ' (副本)';
@@ -518,7 +514,6 @@
                     html += `<div class="form-group"><label>标题级别</label><select id="editLevel"><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option></select></div>`;
                 }
             } else if (mod.type === 'image') {
-                // 如果有 customHtml，尝试从中提取宽度
                 let currentWidth = mod.width || '100%';
                 if (mod.customHtml) {
                     currentWidth = extractWidthFromHtml(mod.customHtml);
@@ -577,7 +572,6 @@
                 if (mod.type === 'heading') {
                     mod.level = document.getElementById('editLevel')?.value || 'h2';
                 }
-                // 样式编辑后清除 customHtml，使用模板渲染
                 delete mod.customHtml;
             } else if (mod.type === 'image') {
                 mod.src = document.getElementById('editSrc')?.value || '';
@@ -612,10 +606,8 @@
             const newHtml = document.getElementById('codeEditorContent').value;
             const mod = modules[currentCodeIndex];
             
-            // 保存自定义 HTML
             mod.customHtml = newHtml;
             
-            // 如果是图片模块，尝试从 HTML 中提取 src 和 width 以便下次编辑时回显
             if (mod.type === 'image') {
                 const srcMatch = newHtml.match(/src="([^"]+)"/);
                 if (srcMatch) mod.src = srcMatch[1];
@@ -662,72 +654,20 @@
         }
         
         function modulesToHtml() {
-    const modulesHtml = modules.map(mod => getModuleHtml(mod)).join('\n');
-    
-    // 包裹响应式容器
-    return `
-    <div class="zhamit-page-container" style="max-width: 100%; margin: 0 auto; padding: 0 16px; box-sizing: border-box;">
-        <style>
-            .zhamit-page-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 16px;
-                box-sizing: border-box;
-            }
-            .zhamit-page-container img {
-                max-width: 100%;
-                height: auto;
-            }
-            .zhamit-page-container .rich-text {
-                overflow-x: auto;
-            }
-            @media (max-width: 768px) {
-                .zhamit-page-container {
-                    padding: 0 12px;
-                }
-                .zhamit-page-container [style*="width:"] {
-                        max-width: 100% !important;
-                    }
-                }
-            }
-        </style>
-        ${modulesHtml}
-    </div>
-    `;
-}
+            const modulesHtml = modules.map(mod => getModuleHtml(mod)).join('\n');
+            return `<div class="zhamit-container" style="max-width:1200px; margin:0 auto; padding:0 16px; box-sizing:border-box;">
+                <style>.zhamit-container img{max-width:100%; height:auto;} .zhamit-container iframe{max-width:100%;} @media (max-width:768px){.zhamit-container{padding:0 12px;} .zhamit-container [style*="width:"]{max-width:100% !important; height:auto !important;}}</style>
+                ${modulesHtml}
+            </div>`;
+        }
         
         function preview() {
-    const modal = document.getElementById('previewModal');
-    const iframe = document.getElementById('previewFrame');
-    const content = modulesToHtml();
-    iframe.srcdoc = `<!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                line-height: 1.5;
-                background: #fff;
-            }
-            img {
-                max-width: 100%;
-                height: auto;
-            }
-        </style>
-    </head>
-    <body>
-        ${content || '<p style="text-align:center; padding:40px; color:#999;">暂无内容</p>'}
-    </body>
-    </html>`;
-    modal.style.display = 'block';
-}
+            const modal = document.getElementById('previewModal');
+            const iframe = document.getElementById('previewFrame');
+            const content = modulesToHtml();
+            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui;line-height:1.5;background:#fff;}img{max-width:100%;height:auto;}</style></head><body>${content || '<p style="text-align:center;padding:40px;color:#999;">暂无内容</p>'}</body></html>`;
+            modal.style.display = 'block';
+        }
         
         async function savePage() {
             const content = modulesToHtml();
