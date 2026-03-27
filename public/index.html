@@ -404,7 +404,6 @@
                 fill: none;
             }
 
-            /* 手机端语言选择弹窗 - 从地球图标下方弹出 */
             .lang-modal {
                 position: fixed;
                 top: 56px;
@@ -439,7 +438,6 @@
                 to { opacity: 1; transform: translateY(0); }
             }
 
-            /* 手机端搜索弹窗 */
             .search-modal {
                 position: fixed;
                 top: 56px;
@@ -749,7 +747,6 @@
             </div>
         </div>
 
-        <!-- 手机端语言选择弹窗 -->
         <div class="lang-modal" id="langModal">
             <div class="lang-modal-option" data-lang="en">English</div>
             <div class="lang-modal-option" data-lang="zh">中文</div>
@@ -757,7 +754,6 @@
             <div class="lang-modal-option" data-lang="ar">العربية</div>
         </div>
 
-        <!-- 手机端搜索弹窗 -->
         <div class="search-modal" id="searchModal">
             <input type="text" id="mobileSearchInput" placeholder="Search...">
             <button id="mobileSearchConfirm">🔍</button>
@@ -765,7 +761,7 @@
 
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
-                <h3>菜单</h3>
+                <h3 id="menuHeaderTitle">菜单</h3>
                 <button class="close-menu" id="closeMenuBtn">✕</button>
             </div>
             <div class="menu-list" id="mobileMenuList"></div>
@@ -803,6 +799,7 @@
                     { name: 'Kitchenware', desc: 'Practical & beautiful, custom packaging available' },
                     { name: 'Decorations', desc: 'Limited editions, updated weekly' }
                 ],
+                menuTitle: 'Menu',
                 nav: {
                     'Home': 'Home',
                     'Products': 'Products',
@@ -831,6 +828,7 @@
                     { name: '厨房用品', desc: '实用美观，可定制包装' },
                     { name: '装饰摆件', desc: '限量款式，每周更新' }
                 ],
+                menuTitle: '菜单',
                 nav: {
                     'Home': '首页',
                     'Products': '产品',
@@ -859,6 +857,7 @@
                     { name: 'Utensilios de cocina', desc: 'Prácticos y hermosos, embalaje personalizado' },
                     { name: 'Decoraciones', desc: 'Ediciones limitadas, actualizadas semanalmente' }
                 ],
+                menuTitle: 'Menú',
                 nav: {
                     'Home': 'Inicio',
                     'Products': 'Productos',
@@ -887,6 +886,7 @@
                     { name: 'أدوات المطبخ', desc: 'عملية وجميلة، تغليف مخصص' },
                     { name: 'ديكورات', desc: 'إصدارات محدودة، تحديث أسبوعي' }
                 ],
+                menuTitle: 'القائمة',
                 nav: {
                     'Home': 'الرئيسية',
                     'Products': 'المنتجات',
@@ -908,7 +908,7 @@
         };
 
         let currentLang = 'en';
-        let rawNavData = [];
+        let rawNavData = []; // 从 API 获取的原始导航数据
 
         function detectLanguage() {
             const cookieMatch = document.cookie.match(/lang=([^;]+)/);
@@ -935,11 +935,18 @@
             const t = translations[currentLang];
             if (!t) return;
             
+            // 公司名称
             document.querySelectorAll('#companyName, #mobileCompanyName').forEach(el => { if (el) el.textContent = t.company; });
+            // 英雄区
             document.querySelectorAll('#heroTitle, #mobileHeroTitle').forEach(el => { if (el) el.textContent = t.heroTitle; });
             document.querySelectorAll('#heroSubtitle, #mobileHeroSubtitle').forEach(el => { if (el) el.textContent = t.heroSubtitle; });
+            // 产品标题
             document.querySelectorAll('#productsTitle, #mobileProductsTitle').forEach(el => { if (el) el.textContent = t.productsTitle; });
+            // 手机端菜单标题
+            const menuHeader = document.getElementById('menuHeaderTitle');
+            if (menuHeader) menuHeader.textContent = t.menuTitle;
             
+            // 产品列表
             const productGrids = [document.getElementById('productGrid'), document.getElementById('mobileProductGrid')];
             productGrids.forEach(grid => {
                 if (grid) {
@@ -952,6 +959,7 @@
                 }
             });
             
+            // 底部导航
             const footerContainers = [document.getElementById('footerNav'), document.getElementById('mobileFooterNav')];
             footerContainers.forEach(container => {
                 if (container) {
@@ -974,41 +982,65 @@
                 }
             });
             
+            // 当前语言显示
             document.querySelectorAll('#currentLangDesktop, #mobileCurrentLang').forEach(el => { if (el) el.textContent = currentLang.toUpperCase(); });
             
+            // 搜索框占位符
             const desktopInput = document.getElementById('searchInputDesktop');
             if (desktopInput) desktopInput.placeholder = t.searchPlaceholder || 'Search...';
             const mobileSearchInput = document.getElementById('mobileSearchInput');
             if (mobileSearchInput) mobileSearchInput.placeholder = t.searchPlaceholder || 'Search...';
         }
 
+        // 渲染导航菜单（从 API 数据翻译）
         function renderNavMenus() {
             const desktopNav = document.getElementById('navMenu');
             const mobileMenu = document.getElementById('mobileMenuList');
-            if (!rawNavData.length) return;
+            
+            if (!rawNavData.length) {
+                // 如果没有数据，显示加载中
+                if (desktopNav) desktopNav.innerHTML = '<li><a href="#">Loading...</a></li>';
+                if (mobileMenu) mobileMenu.innerHTML = '<div class="menu-single">Loading...</div>';
+                return;
+            }
+            
             const topItems = rawNavData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             
+            // 电脑端
             if (desktopNav) {
                 desktopNav.innerHTML = topItems.map(parent => {
                     const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                     const translatedName = translateNavItem(parent.name);
                     if (children.length) {
-                        return `<li><a href="${parent.url}">${escapeHtml(translatedName)}</a><div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(translateNavItem(c.name))}</a>`).join('')}</div></li>`;
+                        return `<li>
+                            <a href="${parent.url}">${escapeHtml(translatedName)}</a>
+                            <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(translateNavItem(c.name))}</a>`).join('')}</div>
+                        </li>`;
                     }
                     return `<li><a href="${parent.url}">${escapeHtml(translatedName)}</a></li>`;
                 }).join('');
             }
             
+            // 手机端
             if (mobileMenu) {
                 mobileMenu.innerHTML = topItems.map(parent => {
                     const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                     const translatedName = translateNavItem(parent.name);
                     if (children.length) {
-                        return `<div class="menu-item"><div class="menu-parent"><span>${escapeHtml(translatedName)}</span><button class="toggle-sub" data-parent="${parent.id}">+</button></div><div class="submenu" data-sub="${parent.id}">${children.map(c => `<a href="${c.url}">${escapeHtml(translateNavItem(c.name))}</a>`).join('')}</div></div>`;
+                        return `<div class="menu-item">
+                            <div class="menu-parent">
+                                <span>${escapeHtml(translatedName)}</span>
+                                <button class="toggle-sub" data-parent="${parent.id}">+</button>
+                            </div>
+                            <div class="submenu" data-sub="${parent.id}">
+                                ${children.map(c => `<a href="${c.url}">${escapeHtml(translateNavItem(c.name))}</a>`).join('')}
+                            </div>
+                        </div>`;
                     }
                     return `<a href="${parent.url}" class="menu-single">${escapeHtml(translatedName)}</a>`;
                 }).join('');
                 
+                // 绑定子菜单展开事件
                 document.querySelectorAll('.toggle-sub').forEach(btn => {
                     btn.removeEventListener('click', toggleSubHandler);
                     btn.addEventListener('click', toggleSubHandler);
@@ -1026,12 +1058,15 @@
             }
         }
 
+        // 从 API 加载导航数据
         async function loadNavData() {
             try {
                 const res = await fetch('/api/nav');
                 rawNavData = await res.json();
                 renderNavMenus();
             } catch(e) {
+                console.error('加载导航失败，使用默认数据', e);
+                // 默认导航数据
                 rawNavData = [
                     { id: 1, name: 'Home', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
                     { id: 2, name: 'Products', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
@@ -1133,9 +1168,10 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
+        // 初始化
         currentLang = detectLanguage();
         renderContent();
-        loadNavData();
+        loadNavData();      // 从 API 加载导航
         setupDesktopLang();
         setupMobileLang();
         setupMobileSearch();
