@@ -16,552 +16,610 @@
         })();
     </script>
     
-    <!-- 拖拽库 -->
+    <!-- SortableJS 拖拽库 -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f0f2f5;
             overflow: hidden;
         }
         
         /* 顶部栏 */
         .top-bar {
-            background: #1a1a1a;
-            color: white;
-            padding: 0.75rem 2rem;
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 0 24px;
+            height: 56px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
         }
-        .top-bar h2 { font-size: 1.25rem; }
-        .top-bar a {
-            color: white;
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .top-bar-left h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .top-bar-left a {
+            color: #666;
             text-decoration: none;
-            margin-left: 1.5rem;
-            font-size: 0.9rem;
+            font-size: 14px;
+            margin-left: 16px;
         }
-        .top-bar a:hover { opacity: 0.8; }
+        .top-bar-left a:hover {
+            color: #1a1a1a;
+        }
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn {
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #1677ff;
+            border-color: #1677ff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4096ff;
+        }
+        .btn-danger {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        .btn-danger:hover {
+            background: #ff4d4f;
+            color: white;
+        }
         
         /* 主布局 */
-        .editor-container {
+        .editor-layout {
             display: flex;
             margin-top: 56px;
             height: calc(100vh - 56px);
         }
         
-        /* 左侧组件库 */
-        .components-panel {
-            width: 260px;
-            background: white;
-            border-right: 1px solid #e0e0e0;
+        /* 左侧模块库 */
+        .module-library {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            padding: 1rem;
+            padding: 16px;
         }
-        .components-panel h3 {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .library-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #333;
         }
-        .component-item {
-            background: #f5f5f5;
-            border: 1px solid #e0e0e0;
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .module-card {
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
             border-radius: 8px;
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
+            padding: 12px 8px;
+            text-align: center;
             cursor: grab;
             transition: all 0.2s;
-            text-align: center;
-            font-size: 0.85rem;
         }
-        .component-item:hover {
-            background: #e8e8e8;
-            border-color: #1a1a1a;
+        .module-card:hover {
+            border-color: #1677ff;
+            background: #f0f7ff;
         }
-        .component-item:active { cursor: grabbing; }
+        .module-card:active {
+            cursor: grabbing;
+        }
+        .module-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .module-name {
+            font-size: 12px;
+            color: #666;
+        }
         
-        /* 右侧编辑区 */
-        .editor-area {
+        /* 中间画布区 */
+        .canvas-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background: #f5f5f5;
         }
-        
-        /* 工具栏 */
-        .editor-toolbar {
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 0.75rem 1rem;
+        .canvas-toolbar {
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 8px 16px;
             display: flex;
-            gap: 1rem;
+            gap: 12px;
             align-items: center;
-            flex-wrap: wrap;
         }
-        .mode-switch {
+        .device-switch {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #f0f0f0;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-        }
-        .mode-switch label {
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-        .btn {
-            padding: 0.5rem 1rem;
-            background: #1a1a1a;
-            color: white;
-            border: none;
+            border: 1px solid #d9d9d9;
             border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
+            overflow: hidden;
         }
-        .btn-primary { background: #2e7d32; }
-        .btn-danger { background: #d32f2f; }
-        
-        /* 画布区域 */
+        .device-btn {
+            padding: 4px 12px;
+            font-size: 12px;
+            background: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .device-btn.active {
+            background: #1677ff;
+            color: white;
+        }
         .canvas-container {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
-            background: #f5f5f5;
+            padding: 24px;
         }
         .canvas {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            min-height: 500px;
-            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            min-height: 600px;
+            padding: 20px;
+            transition: max-width 0.2s;
         }
-        .module {
+        .canvas.pc { max-width: 1200px; }
+        .canvas.tablet { max-width: 768px; }
+        .canvas.mobile { max-width: 375px; }
+        
+        /* 模块样式 */
+        .module-item {
             position: relative;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border: 1px solid #e0e0e0;
+            margin-bottom: 16px;
+            border: 1px solid #e8e8e8;
             border-radius: 8px;
-            background: white;
+            background: #fff;
             transition: box-shadow 0.2s;
         }
-        .module:hover {
+        .module-item:hover {
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .module:hover .module-actions {
+        .module-item:hover .module-actions {
             display: flex;
         }
         .module-actions {
             position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
+            top: 8px;
+            right: 8px;
             display: none;
-            gap: 0.25rem;
-            background: white;
+            gap: 4px;
+            background: #fff;
             border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            padding: 4px;
         }
         .module-actions button {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.7rem;
+            padding: 4px 8px;
+            font-size: 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
-        .module-actions .delete-module { background: #d32f2f; color: white; }
-        .module-actions .edit-module { background: #1976d2; color: white; }
+        .edit-module-btn {
+            background: #1677ff;
+            color: white;
+        }
+        .delete-module-btn {
+            background: #ff4d4f;
+            color: white;
+        }
+        .module-content {
+            padding: 16px;
+        }
+        
+        /* 右侧属性面板 */
+        .property-panel {
+            width: 320px;
+            background: #fff;
+            border-left: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        .panel-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .property-group {
+            margin-bottom: 20px;
+        }
+        .property-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .property-input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .property-input:focus {
+            outline: none;
+            border-color: #1677ff;
+        }
+        .color-input {
+            width: 40px;
+            height: 32px;
+            padding: 2px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+        }
+        .no-selection {
+            text-align: center;
+            color: #999;
+            padding: 40px 0;
+        }
         
         /* 代码模式 */
         .code-editor {
             width: 100%;
             height: 100%;
-            font-family: monospace;
+            font-family: 'Monaco', monospace;
             font-size: 13px;
-            padding: 1rem;
+            padding: 16px;
             border: none;
             resize: none;
             background: #1e1e1e;
             color: #d4d4d4;
         }
         
-        /* 模块编辑弹窗 */
-        .modal {
-            display: none;
+        /* 提示消息 */
+        .status-toast {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            width: 90%;
-            max-width: 500px;
-        }
-        .modal-content h3 { margin-bottom: 1rem; }
-        .modal-content input, .modal-content select {
-            width: 100%;
-            padding: 0.5rem;
-            margin-bottom: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-        .modal-content .row {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .modal-content .row > * { flex: 1; }
-        
-        .status-bar {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            padding: 0.5rem 1rem;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 16px;
             border-radius: 8px;
+            background: #333;
+            color: white;
+            font-size: 13px;
+            z-index: 1000;
             display: none;
-            z-index: 200;
         }
-        .success { background: #2e7d32; color: white; display: block; }
-        .error { background: #d32f2f; color: white; display: block; }
         
-        @media (max-width: 768px) {
-            .components-panel { width: 200px; }
+        /* 拖拽占位 */
+        .sortable-drag {
+            opacity: 0.5;
+            background: #f0f7ff;
+        }
+        
+        @media (max-width: 1200px) {
+            .module-library { width: 240px; }
+            .property-panel { width: 280px; }
         }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <h2>ZHAMIT 管理后台</h2>
-        <div>
-            <a href="/admin/pages.html">页面管理</a>
-            <a href="/admin/nav.html">导航菜单</a>
-            <a href="/admin/editor.html">页面装修</a>
-            <a href="/admin/settings.html">站点设置</a>
+        <div class="top-bar-left">
+            <h2>ZHAMIT 页面装修</h2>
+            <a href="/admin/pages.html">返回页面管理</a>
+        </div>
+        <div class="top-bar-right">
+            <button class="btn" id="previewBtn">👁️ 预览</button>
+            <button class="btn" id="codeModeBtn">💻 代码模式</button>
+            <button class="btn btn-primary" id="saveBtn">保存发布</button>
         </div>
     </div>
     
-    <div class="editor-container">
-        <!-- 左侧组件库 -->
-        <div class="components-panel">
-            <h3>📦 组件库</h3>
-            <div class="component-item" data-type="text" draggable="true">📝 文字模块</div>
-            <div class="component-item" data-type="image" draggable="true">🖼️ 图片模块</div>
-            <div class="component-item" data-type="heading" draggable="true">📌 标题模块</div>
-            <div class="component-item" data-type="button" draggable="true">🔘 按钮模块</div>
-            <div class="component-item" data-type="divider" draggable="true">➖ 分隔线</div>
+    <div class="editor-layout">
+        <!-- 左侧模块库 -->
+        <div class="module-library">
+            <div class="library-title">📦 模块库</div>
+            <div class="module-grid">
+                <div class="module-card" draggable="true" data-type="text">
+                    <div class="module-icon">📝</div>
+                    <div class="module-name">文字</div>
+                </div>
+                <div class="module-card" draggable="true" data-type="heading">
+                    <div class="module-icon">📌</div>
+                    <div class="module-name">标题</div>
+                </div>
+                <div class="module-card" draggable="true" data-type="image">
+                    <div class="module-icon">🖼️</div>
+                    <div class="module-name">图片</div>
+                </div>
+                <div class="module-card" draggable="true" data-type="button">
+                    <div class="module-icon">🔘</div>
+                    <div class="module-name">按钮</div>
+                </div>
+                <div class="module-card" draggable="true" data-type="divider">
+                    <div class="module-icon">➖</div>
+                    <div class="module-name">分隔线</div>
+                </div>
+                <div class="module-card" draggable="true" data-type="richText">
+                    <div class="module-icon">📄</div>
+                    <div class="module-name">富文本</div>
+                </div>
+            </div>
         </div>
         
-        <!-- 右侧编辑区 -->
-        <div class="editor-area">
-            <div class="editor-toolbar">
-                <div class="mode-switch">
-                    <span>🖱️ 可视化</span>
-                    <label class="switch">
-                        <input type="checkbox" id="codeModeToggle">
-                        <span>💻 代码模式</span>
-                    </label>
+        <!-- 中间画布区 -->
+        <div class="canvas-area">
+            <div class="canvas-toolbar">
+                <div class="device-switch">
+                    <button class="device-btn active" data-device="pc">PC</button>
+                    <button class="device-btn" data-device="tablet">平板</button>
+                    <button class="device-btn" data-device="mobile">手机</button>
                 </div>
-                <button class="btn btn-primary" id="saveBtn">💾 保存页面</button>
-                <button class="btn" id="previewBtn">👁️ 刷新预览</button>
-                <button class="btn" id="backBtn">← 返回列表</button>
-                <span id="pageInfo" style="font-size:0.75rem; color:#666;"></span>
+                <span style="font-size:12px; color:#999;">拖拽模块到下方区域</span>
             </div>
-            
             <div class="canvas-container">
-                <!-- 可视化画布 -->
-                <div id="visualCanvas" class="canvas">
-                    <div class="module-placeholder" style="color:#999; text-align:center; padding:2rem;">
-                        从左侧拖拽组件到这里
-                    </div>
-                </div>
-                <!-- 代码编辑器（默认隐藏） -->
+                <div id="canvas" class="canvas pc"></div>
                 <textarea id="codeEditor" class="code-editor" style="display: none;"></textarea>
             </div>
         </div>
-    </div>
-    
-    <!-- 模块编辑弹窗 -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalTitle">编辑模块</h3>
-            <div id="modalFields"></div>
-            <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
-                <button class="btn" id="modalSaveBtn">保存</button>
-                <button class="btn" id="modalCancelBtn" style="background:#ccc;">取消</button>
+        
+        <!-- 右侧属性面板 -->
+        <div class="property-panel" id="propertyPanel">
+            <div class="panel-title">属性设置</div>
+            <div id="panelContent" class="no-selection">
+                点击任意模块进行编辑
             </div>
         </div>
     </div>
     
-    <div id="statusMsg" class="status-bar"></div>
+    <div id="toast" class="status-toast"></div>
+    
+    <!-- 预览弹窗 -->
+    <div id="previewModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:1000;">
+        <div style="position:absolute; top:20px; right:20px;">
+            <button id="closePreviewBtn" style="background:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">关闭预览</button>
+        </div>
+        <iframe id="previewFrame" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
+    </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const pageId = urlParams.get('id');
-        let modules = [];  // 存储模块数据
-        let currentEditIndex = null;
+        // 模块数据
+        let modules = [];
+        let selectedIndex = null;
         let sortable = null;
+        let isCodeMode = false;
         
-        // 默认模块模板
-        const moduleTemplates = {
-            text: { type: 'text', content: '双击编辑文字', styles: { color: '#333', fontSize: '16px', fontWeight: 'normal', textDecoration: 'none' } },
+        // 模块模板
+        const templates = {
+            text: { type: 'text', content: '双击编辑文字', styles: { color: '#333', fontSize: '14px' } },
             heading: { type: 'heading', content: '新标题', level: 'h2', styles: { color: '#333', fontSize: '24px', fontWeight: 'bold' } },
             image: { type: 'image', src: 'https://picsum.photos/400/200', alt: '图片', width: '100%' },
-            button: { type: 'button', text: '按钮', url: '#', styles: { backgroundColor: '#1a1a1a', color: 'white', padding: '10px 20px', borderRadius: '6px', border: 'none' } },
-            divider: { type: 'divider', styles: { height: '1px', backgroundColor: '#e0e0e0', margin: '20px 0' } }
+            button: { type: 'button', text: '按钮', url: '#', styles: { backgroundColor: '#1677ff', color: '#fff', padding: '8px 16px', borderRadius: '6px' } },
+            divider: { type: 'divider', styles: { height: '1px', backgroundColor: '#e8e8e8', margin: '16px 0' } },
+            richText: { type: 'richText', content: '<p>这里是富文本内容，支持<strong>加粗</strong>和<em>斜体</em></p>' }
         };
         
-        // 渲染可视化画布
+        // 渲染画布
         function renderCanvas() {
-            const canvas = document.getElementById('visualCanvas');
+            const canvas = document.getElementById('canvas');
             if (!modules.length) {
-                canvas.innerHTML = '<div class="module-placeholder" style="color:#999; text-align:center; padding:2rem;">从左侧拖拽组件到这里</div>';
+                canvas.innerHTML = '<div style="text-align:center; padding:60px 20px; color:#999;">✨ 从左侧拖拽模块到这里开始装修</div>';
                 return;
             }
             
             canvas.innerHTML = modules.map((mod, idx) => {
-                let html = '';
+                let contentHtml = '';
                 switch(mod.type) {
                     case 'text':
-                        html = `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '16px'}; font-weight:${mod.styles?.fontWeight || 'normal'}; text-decoration:${mod.styles?.textDecoration || 'none'};">${mod.content || ''}</div>`;
+                        contentHtml = `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '14px'};">${escapeHtml(mod.content || '')}</div>`;
                         break;
                     case 'heading':
                         const tag = mod.level || 'h2';
-                        html = `<${tag} style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '24px'}; font-weight:${mod.styles?.fontWeight || 'bold'};">${mod.content || ''}</${tag}>`;
+                        contentHtml = `<${tag} style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '24px'}; font-weight:${mod.styles?.fontWeight || 'bold'};">${escapeHtml(mod.content || '')}</${tag}>`;
                         break;
                     case 'image':
-                        html = `<img src="${mod.src || ''}" alt="${mod.alt || ''}" style="width:${mod.width || '100%'}; max-width:100%; border-radius:8px;">`;
+                        contentHtml = `<img src="${mod.src || ''}" alt="${mod.alt || ''}" style="width:${mod.width || '100%'}; max-width:100%; border-radius:8px;">`;
                         break;
                     case 'button':
-                        html = `<a href="${mod.url || '#'}" style="display:inline-block; background:${mod.styles?.backgroundColor || '#1a1a1a'}; color:${mod.styles?.color || 'white'}; padding:${mod.styles?.padding || '10px 20px'}; border-radius:${mod.styles?.borderRadius || '6px'}; text-decoration:none;">${mod.text || '按钮'}</a>`;
+                        contentHtml = `<a href="${mod.url || '#'}" style="display:inline-block; background:${mod.styles?.backgroundColor || '#1677ff'}; color:${mod.styles?.color || '#fff'}; padding:${mod.styles?.padding || '8px 16px'}; border-radius:${mod.styles?.borderRadius || '6px'}; text-decoration:none;">${escapeHtml(mod.text || '按钮')}</a>`;
                         break;
                     case 'divider':
-                        html = `<hr style="height:${mod.styles?.height || '1px'}; background:${mod.styles?.backgroundColor || '#e0e0e0'}; border:none; margin:${mod.styles?.margin || '20px 0'};">`;
+                        contentHtml = `<hr style="height:${mod.styles?.height || '1px'}; background:${mod.styles?.backgroundColor || '#e8e8e8'}; border:none; margin:${mod.styles?.margin || '16px 0'};">`;
                         break;
-                    default:
-                        html = `<div>未知模块</div>`;
+                    case 'richText':
+                        contentHtml = `<div class="rich-text">${mod.content || ''}</div>`;
+                        break;
                 }
-                return `<div class="module" data-index="${idx}">
-                    ${html}
+                return `<div class="module-item" data-index="${idx}" data-type="${mod.type}">
                     <div class="module-actions">
-                        <button class="edit-module" data-index="${idx}">✏️ 编辑</button>
-                        <button class="delete-module" data-index="${idx}">🗑️ 删除</button>
+                        <button class="edit-module-btn" data-index="${idx}">编辑</button>
+                        <button class="delete-module-btn" data-index="${idx}">删除</button>
+                    </div>
+                    <div class="module-content" onclick="selectModule(${idx})">
+                        ${contentHtml}
                     </div>
                 </div>`;
             }).join('');
             
-            // 绑定编辑/删除事件
-            document.querySelectorAll('.edit-module').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const idx = parseInt(btn.dataset.index);
-                    openEditModal(idx);
-                });
-            });
-            document.querySelectorAll('.delete-module').forEach(btn => {
+            // 绑定删除事件
+            document.querySelectorAll('.delete-module-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const idx = parseInt(btn.dataset.index);
                     modules.splice(idx, 1);
+                    if (selectedIndex === idx) {
+                        selectedIndex = null;
+                        renderPropertyPanel();
+                    }
                     renderCanvas();
-                    updateCodeFromModules();
-                    updatePreview();
                 });
             });
             
-            // 重新初始化拖拽排序
+            // 绑定编辑事件
+            document.querySelectorAll('.edit-module-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.index);
+                    selectModule(idx);
+                });
+            });
+            
+            // 初始化拖拽排序
             if (sortable) sortable.destroy();
             sortable = new Sortable(canvas, {
                 animation: 150,
+                handle: '.module-item',
                 onEnd: () => {
-                    const newOrder = Array.from(canvas.querySelectorAll('.module')).map(el => parseInt(el.dataset.index));
                     const newModules = [];
-                    for (let i = 0; i < newOrder.length; i++) {
-                        newModules.push(modules[newOrder[i]]);
-                    }
+                    document.querySelectorAll('.module-item').forEach(el => {
+                        const idx = parseInt(el.dataset.index);
+                        newModules.push(modules[idx]);
+                    });
                     modules = newModules;
                     renderCanvas();
-                    updateCodeFromModules();
-                    updatePreview();
+                    if (selectedIndex !== null) renderPropertyPanel();
                 }
             });
         }
         
-        // 从模块生成 HTML 代码
-        function modulesToHtml() {
-            return modules.map(mod => {
-                switch(mod.type) {
-                    case 'text':
-                        return `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '16px'}; font-weight:${mod.styles?.fontWeight || 'normal'}; text-decoration:${mod.styles?.textDecoration || 'none'};">${mod.content || ''}</div>`;
-                    case 'heading':
-                        return `<${mod.level || 'h2'} style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '24px'}; font-weight:${mod.styles?.fontWeight || 'bold'};">${mod.content || ''}</${mod.level || 'h2'}>`;
-                    case 'image':
-                        return `<img src="${mod.src || ''}" alt="${mod.alt || ''}" style="width:${mod.width || '100%'}; max-width:100%; border-radius:8px;">`;
-                    case 'button':
-                        return `<a href="${mod.url || '#'}" style="display:inline-block; background:${mod.styles?.backgroundColor || '#1a1a1a'}; color:${mod.styles?.color || 'white'}; padding:${mod.styles?.padding || '10px 20px'}; border-radius:${mod.styles?.borderRadius || '6px'}; text-decoration:none;">${mod.text || '按钮'}</a>`;
-                    case 'divider':
-                        return `<hr style="height:${mod.styles?.height || '1px'}; background:${mod.styles?.backgroundColor || '#e0e0e0'}; border:none; margin:${mod.styles?.margin || '20px 0'};">`;
-                    default:
-                        return '';
-                }
-            }).join('\n');
+        // 选中模块
+        function selectModule(index) {
+            selectedIndex = index;
+            renderPropertyPanel();
+            // 高亮选中模块
+            document.querySelectorAll('.module-item').forEach(el => {
+                el.style.border = '1px solid #e8e8e8';
+            });
+            const selectedEl = document.querySelector(`.module-item[data-index="${index}"]`);
+            if (selectedEl) selectedEl.style.border = '2px solid #1677ff';
         }
         
-        function updateCodeFromModules() {
-            document.getElementById('codeEditor').value = modulesToHtml();
-        }
-        
-        function updatePreview() {
-            const content = modulesToHtml();
-            const previewFrame = document.getElementById('previewFrame');
-            if (previewFrame) {
-                const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-                previewDoc.open();
-                previewDoc.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-                    <body style="margin:0; padding:20px; font-family:system-ui;">${content || '<p style="color:#999;">暂无内容</p>'}</body>
-                    </html>
-                `);
-                previewDoc.close();
+        // 渲染属性面板
+        function renderPropertyPanel() {
+            const panel = document.getElementById('panelContent');
+            if (selectedIndex === null || !modules[selectedIndex]) {
+                panel.innerHTML = '<div class="no-selection">✨ 点击任意模块进行编辑</div>';
+                return;
             }
-        }
-        
-        // 打开编辑弹窗
-        function openEditModal(index) {
-            currentEditIndex = index;
-            const mod = modules[index];
-            const modal = document.getElementById('editModal');
-            const fields = document.getElementById('modalFields');
-            document.getElementById('modalTitle').textContent = `编辑${mod.type === 'text' ? '文字' : mod.type === 'heading' ? '标题' : mod.type === 'image' ? '图片' : mod.type === 'button' ? '按钮' : '模块'}`;
+            const mod = modules[selectedIndex];
+            
+            let html = `<div class="property-group"><label class="property-label">模块类型</label><input class="property-input" value="${mod.type === 'text' ? '文字' : mod.type === 'heading' ? '标题' : mod.type === 'image' ? '图片' : mod.type === 'button' ? '按钮' : mod.type === 'divider' ? '分隔线' : '富文本'}" disabled></div>`;
             
             if (mod.type === 'text' || mod.type === 'heading') {
-                fields.innerHTML = `
-                    <label>内容</label>
-                    <input type="text" id="editContent" value="${escapeHtml(mod.content || '')}">
-                    <div class="row">
-                        <div><label>颜色</label><input type="color" id="editColor" value="${mod.styles?.color || '#333333'}"></div>
-                        <div><label>字体大小</label><input type="text" id="editFontSize" value="${mod.styles?.fontSize || (mod.type === 'heading' ? '24px' : '16px')}"></div>
-                    </div>
-                    <div class="row">
-                        <div><label>粗细</label><select id="editFontWeight"><option value="normal">正常</option><option value="bold">粗体</option></select></div>
-                        <div><label>下划线</label><select id="editDecoration"><option value="none">无</option><option value="underline">下划线</option></select></div>
-                    </div>
-                `;
+                html += `<div class="property-group"><label class="property-label">内容</label><input class="property-input" id="editContent" value="${escapeHtml(mod.content || '')}"></div>`;
+                html += `<div class="property-group"><label class="property-label">文字颜色</label><input type="color" class="color-input" id="editColor" value="${mod.styles?.color || '#333333'}"></div>`;
+                html += `<div class="property-group"><label class="property-label">字体大小</label><input class="property-input" id="editFontSize" value="${mod.styles?.fontSize || (mod.type === 'heading' ? '24px' : '14px')}"></div>`;
                 if (mod.type === 'heading') {
-                    fields.innerHTML += `<div><label>标题级别</label><select id="editLevel"><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option></select></div>`;
+                    html += `<div class="property-group"><label class="property-label">标题级别</label><select class="property-input" id="editLevel"><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option></select></div>`;
                 }
-                // 设置当前值
-                document.getElementById('editContent').value = mod.content || '';
-                document.getElementById('editColor').value = mod.styles?.color || '#333333';
-                document.getElementById('editFontSize').value = mod.styles?.fontSize || (mod.type === 'heading' ? '24px' : '16px');
-                document.getElementById('editFontWeight').value = mod.styles?.fontWeight || 'normal';
-                document.getElementById('editDecoration').value = mod.styles?.textDecoration || 'none';
-                if (mod.type === 'heading') {
+            } else if (mod.type === 'image') {
+                html += `<div class="property-group"><label class="property-label">图片地址</label><input class="property-input" id="editSrc" value="${escapeHtml(mod.src || '')}"></div>`;
+                html += `<div class="property-group"><label class="property-label">替代文字</label><input class="property-input" id="editAlt" value="${escapeHtml(mod.alt || '')}"></div>`;
+                html += `<div class="property-group"><label class="property-label">宽度</label><input class="property-input" id="editWidth" value="${mod.width || '100%'}"></div>`;
+            } else if (mod.type === 'button') {
+                html += `<div class="property-group"><label class="property-label">按钮文字</label><input class="property-input" id="editText" value="${escapeHtml(mod.text || '')}"></div>`;
+                html += `<div class="property-group"><label class="property-label">链接</label><input class="property-input" id="editUrl" value="${escapeHtml(mod.url || '#')}"></div>`;
+                html += `<div class="property-group"><label class="property-label">背景色</label><input type="color" class="color-input" id="editBgColor" value="${mod.styles?.backgroundColor || '#1677ff'}"></div>`;
+                html += `<div class="property-group"><label class="property-label">文字颜色</label><input type="color" class="color-input" id="editBtnColor" value="${mod.styles?.color || '#ffffff'}"></div>`;
+            } else if (mod.type === 'richText') {
+                html += `<div class="property-group"><label class="property-label">富文本内容</label><textarea class="property-input" id="editRichContent" rows="6">${escapeHtml(mod.content || '')}</textarea></div>`;
+            }
+            
+            html += `<div class="property-group"><button class="btn" id="applyPropertyBtn" style="width:100%; background:#1677ff; color:white; border:none;">应用修改</button></div>`;
+            panel.innerHTML = html;
+            
+            // 绑定应用按钮
+            document.getElementById('applyPropertyBtn')?.addEventListener('click', () => {
+                if (mod.type === 'text' || mod.type === 'heading') {
+                    mod.content = document.getElementById('editContent')?.value || '';
+                    mod.styles = {
+                        color: document.getElementById('editColor')?.value || '#333',
+                        fontSize: document.getElementById('editFontSize')?.value || (mod.type === 'heading' ? '24px' : '14px')
+                    };
+                    if (mod.type === 'heading') {
+                        mod.level = document.getElementById('editLevel')?.value || 'h2';
+                    }
+                } else if (mod.type === 'image') {
+                    mod.src = document.getElementById('editSrc')?.value || '';
+                    mod.alt = document.getElementById('editAlt')?.value || '';
+                    mod.width = document.getElementById('editWidth')?.value || '100%';
+                } else if (mod.type === 'button') {
+                    mod.text = document.getElementById('editText')?.value || '';
+                    mod.url = document.getElementById('editUrl')?.value || '#';
+                    mod.styles = {
+                        backgroundColor: document.getElementById('editBgColor')?.value || '#1677ff',
+                        color: document.getElementById('editBtnColor')?.value || '#ffffff',
+                        padding: '8px 16px',
+                        borderRadius: '6px'
+                    };
+                } else if (mod.type === 'richText') {
+                    mod.content = document.getElementById('editRichContent')?.value || '';
+                }
+                renderCanvas();
+                renderPropertyPanel();
+                showToast('修改已应用');
+            });
+            
+            // 设置选中值
+            setTimeout(() => {
+                if (mod.type === 'heading' && document.getElementById('editLevel')) {
                     document.getElementById('editLevel').value = mod.level || 'h2';
                 }
-            } else if (mod.type === 'image') {
-                fields.innerHTML = `
-                    <label>图片 URL</label>
-                    <input type="text" id="editSrc" value="${escapeHtml(mod.src || '')}">
-                    <label>替代文字</label>
-                    <input type="text" id="editAlt" value="${escapeHtml(mod.alt || '')}">
-                    <label>宽度</label>
-                    <input type="text" id="editWidth" value="${mod.width || '100%'}">
-                `;
-            } else if (mod.type === 'button') {
-                fields.innerHTML = `
-                    <label>按钮文字</label>
-                    <input type="text" id="editText" value="${escapeHtml(mod.text || '')}">
-                    <label>链接</label>
-                    <input type="text" id="editUrl" value="${escapeHtml(mod.url || '#')}">
-                    <div class="row">
-                        <div><label>背景色</label><input type="color" id="editBgColor" value="${mod.styles?.backgroundColor || '#1a1a1a'}"></div>
-                        <div><label>文字颜色</label><input type="color" id="editColor" value="${mod.styles?.color || '#ffffff'}"></div>
-                    </div>
-                `;
-            }
-            modal.style.display = 'flex';
-        }
-        
-        function saveModuleEdit() {
-            if (currentEditIndex === null) return;
-            const mod = modules[currentEditIndex];
-            
-            if (mod.type === 'text' || mod.type === 'heading') {
-                mod.content = document.getElementById('editContent')?.value || '';
-                mod.styles = {
-                    color: document.getElementById('editColor')?.value || '#333',
-                    fontSize: document.getElementById('editFontSize')?.value || '16px',
-                    fontWeight: document.getElementById('editFontWeight')?.value || 'normal',
-                    textDecoration: document.getElementById('editDecoration')?.value || 'none'
-                };
-                if (mod.type === 'heading') {
-                    mod.level = document.getElementById('editLevel')?.value || 'h2';
-                }
-            } else if (mod.type === 'image') {
-                mod.src = document.getElementById('editSrc')?.value || '';
-                mod.alt = document.getElementById('editAlt')?.value || '';
-                mod.width = document.getElementById('editWidth')?.value || '100%';
-            } else if (mod.type === 'button') {
-                mod.text = document.getElementById('editText')?.value || '';
-                mod.url = document.getElementById('editUrl')?.value || '#';
-                mod.styles = {
-                    backgroundColor: document.getElementById('editBgColor')?.value || '#1a1a1a',
-                    color: document.getElementById('editColor')?.value || '#ffffff',
-                    padding: '10px 20px',
-                    borderRadius: '6px'
-                };
-            }
-            
-            closeModal();
-            renderCanvas();
-            updateCodeFromModules();
-            updatePreview();
-        }
-        
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
-            currentEditIndex = null;
+            }, 0);
         }
         
         // 添加模块
         function addModule(type) {
-            const newModule = JSON.parse(JSON.stringify(moduleTemplates[type]));
+            const newModule = JSON.parse(JSON.stringify(templates[type]));
             modules.push(newModule);
             renderCanvas();
-            updateCodeFromModules();
-            updatePreview();
+            showToast(`已添加${type === 'text' ? '文字' : type === 'heading' ? '标题' : type === 'image' ? '图片' : type === 'button' ? '按钮' : type === 'divider' ? '分隔线' : '富文本'}模块`);
         }
         
-        // 拖拽处理
+        // 拖拽添加
         function setupDragDrop() {
-            const components = document.querySelectorAll('.component-item');
-            components.forEach(comp => {
-                comp.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', comp.dataset.type);
+            const draggables = document.querySelectorAll('[draggable="true"]');
+            draggables.forEach(el => {
+                el.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', el.dataset.type);
                 });
             });
-            const canvas = document.getElementById('visualCanvas');
+            const canvas = document.getElementById('canvas');
             canvas.addEventListener('dragover', (e) => e.preventDefault());
             canvas.addEventListener('drop', (e) => {
                 e.preventDefault();
@@ -570,54 +628,73 @@
             });
         }
         
-        // 代码模式切换
+        // 设备切换
+        function setupDeviceSwitch() {
+            const btns = document.querySelectorAll('.device-btn');
+            const canvas = document.getElementById('canvas');
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    canvas.className = `canvas ${btn.dataset.device}`;
+                });
+            });
+        }
+        
+        // 代码模式
         function setupCodeMode() {
-            const toggle = document.getElementById('codeModeToggle');
-            const visualCanvas = document.getElementById('visualCanvas');
+            const btn = document.getElementById('codeModeBtn');
+            const canvas = document.getElementById('canvas');
             const codeEditor = document.getElementById('codeEditor');
-            toggle.addEventListener('change', () => {
-                if (toggle.checked) {
-                    // 切换到代码模式
+            btn.addEventListener('click', () => {
+                isCodeMode = !isCodeMode;
+                if (isCodeMode) {
                     codeEditor.value = modulesToHtml();
-                    visualCanvas.style.display = 'none';
+                    canvas.style.display = 'none';
                     codeEditor.style.display = 'block';
+                    btn.textContent = '🎨 可视化模式';
                 } else {
-                    // 切换回可视化模式，从代码解析模块
-                    try {
-                        // 简单解析：将代码按行分割，这里简化处理
-                        // 实际项目中可以用更复杂的解析，这里先用占位
-                        visualCanvas.style.display = 'block';
-                        codeEditor.style.display = 'none';
-                    } catch(e) {
-                        showStatus('代码解析失败', 'error');
-                    }
+                    canvas.style.display = 'block';
+                    codeEditor.style.display = 'none';
+                    btn.textContent = '💻 代码模式';
                 }
             });
         }
         
-        async function loadPage() {
-            if (!pageId) {
-                document.getElementById('pageInfo').textContent = '新建页面';
-                return;
-            }
-            try {
-                const res = await fetch(`/api/pages?id=${pageId}`);
-                const page = await res.json();
-                document.getElementById('pageInfo').textContent = `编辑: ${page.path}`;
-                if (page.content) {
-                    // 这里简化处理，实际需要解析 HTML 为模块
-                    // 暂时先显示提示
-                    showStatus('已加载页面内容', 'success');
+        function modulesToHtml() {
+            return modules.map(mod => {
+                switch(mod.type) {
+                    case 'text': return `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '14px'};">${mod.content || ''}</div>`;
+                    case 'heading': return `<${mod.level || 'h2'} style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '24px'}; font-weight:bold;">${mod.content || ''}</${mod.level || 'h2'}>`;
+                    case 'image': return `<img src="${mod.src || ''}" alt="${mod.alt || ''}" style="width:${mod.width || '100%'}; max-width:100%;">`;
+                    case 'button': return `<a href="${mod.url || '#'}" style="display:inline-block; background:${mod.styles?.backgroundColor || '#1677ff'}; color:${mod.styles?.color || '#fff'}; padding:8px 16px; border-radius:6px; text-decoration:none;">${mod.text || '按钮'}</a>`;
+                    case 'divider': return `<hr style="height:${mod.styles?.height || '1px'}; background:${mod.styles?.backgroundColor || '#e8e8e8'}; border:none; margin:16px 0;">`;
+                    case 'richText': return `<div>${mod.content || ''}</div>`;
+                    default: return '';
                 }
-            } catch(e) {
-                console.error('加载失败', e);
-            }
+            }).join('\n');
         }
         
+        // 预览
+        function preview() {
+            const modal = document.getElementById('previewModal');
+            const iframe = document.getElementById('previewFrame');
+            const content = modulesToHtml();
+            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0; padding:20px; font-family:system-ui;">${content || '<p>暂无内容</p>'}</body></html>`;
+            modal.style.display = 'block';
+        }
+        
+        // 保存
         async function savePage() {
             const content = modulesToHtml();
-            const path = document.getElementById('pagePath')?.value || (pageId ? '' : '/new-page');
-            const title = document.getElementById('pageTitle')?.value || 'New Page';
+            const urlParams = new URLSearchParams(window.location.search);
+            const pageId = urlParams.get('id');
+            
+            // 简单获取路径和标题（可以从 URL 参数或弹窗获取）
+            const path = prompt('页面路径 (如 /about):', pageId ? '' : '/new-page');
+            if (!path) return;
+            const title = prompt('页面标题:', 'New Page');
+            if (!title) return;
             
             const data = {
                 id: pageId || null,
@@ -634,21 +711,21 @@
                     body: JSON.stringify(data)
                 });
                 if (res.ok) {
-                    showStatus('保存成功！', 'success');
+                    showToast('保存成功！');
                     setTimeout(() => { window.location.href = '/admin/pages.html'; }, 1000);
                 } else {
-                    showStatus('保存失败', 'error');
+                    showToast('保存失败');
                 }
             } catch(e) {
-                showStatus('保存失败: ' + e.message, 'error');
+                showToast('保存失败: ' + e.message);
             }
         }
         
-        function showStatus(msg, type) {
-            const el = document.getElementById('statusMsg');
-            el.textContent = msg;
-            el.className = `status-bar ${type}`;
-            setTimeout(() => el.className = 'status-bar', 2000);
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
         }
         
         function escapeHtml(str) {
@@ -656,61 +733,37 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
         
-        // 创建预览 iframe
-        const previewContainer = document.createElement('div');
-        previewContainer.style.position = 'fixed';
-        previewContainer.style.bottom = '20px';
-        previewContainer.style.right = '20px';
-        previewContainer.style.width = '400px';
-        previewContainer.style.height = '300px';
-        previewContainer.style.backgroundColor = 'white';
-        previewContainer.style.border = '1px solid #ccc';
-        previewContainer.style.borderRadius = '8px';
-        previewContainer.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        previewContainer.style.zIndex = '1000';
-        previewContainer.style.display = 'none';
-        previewContainer.innerHTML = `
-            <div style="background:#f0f0f0; padding:5px 10px; display:flex; justify-content:space-between;">
-                <span>实时预览</span>
-                <button id="closePreview" style="background:none; border:none; cursor:pointer;">✕</button>
-            </div>
-            <iframe id="previewFrame" style="width:100%; height:calc(100% - 35px); border:none;"></iframe>
-        `;
-        document.body.appendChild(previewContainer);
-        
-        document.getElementById('previewBtn')?.addEventListener('click', () => {
-            previewContainer.style.display = 'block';
-            updatePreview();
-        });
-        document.getElementById('closePreview')?.addEventListener('click', () => {
-            previewContainer.style.display = 'none';
-        });
+        // 加载已有页面内容
+        async function loadExistingPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pageId = urlParams.get('id');
+            if (!pageId) return;
+            try {
+                const res = await fetch(`/api/pages?id=${pageId}`);
+                const page = await res.json();
+                if (page && page.content) {
+                    // 这里简化解析，实际需要解析 HTML 为模块
+                    // 暂时先不处理，提示用户
+                    showToast('已加载页面，当前编辑器仅支持新建内容');
+                }
+            } catch(e) {}
+        }
         
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            loadPage();
+            loadExistingPage();
             setupDragDrop();
+            setupDeviceSwitch();
             setupCodeMode();
+            document.getElementById('previewBtn').addEventListener('click', preview);
             document.getElementById('saveBtn').addEventListener('click', savePage);
-            document.getElementById('backBtn').addEventListener('click', () => {
-                window.location.href = '/admin/pages.html';
+            document.getElementById('closePreviewBtn').addEventListener('click', () => {
+                document.getElementById('previewModal').style.display = 'none';
             });
-            document.getElementById('modalSaveBtn').addEventListener('click', saveModuleEdit);
-            document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
-            
-            // 添加一个简单的路径/标题输入框到工具栏
-            const toolbar = document.querySelector('.editor-toolbar');
-            const infoSpan = document.getElementById('pageInfo');
-            const inputGroup = document.createElement('div');
-            inputGroup.style.display = 'flex';
-            inputGroup.style.gap = '0.5rem';
-            inputGroup.style.marginLeft = 'auto';
-            inputGroup.innerHTML = `
-                <input type="text" id="pagePath" placeholder="路径" style="padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px; width:120px;">
-                <input type="text" id="pageTitle" placeholder="标题" style="padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px; width:120px;">
-            `;
-            toolbar.appendChild(inputGroup);
+            renderCanvas();
         });
+        
+        window.selectModule = selectModule;
     </script>
 </body>
 </html>
