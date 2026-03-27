@@ -16,16 +16,11 @@
         })();
     </script>
     
-    <!-- SortableJS 拖拽库 -->
+    <!-- SortableJS 拖拽排序 -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f0f2f5;
@@ -46,12 +41,11 @@
             left: 0;
             right: 0;
             z-index: 100;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
         }
         .top-bar-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 24px;
         }
         .top-bar-left h2 {
             font-size: 18px;
@@ -62,14 +56,10 @@
             color: #666;
             text-decoration: none;
             font-size: 14px;
-            margin-left: 16px;
         }
-        .top-bar-left a:hover {
-            color: #1a1a1a;
-        }
+        .top-bar-left a:hover { color: #1677ff; }
         .top-bar-right {
             display: flex;
-            align-items: center;
             gap: 12px;
         }
         .btn {
@@ -86,17 +76,7 @@
             border-color: #1677ff;
             color: white;
         }
-        .btn-primary:hover {
-            background: #4096ff;
-        }
-        .btn-danger {
-            border-color: #ff4d4f;
-            color: #ff4d4f;
-        }
-        .btn-danger:hover {
-            background: #ff4d4f;
-            color: white;
-        }
+        .btn-primary:hover { background: #4096ff; }
         
         /* 主布局 */
         .editor-layout {
@@ -107,13 +87,11 @@
         
         /* 左侧模块库 */
         .module-library {
-            width: 280px;
+            width: 260px;
             background: #fff;
             border-right: 1px solid #e8e8e8;
-            display: flex;
-            flex-direction: column;
             overflow-y: auto;
-            padding: 16px;
+            padding: 20px 16px;
         }
         .library-title {
             font-size: 14px;
@@ -139,17 +117,9 @@
             border-color: #1677ff;
             background: #f0f7ff;
         }
-        .module-card:active {
-            cursor: grabbing;
-        }
-        .module-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        .module-name {
-            font-size: 12px;
-            color: #666;
-        }
+        .module-card:active { cursor: grabbing; }
+        .module-icon { font-size: 24px; margin-bottom: 8px; }
+        .module-name { font-size: 12px; color: #666; }
         
         /* 中间画布区 */
         .canvas-area {
@@ -164,25 +134,12 @@
             border-bottom: 1px solid #e8e8e8;
             padding: 8px 16px;
             display: flex;
-            gap: 12px;
+            justify-content: space-between;
             align-items: center;
         }
-        .device-switch {
-            display: flex;
-            border: 1px solid #d9d9d9;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .device-btn {
-            padding: 4px 12px;
+        .canvas-toolbar span {
             font-size: 12px;
-            background: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        .device-btn.active {
-            background: #1677ff;
-            color: white;
+            color: #999;
         }
         .canvas-container {
             flex: 1;
@@ -190,23 +147,19 @@
             padding: 24px;
         }
         .canvas {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             min-height: 600px;
-            padding: 20px;
-            transition: max-width 0.2s;
+            padding: 24px;
         }
-        .canvas.pc { max-width: 1200px; }
-        .canvas.tablet { max-width: 768px; }
-        .canvas.mobile { max-width: 375px; }
         
         /* 模块样式 */
         .module-item {
             position: relative;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             border: 1px solid #e8e8e8;
             border-radius: 8px;
             background: #fff;
@@ -215,125 +168,133 @@
         .module-item:hover {
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .module-item:hover .module-actions {
+        .module-item:hover .module-toolbar {
             display: flex;
         }
-        .module-actions {
+        .module-toolbar {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: -32px;
+            right: 0;
             display: none;
             gap: 4px;
             background: #fff;
             border-radius: 6px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
             padding: 4px;
+            z-index: 10;
         }
-        .module-actions button {
-            padding: 4px 8px;
+        .module-toolbar button {
+            padding: 4px 10px;
             font-size: 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            background: #f5f5f5;
+            transition: all 0.2s;
         }
-        .edit-module-btn {
-            background: #1677ff;
-            color: white;
-        }
-        .delete-module-btn {
-            background: #ff4d4f;
-            color: white;
-        }
+        .module-toolbar button:hover { background: #e8e8e8; }
+        .toolbar-edit { color: #1677ff; }
+        .toolbar-code { color: #52c41a; }
+        .toolbar-copy { color: #fa8c16; }
+        .toolbar-delete { color: #ff4d4f; }
         .module-content {
             padding: 16px;
+            cursor: pointer;
         }
         
-        /* 右侧属性面板 */
-        .property-panel {
-            width: 320px;
+        /* 编辑弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
             background: #fff;
-            border-left: 1px solid #e8e8e8;
-            display: flex;
-            flex-direction: column;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 80vh;
             overflow-y: auto;
-            padding: 16px;
         }
-        .panel-title {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .property-group {
+        .modal-content h3 {
             margin-bottom: 20px;
+            font-size: 18px;
         }
-        .property-label {
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .form-group textarea {
+            min-height: 150px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .color-row {
+            display: flex;
+            gap: 12px;
+        }
+        .color-row > div { flex: 1; }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .code-mode-hint {
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 6px;
             font-size: 12px;
             color: #666;
-            margin-bottom: 6px;
-            display: block;
-        }
-        .property-input {
-            width: 100%;
-            padding: 6px 10px;
-            border: 1px solid #d9d9d9;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-        .property-input:focus {
-            outline: none;
-            border-color: #1677ff;
-        }
-        .color-input {
-            width: 40px;
-            height: 32px;
-            padding: 2px;
-            border: 1px solid #d9d9d9;
-            border-radius: 6px;
-        }
-        .no-selection {
-            text-align: center;
-            color: #999;
-            padding: 40px 0;
-        }
-        
-        /* 代码模式 */
-        .code-editor {
-            width: 100%;
-            height: 100%;
-            font-family: 'Monaco', monospace;
-            font-size: 13px;
-            padding: 16px;
-            border: none;
-            resize: none;
-            background: #1e1e1e;
-            color: #d4d4d4;
+            margin-bottom: 12px;
         }
         
         /* 提示消息 */
-        .status-toast {
+        .toast {
             position: fixed;
             bottom: 20px;
             right: 20px;
             padding: 8px 16px;
-            border-radius: 8px;
             background: #333;
             color: white;
+            border-radius: 8px;
             font-size: 13px;
             z-index: 1000;
             display: none;
         }
         
-        /* 拖拽占位 */
-        .sortable-drag {
-            opacity: 0.5;
-            background: #f0f7ff;
-        }
+        .sortable-drag { opacity: 0.4; background: #f0f7ff; }
         
-        @media (max-width: 1200px) {
-            .module-library { width: 240px; }
-            .property-panel { width: 280px; }
+        @media (max-width: 768px) {
+            .module-library { width: 200px; }
+            .module-toolbar { top: -28px; }
+            .module-toolbar button { padding: 2px 6px; font-size: 10px; }
         }
     </style>
 </head>
@@ -345,94 +306,107 @@
         </div>
         <div class="top-bar-right">
             <button class="btn" id="previewBtn">👁️ 预览</button>
-            <button class="btn" id="codeModeBtn">💻 代码模式</button>
-            <button class="btn btn-primary" id="saveBtn">保存发布</button>
+            <button class="btn btn-primary" id="saveBtn">💾 保存发布</button>
         </div>
     </div>
     
     <div class="editor-layout">
         <!-- 左侧模块库 -->
         <div class="module-library">
-            <div class="library-title">📦 模块库</div>
+            <div class="library-title">📦 模块库（拖拽添加）</div>
             <div class="module-grid">
-                <div class="module-card" draggable="true" data-type="text">
-                    <div class="module-icon">📝</div>
-                    <div class="module-name">文字</div>
-                </div>
-                <div class="module-card" draggable="true" data-type="heading">
-                    <div class="module-icon">📌</div>
-                    <div class="module-name">标题</div>
-                </div>
-                <div class="module-card" draggable="true" data-type="image">
-                    <div class="module-icon">🖼️</div>
-                    <div class="module-name">图片</div>
-                </div>
-                <div class="module-card" draggable="true" data-type="button">
-                    <div class="module-icon">🔘</div>
-                    <div class="module-name">按钮</div>
-                </div>
-                <div class="module-card" draggable="true" data-type="divider">
-                    <div class="module-icon">➖</div>
-                    <div class="module-name">分隔线</div>
-                </div>
-                <div class="module-card" draggable="true" data-type="richText">
-                    <div class="module-icon">📄</div>
-                    <div class="module-name">富文本</div>
-                </div>
+                <div class="module-card" draggable="true" data-type="text"><div class="module-icon">📝</div><div class="module-name">文字</div></div>
+                <div class="module-card" draggable="true" data-type="heading"><div class="module-icon">📌</div><div class="module-name">标题</div></div>
+                <div class="module-card" draggable="true" data-type="image"><div class="module-icon">🖼️</div><div class="module-name">图片</div></div>
+                <div class="module-card" draggable="true" data-type="button"><div class="module-icon">🔘</div><div class="module-name">按钮</div></div>
+                <div class="module-card" draggable="true" data-type="divider"><div class="module-icon">➖</div><div class="module-name">分隔线</div></div>
+                <div class="module-card" draggable="true" data-type="richText"><div class="module-icon">📄</div><div class="module-name">富文本</div></div>
             </div>
         </div>
         
         <!-- 中间画布区 -->
         <div class="canvas-area">
             <div class="canvas-toolbar">
-                <div class="device-switch">
-                    <button class="device-btn active" data-device="pc">PC</button>
-                    <button class="device-btn" data-device="tablet">平板</button>
-                    <button class="device-btn" data-device="mobile">手机</button>
-                </div>
-                <span style="font-size:12px; color:#999;">拖拽模块到下方区域</span>
+                <span>✨ 鼠标悬停模块显示操作栏</span>
+                <span>📌 拖拽模块可调整顺序 | 每个模块可单独编辑样式或代码</span>
             </div>
             <div class="canvas-container">
-                <div id="canvas" class="canvas pc"></div>
-                <textarea id="codeEditor" class="code-editor" style="display: none;"></textarea>
-            </div>
-        </div>
-        
-        <!-- 右侧属性面板 -->
-        <div class="property-panel" id="propertyPanel">
-            <div class="panel-title">属性设置</div>
-            <div id="panelContent" class="no-selection">
-                点击任意模块进行编辑
+                <div id="canvas" class="canvas"></div>
             </div>
         </div>
     </div>
     
-    <div id="toast" class="status-toast"></div>
+    <!-- 编辑弹窗（样式编辑） -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">编辑模块</h3>
+            <div id="modalFields"></div>
+            <div class="modal-buttons">
+                <button class="btn" id="modalSaveBtn">保存</button>
+                <button class="btn" id="modalCancelBtn" style="background:#f0f0f0;">取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 代码编辑弹窗（单独模块的源代码） -->
+    <div id="codeModal" class="modal">
+        <div class="modal-content">
+            <h3>编辑模块源代码</h3>
+            <div class="code-mode-hint">✏️ 直接修改此模块的 HTML 代码，保存后立即生效</div>
+            <div class="form-group">
+                <textarea id="codeEditorContent" rows="12" style="font-family: monospace;"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="codeSaveBtn">保存并应用</button>
+                <button class="btn" id="codeCancelBtn" style="background:#f0f0f0;">取消</button>
+            </div>
+        </div>
+    </div>
     
     <!-- 预览弹窗 -->
     <div id="previewModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:1000;">
-        <div style="position:absolute; top:20px; right:20px;">
-            <button id="closePreviewBtn" style="background:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">关闭预览</button>
-        </div>
+        <div style="position:absolute; top:20px; right:20px;"><button id="closePreviewBtn" style="background:#fff; border:none; padding:8px 16px; border-radius:6px;">关闭预览</button></div>
         <iframe id="previewFrame" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
     </div>
+    
+    <div id="toast" class="toast"></div>
 
     <script>
-        // 模块数据
         let modules = [];
-        let selectedIndex = null;
+        let currentEditIndex = null;
+        let currentCodeIndex = null;
         let sortable = null;
-        let isCodeMode = false;
         
         // 模块模板
         const templates = {
-            text: { type: 'text', content: '双击编辑文字', styles: { color: '#333', fontSize: '14px' } },
+            text: { type: 'text', content: '双击编辑文字', styles: { color: '#333', fontSize: '14px', fontWeight: 'normal', textDecoration: 'none' } },
             heading: { type: 'heading', content: '新标题', level: 'h2', styles: { color: '#333', fontSize: '24px', fontWeight: 'bold' } },
             image: { type: 'image', src: 'https://picsum.photos/400/200', alt: '图片', width: '100%' },
-            button: { type: 'button', text: '按钮', url: '#', styles: { backgroundColor: '#1677ff', color: '#fff', padding: '8px 16px', borderRadius: '6px' } },
-            divider: { type: 'divider', styles: { height: '1px', backgroundColor: '#e8e8e8', margin: '16px 0' } },
+            button: { type: 'button', text: '按钮', url: '#', styles: { backgroundColor: '#1677ff', color: '#fff', padding: '8px 20px', borderRadius: '6px' } },
+            divider: { type: 'divider', styles: { height: '1px', backgroundColor: '#e8e8e8', margin: '20px 0' } },
             richText: { type: 'richText', content: '<p>这里是富文本内容，支持<strong>加粗</strong>和<em>斜体</em></p>' }
         };
+        
+        // 生成模块HTML
+        function renderModuleContent(mod) {
+            switch(mod.type) {
+                case 'text':
+                    return `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '14px'}; font-weight:${mod.styles?.fontWeight || 'normal'}; text-decoration:${mod.styles?.textDecoration || 'none'};">${escapeHtml(mod.content || '')}</div>`;
+                case 'heading':
+                    const tag = mod.level || 'h2';
+                    return `<${tag} style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '24px'}; font-weight:${mod.styles?.fontWeight || 'bold'};">${escapeHtml(mod.content || '')}</${tag}>`;
+                case 'image':
+                    return `<img src="${mod.src || ''}" alt="${mod.alt || ''}" style="width:${mod.width || '100%'}; max-width:100%; border-radius:8px;">`;
+                case 'button':
+                    return `<a href="${mod.url || '#'}" style="display:inline-block; background:${mod.styles?.backgroundColor || '#1677ff'}; color:${mod.styles?.color || '#fff'}; padding:${mod.styles?.padding || '8px 20px'}; border-radius:${mod.styles?.borderRadius || '6px'}; text-decoration:none;">${escapeHtml(mod.text || '按钮')}</a>`;
+                case 'divider':
+                    return `<hr style="height:${mod.styles?.height || '1px'}; background:${mod.styles?.backgroundColor || '#e8e8e8'}; border:none; margin:${mod.styles?.margin || '20px 0'};">`;
+                case 'richText':
+                    return `<div class="rich-text">${mod.content || ''}</div>`;
+                default:
+                    return '';
+            }
+        }
         
         // 渲染画布
         function renderCanvas() {
@@ -443,59 +417,37 @@
             }
             
             canvas.innerHTML = modules.map((mod, idx) => {
-                let contentHtml = '';
-                switch(mod.type) {
-                    case 'text':
-                        contentHtml = `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '14px'};">${escapeHtml(mod.content || '')}</div>`;
-                        break;
-                    case 'heading':
-                        const tag = mod.level || 'h2';
-                        contentHtml = `<${tag} style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '24px'}; font-weight:${mod.styles?.fontWeight || 'bold'};">${escapeHtml(mod.content || '')}</${tag}>`;
-                        break;
-                    case 'image':
-                        contentHtml = `<img src="${mod.src || ''}" alt="${mod.alt || ''}" style="width:${mod.width || '100%'}; max-width:100%; border-radius:8px;">`;
-                        break;
-                    case 'button':
-                        contentHtml = `<a href="${mod.url || '#'}" style="display:inline-block; background:${mod.styles?.backgroundColor || '#1677ff'}; color:${mod.styles?.color || '#fff'}; padding:${mod.styles?.padding || '8px 16px'}; border-radius:${mod.styles?.borderRadius || '6px'}; text-decoration:none;">${escapeHtml(mod.text || '按钮')}</a>`;
-                        break;
-                    case 'divider':
-                        contentHtml = `<hr style="height:${mod.styles?.height || '1px'}; background:${mod.styles?.backgroundColor || '#e8e8e8'}; border:none; margin:${mod.styles?.margin || '16px 0'};">`;
-                        break;
-                    case 'richText':
-                        contentHtml = `<div class="rich-text">${mod.content || ''}</div>`;
-                        break;
-                }
-                return `<div class="module-item" data-index="${idx}" data-type="${mod.type}">
-                    <div class="module-actions">
-                        <button class="edit-module-btn" data-index="${idx}">编辑</button>
-                        <button class="delete-module-btn" data-index="${idx}">删除</button>
+                const contentHtml = renderModuleContent(mod);
+                return `<div class="module-item" data-index="${idx}">
+                    <div class="module-toolbar">
+                        <button class="toolbar-edit" data-index="${idx}" data-action="edit">✏️ 样式</button>
+                        <button class="toolbar-code" data-index="${idx}" data-action="code">&lt;/&gt; 代码</button>
+                        <button class="toolbar-copy" data-index="${idx}" data-action="copy">📋 复制</button>
+                        <button class="" data-index="${idx}" data-action="up">⬆️ 上移</button>
+                        <button class="" data-index="${idx}" data-action="down">⬇️ 下移</button>
+                        <button class="toolbar-delete" data-index="${idx}" data-action="delete">🗑️ 删除</button>
                     </div>
-                    <div class="module-content" onclick="selectModule(${idx})">
+                    <div class="module-content" data-index="${idx}">
                         ${contentHtml}
                     </div>
                 </div>`;
             }).join('');
             
-            // 绑定删除事件
-            document.querySelectorAll('.delete-module-btn').forEach(btn => {
+            // 绑定工具栏事件
+            document.querySelectorAll('.module-toolbar button').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const idx = parseInt(btn.dataset.index);
-                    modules.splice(idx, 1);
-                    if (selectedIndex === idx) {
-                        selectedIndex = null;
-                        renderPropertyPanel();
-                    }
-                    renderCanvas();
+                    const action = btn.dataset.action;
+                    handleModuleAction(idx, action);
                 });
             });
             
-            // 绑定编辑事件
-            document.querySelectorAll('.edit-module-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const idx = parseInt(btn.dataset.index);
-                    selectModule(idx);
+            // 点击模块内容也可编辑样式
+            document.querySelectorAll('.module-content').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const idx = parseInt(el.dataset.index);
+                    openEditModal(idx);
                 });
             });
             
@@ -512,95 +464,169 @@
                     });
                     modules = newModules;
                     renderCanvas();
-                    if (selectedIndex !== null) renderPropertyPanel();
                 }
             });
         }
         
-        // 选中模块
-        function selectModule(index) {
-            selectedIndex = index;
-            renderPropertyPanel();
-            // 高亮选中模块
-            document.querySelectorAll('.module-item').forEach(el => {
-                el.style.border = '1px solid #e8e8e8';
-            });
-            const selectedEl = document.querySelector(`.module-item[data-index="${index}"]`);
-            if (selectedEl) selectedEl.style.border = '2px solid #1677ff';
+        // 模块操作
+        function handleModuleAction(idx, action) {
+            if (action === 'edit') {
+                openEditModal(idx);
+            } else if (action === 'code') {
+                openCodeModal(idx);
+            } else if (action === 'copy') {
+                const newModule = JSON.parse(JSON.stringify(modules[idx]));
+                if (newModule.type === 'text' || newModule.type === 'heading') {
+                    newModule.content = (newModule.content || '') + ' (副本)';
+                } else if (newModule.type === 'button') {
+                    newModule.text = (newModule.text || '') + ' (副本)';
+                }
+                modules.splice(idx + 1, 0, newModule);
+                renderCanvas();
+                showToast('已复制模块');
+            } else if (action === 'up' && idx > 0) {
+                [modules[idx-1], modules[idx]] = [modules[idx], modules[idx-1]];
+                renderCanvas();
+            } else if (action === 'down' && idx < modules.length - 1) {
+                [modules[idx], modules[idx+1]] = [modules[idx+1], modules[idx]];
+                renderCanvas();
+            } else if (action === 'delete') {
+                modules.splice(idx, 1);
+                renderCanvas();
+                showToast('已删除模块');
+            }
         }
         
-        // 渲染属性面板
-        function renderPropertyPanel() {
-            const panel = document.getElementById('panelContent');
-            if (selectedIndex === null || !modules[selectedIndex]) {
-                panel.innerHTML = '<div class="no-selection">✨ 点击任意模块进行编辑</div>';
-                return;
-            }
-            const mod = modules[selectedIndex];
+        // 打开样式编辑弹窗
+        function openEditModal(index) {
+            currentEditIndex = index;
+            const mod = modules[index];
+            const fieldsDiv = document.getElementById('modalFields');
+            const titleMap = { text: '文字模块', heading: '标题模块', image: '图片模块', button: '按钮模块', divider: '分隔线', richText: '富文本模块' };
+            document.getElementById('modalTitle').textContent = `编辑${titleMap[mod.type] || '模块'}`;
             
-            let html = `<div class="property-group"><label class="property-label">模块类型</label><input class="property-input" value="${mod.type === 'text' ? '文字' : mod.type === 'heading' ? '标题' : mod.type === 'image' ? '图片' : mod.type === 'button' ? '按钮' : mod.type === 'divider' ? '分隔线' : '富文本'}" disabled></div>`;
-            
+            let html = '';
             if (mod.type === 'text' || mod.type === 'heading') {
-                html += `<div class="property-group"><label class="property-label">内容</label><input class="property-input" id="editContent" value="${escapeHtml(mod.content || '')}"></div>`;
-                html += `<div class="property-group"><label class="property-label">文字颜色</label><input type="color" class="color-input" id="editColor" value="${mod.styles?.color || '#333333'}"></div>`;
-                html += `<div class="property-group"><label class="property-label">字体大小</label><input class="property-input" id="editFontSize" value="${mod.styles?.fontSize || (mod.type === 'heading' ? '24px' : '14px')}"></div>`;
+                html = `
+                    <div class="form-group"><label>内容</label><input type="text" id="editContent" value="${escapeHtml(mod.content || '')}"></div>
+                    <div class="color-row">
+                        <div class="form-group"><label>文字颜色</label><input type="color" id="editColor" value="${mod.styles?.color || '#333333'}"></div>
+                        <div class="form-group"><label>字体大小</label><input type="text" id="editFontSize" value="${mod.styles?.fontSize || (mod.type === 'heading' ? '24px' : '14px')}"></div>
+                    </div>
+                    <div class="color-row">
+                        <div class="form-group"><label>粗细</label><select id="editFontWeight"><option value="normal">正常</option><option value="bold">粗体</option></select></div>
+                        <div class="form-group"><label>下划线</label><select id="editDecoration"><option value="none">无</option><option value="underline">下划线</option></select></div>
+                    </div>`;
                 if (mod.type === 'heading') {
-                    html += `<div class="property-group"><label class="property-label">标题级别</label><select class="property-input" id="editLevel"><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option></select></div>`;
+                    html += `<div class="form-group"><label>标题级别</label><select id="editLevel"><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option></select></div>`;
                 }
             } else if (mod.type === 'image') {
-                html += `<div class="property-group"><label class="property-label">图片地址</label><input class="property-input" id="editSrc" value="${escapeHtml(mod.src || '')}"></div>`;
-                html += `<div class="property-group"><label class="property-label">替代文字</label><input class="property-input" id="editAlt" value="${escapeHtml(mod.alt || '')}"></div>`;
-                html += `<div class="property-group"><label class="property-label">宽度</label><input class="property-input" id="editWidth" value="${mod.width || '100%'}"></div>`;
+                html = `
+                    <div class="form-group"><label>图片地址</label><input type="text" id="editSrc" value="${escapeHtml(mod.src || '')}"></div>
+                    <div class="form-group"><label>替代文字</label><input type="text" id="editAlt" value="${escapeHtml(mod.alt || '')}"></div>
+                    <div class="form-group"><label>宽度</label><input type="text" id="editWidth" value="${mod.width || '100%'}"></div>`;
             } else if (mod.type === 'button') {
-                html += `<div class="property-group"><label class="property-label">按钮文字</label><input class="property-input" id="editText" value="${escapeHtml(mod.text || '')}"></div>`;
-                html += `<div class="property-group"><label class="property-label">链接</label><input class="property-input" id="editUrl" value="${escapeHtml(mod.url || '#')}"></div>`;
-                html += `<div class="property-group"><label class="property-label">背景色</label><input type="color" class="color-input" id="editBgColor" value="${mod.styles?.backgroundColor || '#1677ff'}"></div>`;
-                html += `<div class="property-group"><label class="property-label">文字颜色</label><input type="color" class="color-input" id="editBtnColor" value="${mod.styles?.color || '#ffffff'}"></div>`;
+                html = `
+                    <div class="form-group"><label>按钮文字</label><input type="text" id="editText" value="${escapeHtml(mod.text || '')}"></div>
+                    <div class="form-group"><label>链接</label><input type="text" id="editUrl" value="${escapeHtml(mod.url || '#')}"></div>
+                    <div class="color-row">
+                        <div class="form-group"><label>背景色</label><input type="color" id="editBgColor" value="${mod.styles?.backgroundColor || '#1677ff'}"></div>
+                        <div class="form-group"><label>文字颜色</label><input type="color" id="editBtnColor" value="${mod.styles?.color || '#ffffff'}"></div>
+                    </div>`;
             } else if (mod.type === 'richText') {
-                html += `<div class="property-group"><label class="property-label">富文本内容</label><textarea class="property-input" id="editRichContent" rows="6">${escapeHtml(mod.content || '')}</textarea></div>`;
+                html = `<div class="form-group"><label>富文本内容</label><textarea id="editRichContent" rows="6">${escapeHtml(mod.content || '')}</textarea></div>`;
+            } else if (mod.type === 'divider') {
+                html = `<div class="form-group"><label>分隔线颜色</label><input type="color" id="editDividerColor" value="${mod.styles?.backgroundColor || '#e8e8e8'}"></div>`;
             }
             
-            html += `<div class="property-group"><button class="btn" id="applyPropertyBtn" style="width:100%; background:#1677ff; color:white; border:none;">应用修改</button></div>`;
-            panel.innerHTML = html;
+            fieldsDiv.innerHTML = html;
             
-            // 绑定应用按钮
-            document.getElementById('applyPropertyBtn')?.addEventListener('click', () => {
-                if (mod.type === 'text' || mod.type === 'heading') {
-                    mod.content = document.getElementById('editContent')?.value || '';
-                    mod.styles = {
-                        color: document.getElementById('editColor')?.value || '#333',
-                        fontSize: document.getElementById('editFontSize')?.value || (mod.type === 'heading' ? '24px' : '14px')
-                    };
-                    if (mod.type === 'heading') {
-                        mod.level = document.getElementById('editLevel')?.value || 'h2';
-                    }
-                } else if (mod.type === 'image') {
-                    mod.src = document.getElementById('editSrc')?.value || '';
-                    mod.alt = document.getElementById('editAlt')?.value || '';
-                    mod.width = document.getElementById('editWidth')?.value || '100%';
-                } else if (mod.type === 'button') {
-                    mod.text = document.getElementById('editText')?.value || '';
-                    mod.url = document.getElementById('editUrl')?.value || '#';
-                    mod.styles = {
-                        backgroundColor: document.getElementById('editBgColor')?.value || '#1677ff',
-                        color: document.getElementById('editBtnColor')?.value || '#ffffff',
-                        padding: '8px 16px',
-                        borderRadius: '6px'
-                    };
-                } else if (mod.type === 'richText') {
-                    mod.content = document.getElementById('editRichContent')?.value || '';
-                }
-                renderCanvas();
-                renderPropertyPanel();
-                showToast('修改已应用');
-            });
-            
-            // 设置选中值
+            // 设置当前值
             setTimeout(() => {
-                if (mod.type === 'heading' && document.getElementById('editLevel')) {
-                    document.getElementById('editLevel').value = mod.level || 'h2';
+                if (mod.type === 'text' || mod.type === 'heading') {
+                    if (document.getElementById('editFontWeight')) document.getElementById('editFontWeight').value = mod.styles?.fontWeight || 'normal';
+                    if (document.getElementById('editDecoration')) document.getElementById('editDecoration').value = mod.styles?.textDecoration || 'none';
+                    if (mod.type === 'heading' && document.getElementById('editLevel')) document.getElementById('editLevel').value = mod.level || 'h2';
                 }
             }, 0);
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        
+        // 打开代码编辑弹窗（单独模块的源代码）
+        function openCodeModal(index) {
+            currentCodeIndex = index;
+            const mod = modules[index];
+            const currentHtml = renderModuleContent(mod);
+            document.getElementById('codeEditorContent').value = currentHtml;
+            document.getElementById('codeModal').style.display = 'flex';
+        }
+        
+        // 保存样式编辑
+        function saveModuleEdit() {
+            if (currentEditIndex === null) return;
+            const mod = modules[currentEditIndex];
+            
+            if (mod.type === 'text' || mod.type === 'heading') {
+                mod.content = document.getElementById('editContent')?.value || '';
+                mod.styles = {
+                    color: document.getElementById('editColor')?.value || '#333',
+                    fontSize: document.getElementById('editFontSize')?.value || (mod.type === 'heading' ? '24px' : '14px'),
+                    fontWeight: document.getElementById('editFontWeight')?.value || 'normal',
+                    textDecoration: document.getElementById('editDecoration')?.value || 'none'
+                };
+                if (mod.type === 'heading') {
+                    mod.level = document.getElementById('editLevel')?.value || 'h2';
+                }
+            } else if (mod.type === 'image') {
+                mod.src = document.getElementById('editSrc')?.value || '';
+                mod.alt = document.getElementById('editAlt')?.value || '';
+                mod.width = document.getElementById('editWidth')?.value || '100%';
+            } else if (mod.type === 'button') {
+                mod.text = document.getElementById('editText')?.value || '';
+                mod.url = document.getElementById('editUrl')?.value || '#';
+                mod.styles = {
+                    backgroundColor: document.getElementById('editBgColor')?.value || '#1677ff',
+                    color: document.getElementById('editBtnColor')?.value || '#ffffff',
+                    padding: '8px 20px',
+                    borderRadius: '6px'
+                };
+            } else if (mod.type === 'richText') {
+                mod.content = document.getElementById('editRichContent')?.value || '';
+            } else if (mod.type === 'divider') {
+                mod.styles.backgroundColor = document.getElementById('editDividerColor')?.value || '#e8e8e8';
+            }
+            
+            closeEditModal();
+            renderCanvas();
+            showToast('模块已更新');
+        }
+        
+        // 保存代码编辑
+        function saveCodeEdit() {
+            if (currentCodeIndex === null) return;
+            const newHtml = document.getElementById('codeEditorContent').value;
+            const mod = modules[currentCodeIndex];
+            
+            // 将模块标记为自定义HTML模式
+            mod.isCustomHtml = true;
+            mod.customHtml = newHtml;
+            // 同时更新渲染方式
+            mod.rawHtml = newHtml;
+            
+            closeCodeModal();
+            renderCanvas();
+            showToast('代码已应用');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditIndex = null;
+        }
+        
+        function closeCodeModal() {
+            document.getElementById('codeModal').style.display = 'none';
+            currentCodeIndex = null;
         }
         
         // 添加模块
@@ -628,50 +654,13 @@
             });
         }
         
-        // 设备切换
-        function setupDeviceSwitch() {
-            const btns = document.querySelectorAll('.device-btn');
-            const canvas = document.getElementById('canvas');
-            btns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    canvas.className = `canvas ${btn.dataset.device}`;
-                });
-            });
-        }
-        
-        // 代码模式
-        function setupCodeMode() {
-            const btn = document.getElementById('codeModeBtn');
-            const canvas = document.getElementById('canvas');
-            const codeEditor = document.getElementById('codeEditor');
-            btn.addEventListener('click', () => {
-                isCodeMode = !isCodeMode;
-                if (isCodeMode) {
-                    codeEditor.value = modulesToHtml();
-                    canvas.style.display = 'none';
-                    codeEditor.style.display = 'block';
-                    btn.textContent = '🎨 可视化模式';
-                } else {
-                    canvas.style.display = 'block';
-                    codeEditor.style.display = 'none';
-                    btn.textContent = '💻 代码模式';
-                }
-            });
-        }
-        
+        // 生成最终HTML
         function modulesToHtml() {
             return modules.map(mod => {
-                switch(mod.type) {
-                    case 'text': return `<div style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '14px'};">${mod.content || ''}</div>`;
-                    case 'heading': return `<${mod.level || 'h2'} style="color:${mod.styles?.color || '#333'}; font-size:${mod.styles?.fontSize || '24px'}; font-weight:bold;">${mod.content || ''}</${mod.level || 'h2'}>`;
-                    case 'image': return `<img src="${mod.src || ''}" alt="${mod.alt || ''}" style="width:${mod.width || '100%'}; max-width:100%;">`;
-                    case 'button': return `<a href="${mod.url || '#'}" style="display:inline-block; background:${mod.styles?.backgroundColor || '#1677ff'}; color:${mod.styles?.color || '#fff'}; padding:8px 16px; border-radius:6px; text-decoration:none;">${mod.text || '按钮'}</a>`;
-                    case 'divider': return `<hr style="height:${mod.styles?.height || '1px'}; background:${mod.styles?.backgroundColor || '#e8e8e8'}; border:none; margin:16px 0;">`;
-                    case 'richText': return `<div>${mod.content || ''}</div>`;
-                    default: return '';
+                if (mod.isCustomHtml && mod.customHtml) {
+                    return mod.customHtml;
                 }
+                return renderModuleContent(mod);
             }).join('\n');
         }
         
@@ -680,7 +669,7 @@
             const modal = document.getElementById('previewModal');
             const iframe = document.getElementById('previewFrame');
             const content = modulesToHtml();
-            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0; padding:20px; font-family:system-ui;">${content || '<p>暂无内容</p>'}</body></html>`;
+            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0; padding:20px; font-family:system-ui;}</style></head><body>${content || '<p>暂无内容</p>'}</body></html>`;
             modal.style.display = 'block';
         }
         
@@ -690,7 +679,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const pageId = urlParams.get('id');
             
-            // 简单获取路径和标题（可以从 URL 参数或弹窗获取）
             const path = prompt('页面路径 (如 /about):', pageId ? '' : '/new-page');
             if (!path) return;
             const title = prompt('页面标题:', 'New Page');
@@ -742,9 +730,8 @@
                 const res = await fetch(`/api/pages?id=${pageId}`);
                 const page = await res.json();
                 if (page && page.content) {
-                    // 这里简化解析，实际需要解析 HTML 为模块
-                    // 暂时先不处理，提示用户
-                    showToast('已加载页面，当前编辑器仅支持新建内容');
+                    // 简单解析：如果是HTML，可以尝试解析成模块，这里先保留原内容
+                    showToast('已加载页面，当前编辑器新建内容会覆盖原有内容');
                 }
             } catch(e) {}
         }
@@ -753,17 +740,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadExistingPage();
             setupDragDrop();
-            setupDeviceSwitch();
-            setupCodeMode();
+            renderCanvas();
             document.getElementById('previewBtn').addEventListener('click', preview);
             document.getElementById('saveBtn').addEventListener('click', savePage);
             document.getElementById('closePreviewBtn').addEventListener('click', () => {
                 document.getElementById('previewModal').style.display = 'none';
             });
-            renderCanvas();
+            document.getElementById('modalSaveBtn').addEventListener('click', saveModuleEdit);
+            document.getElementById('modalCancelBtn').addEventListener('click', closeEditModal);
+            document.getElementById('codeSaveBtn').addEventListener('click', saveCodeEdit);
+            document.getElementById('codeCancelBtn').addEventListener('click', closeCodeModal);
         });
-        
-        window.selectModule = selectModule;
     </script>
 </body>
 </html>
