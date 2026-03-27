@@ -5,668 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ZHAMIT - 专业家居贸易</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* 样式部分保持不变，省略重复代码 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; line-height: 1.5; color: #1a1a1a; background: #fff; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            line-height: 1.5;
-            color: #1a1a1a;
-            background: #fff;
-        }
-
-        /* ========== 电脑端样式 (>=768px) ========== */
         @media (min-width: 768px) {
-            .mobile-only {
-                display: none !important;
-            }
-
-            .top-nav {
-                background: #1a1a1a;
-                position: sticky;
-                top: 0;
-                z-index: 200;
-                padding: 0 40px;
-            }
-
-            .top-nav .container {
-                max-width: 1400px;
-                margin: 0 auto;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                height: 80px;
-            }
-
-            .company-name {
-                font-size: 24px;
-                font-weight: 700;
-                color: white;
-                letter-spacing: 1px;
-            }
-
-            .nav-menu {
-                display: flex;
-                gap: 32px;
-                list-style: none;
-                margin-left: auto;
-                margin-right: 24px;
-            }
-
-            .nav-menu > li {
-                position: relative;
-            }
-
-            .nav-menu > li > a {
-                color: white;
-                text-decoration: none;
-                font-size: 16px;
-                font-weight: 500;
-                padding: 8px 0;
-                display: block;
-            }
-
-            .nav-menu .dropdown {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                background: white;
-                min-width: 180px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                border-radius: 8px;
-                opacity: 0;
-                visibility: hidden;
-                transition: all 0.2s;
-                z-index: 100;
-            }
-
-            .nav-menu > li:hover .dropdown {
-                opacity: 1;
-                visibility: visible;
-            }
-
-            .dropdown a {
-                display: block;
-                padding: 12px 16px;
-                color: #333;
-                text-decoration: none;
-                font-size: 14px;
-            }
-
-            .dropdown a:hover {
-                background: #f5f5f5;
-            }
-
-            .toolbar {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-            }
-
-            .lang-selector {
-                position: relative;
-            }
-
-            .lang-btn {
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                padding: 6px 8px;
-                font-weight: 500;
-            }
-
-            .lang-menu {
-                position: absolute;
-                top: 100%;
-                right: 0;
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                display: none;
-                z-index: 100;
-                min-width: 120px;
-            }
-
-            .lang-selector:hover .lang-menu {
-                display: block;
-            }
-
-            .lang-menu a {
-                display: block;
-                padding: 10px 16px;
-                color: #333;
-                text-decoration: none;
-                font-size: 14px;
-                cursor: pointer;
-            }
-
-            .lang-menu a:hover {
-                background: #f5f5f5;
-            }
-
-            .search-wrapper {
-                position: relative;
-            }
-
-            .search-icon {
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 6px;
-                display: flex;
-                align-items: center;
-            }
-
-            .search-icon svg {
-                width: 20px;
-                height: 20px;
-                stroke: white;
-                stroke-width: 1.5;
-                fill: none;
-            }
-
-            .search-input-container {
-                position: absolute;
-                right: 0;
-                top: 100%;
-                background: white;
-                border: 1px solid #e0e0e0;
-                border-radius: 30px;
-                padding: 8px 16px;
-                width: 240px;
-                display: none;
-                margin-top: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-
-            .search-wrapper:hover .search-input-container {
-                display: block;
-            }
-
-            .search-input-container input {
-                border: none;
-                outline: none;
-                width: 100%;
-                font-size: 14px;
-                padding: 6px 0;
-            }
-
-            .footer-nav {
-                background: #f8f8f8;
-                padding: 60px 40px 40px;
-                margin-top: 80px;
-                border-top: 1px solid #e8e8e8;
-            }
-
-            .footer-nav .container {
-                max-width: 1400px;
-                margin: 0 auto;
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 48px;
-            }
-
-            .footer-col {
-                flex: 1;
-                min-width: 160px;
-            }
-
-            .footer-col .footer-logo {
-                font-size: 20px;
-                font-weight: 700;
-                color: #1a1a1a;
-                margin-bottom: 16px;
-                display: inline-block;
-            }
-
-            .footer-col p {
-                color: #666;
-                font-size: 14px;
-                line-height: 1.6;
-                margin-top: 8px;
-            }
-
-            .footer-col h4 {
-                font-size: 16px;
-                font-weight: 600;
-                color: #333;
-                margin-bottom: 16px;
-            }
-
-            .footer-col a {
-                display: block;
-                color: #666;
-                text-decoration: none;
-                font-size: 14px;
-                margin-bottom: 12px;
-                transition: color 0.2s;
-            }
-
-            .footer-col a:hover {
-                color: #1a1a1a;
-            }
-
-            .footer-bottom {
-                max-width: 1400px;
-                margin: 40px auto 0;
-                padding-top: 24px;
-                border-top: 1px solid #e8e8e8;
-                text-align: center;
-                font-size: 13px;
-                color: #999;
-            }
-
-            .hero {
-                padding: 100px 20px;
-                text-align: center;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-            }
-
-            .hero h1 {
-                font-size: 56px;
-                font-weight: 700;
-                margin-bottom: 20px;
-                letter-spacing: -0.5px;
-            }
-
-            .hero p {
-                font-size: 18px;
-                opacity: 0.9;
-                max-width: 600px;
-                margin: 0 auto;
-            }
-
-            .products {
-                padding: 80px 40px;
-                max-width: 1400px;
-                margin: 0 auto;
-            }
-
-            .products h2 {
-                text-align: center;
-                font-size: 36px;
-                font-weight: 600;
-                margin-bottom: 48px;
-            }
-
-            .product-grid {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 40px;
-            }
-
-            .product-card {
-                background: #f9f9f9;
-                border-radius: 16px;
-                padding: 40px 24px;
-                text-align: center;
-                transition: transform 0.2s;
-            }
-
-            .product-card:hover {
-                transform: translateY(-4px);
-            }
-
-            .product-card h3 {
-                font-size: 22px;
-                font-weight: 600;
-                margin-bottom: 12px;
-            }
-
-            .product-card p {
-                color: #666;
-                font-size: 15px;
-            }
+            .mobile-only { display: none !important; }
+            .top-nav { background: #1a1a1a; position: sticky; top: 0; z-index: 200; padding: 0 40px; }
+            .top-nav .container { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 80px; }
+            .company-name { font-size: 24px; font-weight: 700; color: white; letter-spacing: 1px; }
+            .nav-menu { display: flex; gap: 32px; list-style: none; margin-left: auto; margin-right: 24px; }
+            .nav-menu > li { position: relative; }
+            .nav-menu > li > a { color: white; text-decoration: none; font-size: 16px; font-weight: 500; padding: 8px 0; display: block; }
+            .nav-menu .dropdown { position: absolute; top: 100%; left: 0; background: white; min-width: 180px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; opacity: 0; visibility: hidden; transition: all 0.2s; z-index: 100; }
+            .nav-menu > li:hover .dropdown { opacity: 1; visibility: visible; }
+            .dropdown a { display: block; padding: 12px 16px; color: #333; text-decoration: none; font-size: 14px; }
+            .dropdown a:hover { background: #f5f5f5; }
+            .toolbar { display: flex; align-items: center; gap: 20px; }
+            .lang-selector { position: relative; }
+            .lang-btn { background: none; border: none; color: white; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; padding: 6px 8px; font-weight: 500; }
+            .lang-menu { position: absolute; top: 100%; right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; z-index: 100; min-width: 120px; }
+            .lang-selector:hover .lang-menu { display: block; }
+            .lang-menu a { display: block; padding: 10px 16px; color: #333; text-decoration: none; font-size: 14px; cursor: pointer; }
+            .lang-menu a:hover { background: #f5f5f5; }
+            .search-wrapper { position: relative; }
+            .search-icon { background: none; border: none; cursor: pointer; padding: 6px; display: flex; align-items: center; }
+            .search-icon svg { width: 20px; height: 20px; stroke: white; stroke-width: 1.5; fill: none; }
+            .search-input-container { position: absolute; right: 0; top: 100%; background: white; border: 1px solid #e0e0e0; border-radius: 30px; padding: 8px 16px; width: 240px; display: none; margin-top: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+            .search-wrapper:hover .search-input-container { display: block; }
+            .search-input-container input { border: none; outline: none; width: 100%; font-size: 14px; padding: 6px 0; }
+            .footer-nav { background: #f8f8f8; padding: 60px 40px 40px; margin-top: 80px; border-top: 1px solid #e8e8e8; }
+            .footer-nav .container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 48px; }
+            .footer-col { flex: 1; min-width: 160px; }
+            .footer-col .footer-logo { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; display: inline-block; }
+            .footer-col p { color: #666; font-size: 14px; line-height: 1.6; margin-top: 8px; }
+            .footer-col h4 { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; }
+            .footer-col a { display: block; color: #666; text-decoration: none; font-size: 14px; margin-bottom: 12px; transition: color 0.2s; }
+            .footer-col a:hover { color: #1a1a1a; }
+            .footer-bottom { max-width: 1400px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid #e8e8e8; text-align: center; font-size: 13px; color: #999; }
+            .hero { padding: 100px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+            .hero h1 { font-size: 56px; font-weight: 700; margin-bottom: 20px; }
+            .hero p { font-size: 18px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+            .products { padding: 80px 40px; max-width: 1400px; margin: 0 auto; }
+            .products h2 { text-align: center; font-size: 36px; font-weight: 600; margin-bottom: 48px; }
+            .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+            .product-card { background: #f9f9f9; border-radius: 16px; padding: 40px 24px; text-align: center; transition: transform 0.2s; }
+            .product-card:hover { transform: translateY(-4px); }
+            .product-card h3 { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+            .product-card p { color: #666; font-size: 15px; }
         }
 
-        /* ========== 手机端样式 ========== */
         @media (max-width: 767px) {
-            .desktop-only {
-                display: none !important;
-            }
-
-            .top-nav {
-                background: #1a1a1a;
-                position: sticky;
-                top: 0;
-                z-index: 200;
-                padding: 12px 16px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .hamburger {
-                background: none;
-                border: none;
-                width: 30px;
-                height: 30px;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                align-items: center;
-                padding: 6px 0;
-                cursor: pointer;
-            }
-
-            .hamburger span {
-                display: block;
-                width: 22px;
-                height: 2px;
-                background: white;
-                border-radius: 2px;
-            }
-
-            .mobile-logo {
-                font-size: 20px;
-                font-weight: 700;
-                color: white;
-            }
-
-            .mobile-toolbar {
-                display: flex;
-                gap: 16px;
-                align-items: center;
-                position: relative;
-            }
-
-            .mobile-lang-btn, .mobile-search-btn {
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                font-size: 16px;
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                padding: 4px;
-            }
-
-            .mobile-lang-btn span {
-                font-size: 12px;
-            }
-
-            .mobile-search-btn svg {
-                width: 18px;
-                height: 18px;
-                stroke: white;
-                stroke-width: 1.5;
-                fill: none;
-            }
-
-            .lang-modal {
-                position: fixed;
-                top: 56px;
-                right: 16px;
-                background: white;
-                border-radius: 16px;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-                z-index: 400;
-                display: none;
-                overflow: hidden;
-                min-width: 140px;
-                animation: fadeIn 0.2s ease;
-            }
-            .lang-modal.show {
-                display: block;
-            }
-            .lang-modal-option {
-                padding: 12px 20px;
-                cursor: pointer;
-                text-align: center;
-                font-size: 15px;
-                transition: background 0.2s;
-            }
-            .lang-modal-option:hover {
-                background: #f5f5f5;
-            }
-            .lang-modal-option:active {
-                background: #e8e8e8;
-            }
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(-8px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-
-            .search-modal {
-                position: fixed;
-                top: 56px;
-                right: 16px;
-                background: white;
-                border-radius: 30px;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-                z-index: 400;
-                display: none;
-                padding: 8px 16px;
-                width: 240px;
-                animation: fadeIn 0.2s ease;
-            }
-            .search-modal.show {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .search-modal input {
-                flex: 1;
-                border: none;
-                outline: none;
-                font-size: 14px;
-                padding: 8px 0;
-            }
-            .search-modal button {
-                background: none;
-                border: none;
-                cursor: pointer;
-                font-size: 16px;
-                color: #666;
-            }
-
-            .side-menu {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 85%;
-                max-width: 320px;
-                height: 100%;
-                background: white;
-                z-index: 300;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                box-shadow: 2px 0 12px rgba(0,0,0,0.1);
-                overflow-y: auto;
-            }
-
-            .side-menu.open {
-                transform: translateX(0);
-            }
-
-            .menu-header {
-                padding: 20px;
-                border-bottom: 1px solid #eee;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .menu-header h3 {
-                font-size: 18px;
-            }
-
-            .close-menu {
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #999;
-            }
-
-            .menu-list {
-                padding: 8px 0;
-            }
-
-            .menu-item {
-                border-bottom: 1px solid #f0f0f0;
-            }
-
-            .menu-parent {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 14px 20px;
-                cursor: pointer;
-            }
-
-            .menu-parent span {
-                font-size: 16px;
-                font-weight: 500;
-            }
-
-            .toggle-sub {
-                background: none;
-                border: none;
-                font-size: 18px;
-                cursor: pointer;
-                color: #999;
-                width: 30px;
-            }
-
-            .submenu {
-                display: none;
-                background: #f9f9f9;
-                padding-left: 20px;
-            }
-
-            .submenu.open {
-                display: block;
-            }
-
-            .submenu a {
-                display: block;
-                padding: 12px 20px;
-                color: #666;
-                text-decoration: none;
-                font-size: 14px;
-            }
-
-            .menu-single {
-                display: block;
-                padding: 14px 20px;
-                color: #333;
-                text-decoration: none;
-                font-size: 16px;
-            }
-
-            .hero {
-                padding: 60px 20px;
-                text-align: center;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-            }
-
-            .hero h1 {
-                font-size: 32px;
-                font-weight: 700;
-                margin-bottom: 12px;
-            }
-
-            .hero p {
-                font-size: 14px;
-                opacity: 0.9;
-            }
-
-            .products {
-                padding: 48px 16px;
-            }
-
-            .products h2 {
-                text-align: center;
-                font-size: 24px;
-                font-weight: 600;
-                margin-bottom: 24px;
-            }
-
-            .product-card {
-                background: #f9f9f9;
-                border-radius: 12px;
-                padding: 24px 16px;
-                margin-bottom: 16px;
-                text-align: center;
-            }
-
-            .product-card h3 {
-                font-size: 18px;
-                font-weight: 600;
-                margin-bottom: 8px;
-            }
-
-            .product-card p {
-                color: #666;
-                font-size: 13px;
-            }
-
-            .footer-nav {
-                background: #f8f8f8;
-                padding: 40px 20px 24px;
-                margin-top: 48px;
-            }
-
-            .footer-nav .container {
-                display: flex;
-                flex-direction: column;
-                gap: 32px;
-            }
-
-            .footer-col {
-                text-align: center;
-            }
-
-            .footer-col .footer-logo {
-                font-size: 20px;
-                font-weight: 700;
-                color: #1a1a1a;
-                margin-bottom: 12px;
-                display: inline-block;
-            }
-
-            .footer-col p {
-                color: #666;
-                font-size: 13px;
-                margin-top: 4px;
-            }
-
-            .footer-col h4 {
-                font-size: 15px;
-                font-weight: 600;
-                color: #333;
-                margin-bottom: 12px;
-            }
-
-            .footer-col a {
-                display: block;
-                color: #666;
-                text-decoration: none;
-                font-size: 13px;
-                margin-bottom: 8px;
-            }
-
-            .footer-bottom {
-                text-align: center;
-                padding-top: 24px;
-                margin-top: 24px;
-                border-top: 1px solid #e8e8e8;
-                font-size: 11px;
-                color: #999;
-            }
+            .desktop-only { display: none !important; }
+            .top-nav { background: #1a1a1a; position: sticky; top: 0; z-index: 200; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+            .hamburger { background: none; border: none; width: 30px; height: 30px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px 0; cursor: pointer; }
+            .hamburger span { display: block; width: 22px; height: 2px; background: white; border-radius: 2px; }
+            .mobile-logo { font-size: 20px; font-weight: 700; color: white; }
+            .mobile-toolbar { display: flex; gap: 16px; align-items: center; position: relative; }
+            .mobile-lang-btn, .mobile-search-btn { background: none; border: none; color: white; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 4px; padding: 4px; }
+            .mobile-lang-btn span { font-size: 12px; }
+            .mobile-search-btn svg { width: 18px; height: 18px; stroke: white; stroke-width: 1.5; fill: none; }
+            .lang-modal { position: fixed; top: 56px; right: 16px; background: white; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 400; display: none; overflow: hidden; min-width: 140px; animation: fadeIn 0.2s ease; }
+            .lang-modal.show { display: block; }
+            .lang-modal-option { padding: 12px 20px; cursor: pointer; text-align: center; font-size: 15px; transition: background 0.2s; }
+            .lang-modal-option:hover { background: #f5f5f5; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+            .search-modal { position: fixed; top: 56px; right: 16px; background: white; border-radius: 30px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 400; display: none; padding: 8px 16px; width: 240px; animation: fadeIn 0.2s ease; }
+            .search-modal.show { display: flex; align-items: center; gap: 8px; }
+            .search-modal input { flex: 1; border: none; outline: none; font-size: 14px; padding: 8px 0; }
+            .search-modal button { background: none; border: none; cursor: pointer; font-size: 16px; color: #666; }
+            .side-menu { position: fixed; top: 0; left: 0; width: 85%; max-width: 320px; height: 100%; background: white; z-index: 300; transform: translateX(-100%); transition: transform 0.3s ease; box-shadow: 2px 0 12px rgba(0,0,0,0.1); overflow-y: auto; }
+            .side-menu.open { transform: translateX(0); }
+            .menu-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+            .menu-header h3 { font-size: 18px; }
+            .close-menu { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+            .menu-list { padding: 8px 0; }
+            .menu-item { border-bottom: 1px solid #f0f0f0; }
+            .menu-parent { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; cursor: pointer; }
+            .menu-parent span { font-size: 16px; font-weight: 500; }
+            .toggle-sub { background: none; border: none; font-size: 18px; cursor: pointer; color: #999; width: 30px; }
+            .submenu { display: none; background: #f9f9f9; padding-left: 20px; }
+            .submenu.open { display: block; }
+            .submenu a { display: block; padding: 12px 20px; color: #666; text-decoration: none; font-size: 14px; }
+            .menu-single { display: block; padding: 14px 20px; color: #333; text-decoration: none; font-size: 16px; }
+            .hero { padding: 60px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+            .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+            .hero p { font-size: 14px; opacity: 0.9; }
+            .products { padding: 48px 16px; }
+            .products h2 { text-align: center; font-size: 24px; font-weight: 600; margin-bottom: 24px; }
+            .product-card { background: #f9f9f9; border-radius: 12px; padding: 24px 16px; margin-bottom: 16px; text-align: center; }
+            .product-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+            .product-card p { color: #666; font-size: 13px; }
+            .footer-nav { background: #f8f8f8; padding: 40px 20px 24px; margin-top: 48px; }
+            .footer-nav .container { display: flex; flex-direction: column; gap: 32px; }
+            .footer-col { text-align: center; }
+            .footer-col .footer-logo { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; display: inline-block; }
+            .footer-col p { color: #666; font-size: 13px; margin-top: 4px; }
+            .footer-col h4 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; }
+            .footer-col a { display: block; color: #666; text-decoration: none; font-size: 13px; margin-bottom: 8px; }
+            .footer-bottom { text-align: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid #e8e8e8; font-size: 11px; color: #999; }
         }
     </style>
 </head>
@@ -800,22 +237,8 @@
                     { name: 'Decorations', desc: 'Limited editions, updated weekly' }
                 ],
                 menuTitle: 'Menu',
-                nav: {
-                    'Home': 'Home',
-                    'Products': 'Products',
-                    'Home Goods': 'Home Goods',
-                    'Kitchenware': 'Kitchenware',
-                    'About': 'About',
-                    'Contact': 'Contact'
-                },
-                footer: {
-                    about: 'About ZHAMIT',
-                    aboutText: 'Professional trading company based in Yiwu, China',
-                    quickLinks: 'Quick Links',
-                    contact: 'Contact',
-                    email: 'info@zhamit.com',
-                    phone: '+86 579 12345678'
-                },
+                nav: {},  // 动态从数据库获取，不预设翻译
+                footer: {}, // 底部导航从数据库获取，不预设
                 searchPlaceholder: 'Search...'
             },
             zh: {
@@ -829,22 +252,8 @@
                     { name: '装饰摆件', desc: '限量款式，每周更新' }
                 ],
                 menuTitle: '菜单',
-                nav: {
-                    'Home': '首页',
-                    'Products': '产品',
-                    'Home Goods': '家居用品',
-                    'Kitchenware': '厨房用品',
-                    'About': '关于我们',
-                    'Contact': '联系我们'
-                },
-                footer: {
-                    about: '关于哲觅',
-                    aboutText: '专业家居贸易公司，总部位于中国义乌',
-                    quickLinks: '快速链接',
-                    contact: '联系方式',
-                    email: 'info@zhamit.com',
-                    phone: '+86 579 12345678'
-                },
+                nav: {},
+                footer: {},
                 searchPlaceholder: '搜索...'
             },
             es: {
@@ -858,22 +267,8 @@
                     { name: 'Decoraciones', desc: 'Ediciones limitadas, actualizadas semanalmente' }
                 ],
                 menuTitle: 'Menú',
-                nav: {
-                    'Home': 'Inicio',
-                    'Products': 'Productos',
-                    'Home Goods': 'Artículos para el hogar',
-                    'Kitchenware': 'Utensilios de cocina',
-                    'About': 'Sobre',
-                    'Contact': 'Contacto'
-                },
-                footer: {
-                    about: 'Sobre ZHAMIT',
-                    aboutText: 'Empresa comercial profesional con sede en Yiwu, China',
-                    quickLinks: 'Enlaces Rápidos',
-                    contact: 'Contacto',
-                    email: 'info@zhamit.com',
-                    phone: '+86 579 12345678'
-                },
+                nav: {},
+                footer: {},
                 searchPlaceholder: 'Buscar...'
             },
             ar: {
@@ -887,28 +282,15 @@
                     { name: 'ديكورات', desc: 'إصدارات محدودة، تحديث أسبوعي' }
                 ],
                 menuTitle: 'القائمة',
-                nav: {
-                    'Home': 'الرئيسية',
-                    'Products': 'المنتجات',
-                    'Home Goods': 'أدوات منزلية',
-                    'Kitchenware': 'أدوات المطبخ',
-                    'About': 'معلومات عنا',
-                    'Contact': 'اتصل بنا'
-                },
-                footer: {
-                    about: 'عن ZHAMIT',
-                    aboutText: 'شركة تجارية محترفة مقرها ييوو، الصين',
-                    quickLinks: 'روابط سريعة',
-                    contact: 'اتصل بنا',
-                    email: 'info@zhamit.com',
-                    phone: '+86 579 12345678'
-                },
+                nav: {},
+                footer: {},
                 searchPlaceholder: 'بحث...'
             }
         };
 
         let currentLang = 'en';
-        let rawNavData = []; // 从 API 获取的原始导航数据
+        let rawNavData = [];      // 从 API 获取的完整导航数据
+        let rawFooterData = [];   // 底部导航数据（location='bottom'）
 
         function detectLanguage() {
             const cookieMatch = document.cookie.match(/lang=([^;]+)/);
@@ -918,9 +300,53 @@
             return 'en';
         }
 
+        // 翻译菜单项（使用数据库中的 name 作为 key，但数据库里存的是英文，所以需要翻译）
+        // 这里我们直接用数据库的原始 name，然后根据当前语言映射
+        // 由于数据库 name 可能是英文，我们需要一个翻译映射表
+        // 但更简单的方式是：让用户在后台把多语言名称存在数据库里
+        // 目前先使用一个简单的映射
+        const navTranslationMap = {
+            en: {
+                'Home': 'Home',
+                'Products': 'Products',
+                'About': 'About',
+                'Contact': 'Contact',
+                '家居用品': 'Home Goods',
+                '厨房用品': 'Kitchenware',
+                '装饰摆件': 'Decorations'
+            },
+            zh: {
+                'Home': '首页',
+                'Products': '产品',
+                'About': '关于我们',
+                'Contact': '联系我们',
+                'Home Goods': '家居用品',
+                'Kitchenware': '厨房用品',
+                'Decorations': '装饰摆件'
+            },
+            es: {
+                'Home': 'Inicio',
+                'Products': 'Productos',
+                'About': 'Sobre',
+                'Contact': 'Contacto',
+                'Home Goods': 'Artículos para el hogar',
+                'Kitchenware': 'Utensilios de cocina',
+                'Decorations': 'Decoraciones'
+            },
+            ar: {
+                'Home': 'الرئيسية',
+                'Products': 'المنتجات',
+                'About': 'معلومات عنا',
+                'Contact': 'اتصل بنا',
+                'Home Goods': 'أدوات منزلية',
+                'Kitchenware': 'أدوات المطبخ',
+                'Decorations': 'ديكورات'
+            }
+        };
+
         function translateNavItem(originalName) {
-            const t = translations[currentLang];
-            if (t.nav && t.nav[originalName]) return t.nav[originalName];
+            const map = navTranslationMap[currentLang];
+            if (map && map[originalName]) return map[originalName];
             return originalName;
         }
 
@@ -935,18 +361,14 @@
             const t = translations[currentLang];
             if (!t) return;
             
-            // 公司名称
             document.querySelectorAll('#companyName, #mobileCompanyName').forEach(el => { if (el) el.textContent = t.company; });
-            // 英雄区
             document.querySelectorAll('#heroTitle, #mobileHeroTitle').forEach(el => { if (el) el.textContent = t.heroTitle; });
             document.querySelectorAll('#heroSubtitle, #mobileHeroSubtitle').forEach(el => { if (el) el.textContent = t.heroSubtitle; });
-            // 产品标题
             document.querySelectorAll('#productsTitle, #mobileProductsTitle').forEach(el => { if (el) el.textContent = t.productsTitle; });
-            // 手机端菜单标题
+            
             const menuHeader = document.getElementById('menuHeaderTitle');
             if (menuHeader) menuHeader.textContent = t.menuTitle;
             
-            // 产品列表
             const productGrids = [document.getElementById('productGrid'), document.getElementById('mobileProductGrid')];
             productGrids.forEach(grid => {
                 if (grid) {
@@ -959,46 +381,58 @@
                 }
             });
             
-            // 底部导航
-            const footerContainers = [document.getElementById('footerNav'), document.getElementById('mobileFooterNav')];
-            footerContainers.forEach(container => {
-                if (container) {
-                    container.innerHTML = `
-                        <div class="footer-col">
-                            <div class="footer-logo">${escapeHtml(t.company)}</div>
-                            <p>${escapeHtml(t.footer.aboutText)}</p>
-                        </div>
-                        <div class="footer-col">
-                            <h4>${escapeHtml(t.footer.quickLinks)}</h4>
-                            <a href="/about">${escapeHtml(t.footer.about)}</a>
-                            <a href="/contact">${escapeHtml(t.footer.contact)}</a>
-                        </div>
-                        <div class="footer-col">
-                            <h4>${escapeHtml(t.footer.contact)}</h4>
-                            <a href="mailto:${t.footer.email}">${t.footer.email}</a>
-                            <a href="tel:${t.footer.phone}">${t.footer.phone}</a>
-                        </div>
-                    `;
-                }
-            });
+            // 底部导航由数据库数据渲染，不在 renderContent 中硬编码
+            renderFooterNav();
             
-            // 当前语言显示
             document.querySelectorAll('#currentLangDesktop, #mobileCurrentLang').forEach(el => { if (el) el.textContent = currentLang.toUpperCase(); });
             
-            // 搜索框占位符
             const desktopInput = document.getElementById('searchInputDesktop');
             if (desktopInput) desktopInput.placeholder = t.searchPlaceholder || 'Search...';
             const mobileSearchInput = document.getElementById('mobileSearchInput');
             if (mobileSearchInput) mobileSearchInput.placeholder = t.searchPlaceholder || 'Search...';
         }
 
-        // 渲染导航菜单（从 API 数据翻译）
+        // 渲染底部导航（从数据库数据）
+        function renderFooterNav() {
+            const footerContainer = document.getElementById('footerNav');
+            const mobileFooterContainer = document.getElementById('mobileFooterNav');
+            
+            if (!footerContainer && !mobileFooterContainer) return;
+            
+            const bottomItems = rawNavData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+            
+            if (!bottomItems.length) {
+                // 如果没有底部导航数据，显示默认的简单信息
+                const defaultFooter = `<div class="footer-col"><div class="footer-logo">ZHAMIT</div><p>Professional trading company based in Yiwu, China</p></div>`;
+                if (footerContainer) footerContainer.innerHTML = defaultFooter;
+                if (mobileFooterContainer) mobileFooterContainer.innerHTML = defaultFooter;
+                return;
+            }
+            
+            const footerHtml = bottomItems.map(parent => {
+                const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                if (children.length) {
+                    return `<div class="footer-col">
+                        <h4>${escapeHtml(translateNavItem(parent.name))}</h4>
+                        ${children.map(child => `<a href="${child.url}">${escapeHtml(translateNavItem(child.name))}</a>`).join('')}
+                    </div>`;
+                }
+                return `<div class="footer-col">
+                    <div class="footer-logo">${escapeHtml(translateNavItem(parent.name))}</div>
+                    <p>${escapeHtml(parent.url === '/about' ? 'About us' : '')}</p>
+                </div>`;
+            }).join('');
+            
+            if (footerContainer) footerContainer.innerHTML = footerHtml;
+            if (mobileFooterContainer) mobileFooterContainer.innerHTML = footerHtml;
+        }
+
+        // 渲染顶部导航（电脑端和手机端）
         function renderNavMenus() {
             const desktopNav = document.getElementById('navMenu');
             const mobileMenu = document.getElementById('mobileMenuList');
             
             if (!rawNavData.length) {
-                // 如果没有数据，显示加载中
                 if (desktopNav) desktopNav.innerHTML = '<li><a href="#">Loading...</a></li>';
                 if (mobileMenu) mobileMenu.innerHTML = '<div class="menu-single">Loading...</div>';
                 return;
@@ -1040,7 +474,6 @@
                     return `<a href="${parent.url}" class="menu-single">${escapeHtml(translatedName)}</a>`;
                 }).join('');
                 
-                // 绑定子菜单展开事件
                 document.querySelectorAll('.toggle-sub').forEach(btn => {
                     btn.removeEventListener('click', toggleSubHandler);
                     btn.addEventListener('click', toggleSubHandler);
@@ -1064,6 +497,7 @@
                 const res = await fetch('/api/nav');
                 rawNavData = await res.json();
                 renderNavMenus();
+                renderFooterNav();
             } catch(e) {
                 console.error('加载导航失败，使用默认数据', e);
                 // 默认导航数据
@@ -1073,9 +507,17 @@
                     { id: 3, name: 'Home Goods', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
                     { id: 4, name: 'Kitchenware', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
                     { id: 5, name: 'About', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
-                    { id: 6, name: 'Contact', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' }
+                    { id: 6, name: 'Contact', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' },
+                    { id: 10, name: 'ZHAMIT', url: '/', parent_id: 0, sort_order: 1, location: 'bottom' },
+                    { id: 11, name: 'Quick Links', url: '#', parent_id: 0, sort_order: 2, location: 'bottom' },
+                    { id: 12, name: 'About', url: '/about', parent_id: 11, sort_order: 1, location: 'bottom' },
+                    { id: 13, name: 'Contact', url: '/contact', parent_id: 11, sort_order: 2, location: 'bottom' },
+                    { id: 14, name: 'Contact Info', url: '#', parent_id: 0, sort_order: 3, location: 'bottom' },
+                    { id: 15, name: 'info@zhamit.com', url: 'mailto:info@zhamit.com', parent_id: 14, sort_order: 1, location: 'bottom' },
+                    { id: 16, name: '+86 579 12345678', url: 'tel:+8657912345678', parent_id: 14, sort_order: 2, location: 'bottom' }
                 ];
                 renderNavMenus();
+                renderFooterNav();
             }
         }
 
@@ -1171,7 +613,7 @@
         // 初始化
         currentLang = detectLanguage();
         renderContent();
-        loadNavData();      // 从 API 加载导航
+        loadNavData();      // 从 API 加载导航，会自动渲染顶部和底部
         setupDesktopLang();
         setupMobileLang();
         setupMobileSearch();
