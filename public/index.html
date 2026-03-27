@@ -18,19 +18,18 @@
             background: #fff;
         }
 
-        /* ========== 电脑端样式 ========== */
-        @media (min-width: 769px) {
-            /* 电脑端上导航 */
-            .top-nav-desktop {
+        /* ========== 电脑端样式 (>=768px) ========== */
+        @media (min-width: 768px) {
+            /* 上导航 */
+            .top-nav {
                 background: #1a1a1a;
-                color: white;
                 position: sticky;
                 top: 0;
                 z-index: 200;
                 padding: 0 40px;
             }
 
-            .top-nav-desktop .nav-container {
+            .top-nav .container {
                 max-width: 1400px;
                 margin: 0 auto;
                 display: flex;
@@ -39,35 +38,36 @@
                 height: 70px;
             }
 
-            .desktop-logo {
+            .logo-area {
                 display: flex;
                 align-items: center;
-                gap: 8px;
             }
 
-            .desktop-logo img {
-                height: 40px;
-                width: auto;
-            }
-
-            .desktop-logo span {
+            .logo-text {
                 font-size: 20px;
                 font-weight: 600;
                 color: white;
             }
 
-            .desktop-nav-menu {
+            .logo-img {
+                height: 40px;
+                width: auto;
+            }
+
+            /* 导航菜单 - 靠右 */
+            .nav-menu {
                 display: flex;
                 gap: 32px;
                 list-style: none;
-                margin: 0 auto;
+                margin-left: auto;
+                margin-right: 24px;
             }
 
-            .desktop-nav-menu > li {
+            .nav-menu > li {
                 position: relative;
             }
 
-            .desktop-nav-menu > li > a {
+            .nav-menu > li > a {
                 color: white;
                 text-decoration: none;
                 font-size: 15px;
@@ -75,12 +75,12 @@
                 display: block;
             }
 
-            .desktop-nav-menu .dropdown {
+            .nav-menu .dropdown {
                 position: absolute;
                 top: 100%;
                 left: 0;
                 background: white;
-                min-width: 180px;
+                min-width: 160px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                 border-radius: 8px;
                 opacity: 0;
@@ -89,7 +89,7 @@
                 z-index: 100;
             }
 
-            .desktop-nav-menu > li:hover .dropdown {
+            .nav-menu > li:hover .dropdown {
                 opacity: 1;
                 visibility: visible;
             }
@@ -106,28 +106,30 @@
                 background: #f5f5f5;
             }
 
-            .nav-right {
+            /* 右侧工具栏 - 图标样式 */
+            .toolbar {
                 display: flex;
                 align-items: center;
-                gap: 20px;
+                gap: 16px;
             }
 
-            .language-selector {
-                position: relative;
-            }
-
-            .language-btn {
+            .lang-btn, .search-btn {
                 background: none;
                 border: none;
                 color: white;
                 cursor: pointer;
-                font-size: 14px;
+                font-size: 18px;
+                padding: 6px;
                 display: flex;
                 align-items: center;
                 gap: 4px;
             }
 
-            .language-dropdown {
+            .lang-dropdown {
+                position: relative;
+            }
+
+            .lang-menu {
                 position: absolute;
                 top: 100%;
                 right: 0;
@@ -136,13 +138,14 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                 display: none;
                 z-index: 100;
+                min-width: 100px;
             }
 
-            .language-selector:hover .language-dropdown {
+            .lang-dropdown:hover .lang-menu {
                 display: block;
             }
 
-            .language-dropdown a {
+            .lang-menu a {
                 display: block;
                 padding: 8px 16px;
                 color: #333;
@@ -150,48 +153,47 @@
                 font-size: 13px;
             }
 
-            .language-dropdown a:hover {
+            .lang-menu a:hover {
                 background: #f5f5f5;
             }
 
             .search-box {
-                display: flex;
-                align-items: center;
-                background: rgba(255,255,255,0.15);
+                position: relative;
+            }
+
+            .search-input {
+                position: absolute;
+                right: 0;
+                top: 100%;
+                background: white;
+                border: 1px solid #ddd;
                 border-radius: 30px;
-                padding: 6px 12px;
+                padding: 8px 16px;
+                width: 200px;
+                display: none;
+                margin-top: 8px;
             }
 
-            .search-box input {
-                background: none;
+            .search-box:hover .search-input {
+                display: block;
+            }
+
+            .search-input input {
                 border: none;
-                color: white;
-                padding: 6px;
                 outline: none;
-                width: 150px;
+                width: 100%;
+                font-size: 14px;
             }
 
-            .search-box input::placeholder {
-                color: rgba(255,255,255,0.6);
-            }
-
-            .search-box button {
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                font-size: 16px;
-            }
-
-            /* 电脑端下导航 */
-            .bottom-nav-desktop {
+            /* 下导航 */
+            .bottom-nav {
                 background: #f8f8f8;
                 padding: 40px 40px 20px;
                 margin-top: 60px;
                 border-top: 1px solid #e8e8e8;
             }
 
-            .bottom-nav-desktop .nav-container {
+            .bottom-nav .container {
                 max-width: 1400px;
                 margin: 0 auto;
                 display: flex;
@@ -199,36 +201,30 @@
                 align-items: flex-start;
             }
 
-            .bottom-logo img {
-                height: 36px;
-                width: auto;
-            }
-
             .bottom-logo span {
-                display: block;
-                font-size: 14px;
-                color: #666;
-                margin-top: 8px;
+                font-size: 18px;
+                font-weight: 600;
+                color: #333;
             }
 
-            .bottom-nav-menu {
+            .bottom-menu {
                 display: flex;
                 gap: 48px;
                 list-style: none;
             }
 
-            .bottom-nav-menu > li > a {
+            .bottom-menu > li > a {
                 color: #333;
                 text-decoration: none;
                 font-weight: 500;
                 font-size: 14px;
             }
 
-            .bottom-dropdown {
+            .bottom-submenu {
                 margin-top: 8px;
             }
 
-            .bottom-dropdown a {
+            .bottom-submenu a {
                 display: block;
                 color: #666;
                 text-decoration: none;
@@ -238,24 +234,53 @@
 
             .copyright {
                 text-align: center;
-                padding: 24px 20px;
+                padding: 20px;
                 font-size: 12px;
                 color: #999;
                 background: #f8f8f8;
                 border-top: 1px solid #e8e8e8;
             }
-        }
 
-        /* ========== 手机端样式 ========== */
-        @media (max-width: 768px) {
-            body {
-                padding-bottom: 80px;
+            /* 内容区 */
+            .hero {
+                padding: 80px 20px;
+                text-align: center;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
             }
 
-            /* 手机端上导航 - 汉堡菜单 */
-            .mobile-top-nav {
+            .hero h1 { font-size: 48px; margin-bottom: 16px; }
+            .hero p { font-size: 18px; }
+
+            .products {
+                padding: 60px 40px;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .products h2 { text-align: center; margin-bottom: 40px; font-size: 32px; }
+
+            .product-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 30px;
+            }
+
+            .product-card {
+                background: #f9f9f9;
+                border-radius: 12px;
+                padding: 32px 24px;
+                text-align: center;
+            }
+
+            .product-card h3 { font-size: 20px; margin-bottom: 12px; }
+        }
+
+        /* ========== 手机端样式 (<=767px) ========== */
+        @media (max-width: 767px) {
+            /* 上导航 - 汉堡菜单 */
+            .top-nav {
                 background: #1a1a1a;
-                color: white;
                 position: sticky;
                 top: 0;
                 z-index: 200;
@@ -268,7 +293,6 @@
             .hamburger {
                 background: none;
                 border: none;
-                cursor: pointer;
                 width: 30px;
                 height: 30px;
                 display: flex;
@@ -276,6 +300,7 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: 6px 0;
+                cursor: pointer;
             }
 
             .hamburger span {
@@ -289,19 +314,30 @@
             .mobile-logo {
                 font-size: 18px;
                 font-weight: 600;
+                color: white;
             }
 
-            .mobile-logo img {
-                height: 28px;
-                width: auto;
+            .mobile-toolbar {
+                display: flex;
+                gap: 12px;
+                align-items: center;
             }
 
-            /* 侧滑菜单 - 不霸屏，右边留白 */
-            .mobile-menu-overlay {
+            .mobile-lang-btn, .mobile-search-btn {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+                padding: 4px;
+            }
+
+            /* 侧滑菜单 - 90%宽度，右边留白 */
+            .side-menu {
                 position: fixed;
                 top: 0;
                 left: 0;
-                width: 90%;
+                width: 85%;
                 max-width: 320px;
                 height: 100%;
                 background: white;
@@ -312,7 +348,7 @@
                 overflow-y: auto;
             }
 
-            .mobile-menu-overlay.open {
+            .side-menu.open {
                 transform: translateX(0);
             }
 
@@ -324,10 +360,7 @@
                 align-items: center;
             }
 
-            .menu-header h3 {
-                font-size: 18px;
-                color: #1a1a1a;
-            }
+            .menu-header h3 { font-size: 18px; }
 
             .close-menu {
                 background: none;
@@ -337,15 +370,11 @@
                 color: #999;
             }
 
-            .mobile-menu-list {
-                padding: 8px 0;
-            }
+            .menu-list { padding: 8px 0; }
 
-            .mobile-menu-item {
-                border-bottom: 1px solid #f0f0f0;
-            }
+            .menu-item { border-bottom: 1px solid #f0f0f0; }
 
-            .mobile-menu-parent {
+            .menu-parent {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -353,10 +382,7 @@
                 cursor: pointer;
             }
 
-            .mobile-menu-parent span:first-child {
-                font-size: 16px;
-                font-weight: 500;
-            }
+            .menu-parent span { font-size: 16px; font-weight: 500; }
 
             .toggle-sub {
                 background: none;
@@ -365,20 +391,17 @@
                 cursor: pointer;
                 color: #999;
                 width: 30px;
-                text-align: center;
             }
 
-            .mobile-submenu {
+            .submenu {
                 display: none;
                 background: #f9f9f9;
                 padding-left: 20px;
             }
 
-            .mobile-submenu.open {
-                display: block;
-            }
+            .submenu.open { display: block; }
 
-            .mobile-submenu a {
+            .submenu a {
                 display: block;
                 padding: 12px 20px;
                 color: #666;
@@ -386,55 +409,12 @@
                 font-size: 14px;
             }
 
-            .mobile-menu-single {
+            .menu-single {
                 display: block;
                 padding: 14px 20px;
                 color: #333;
                 text-decoration: none;
                 font-size: 16px;
-            }
-
-            /* 手机端下导航 */
-            .mobile-bottom-nav {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: white;
-                border-top: 1px solid #e8e8e8;
-                padding: 12px 16px;
-                z-index: 100;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            }
-
-            .mobile-bottom-logo {
-                text-align: center;
-                margin-bottom: 12px;
-            }
-
-            .mobile-bottom-logo img {
-                height: 28px;
-                width: auto;
-            }
-
-            .mobile-bottom-logo span {
-                font-size: 16px;
-                font-weight: 600;
-                color: #1a1a1a;
-            }
-
-            .mobile-bottom-menu {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 16px;
-                margin-top: 8px;
-            }
-
-            .mobile-bottom-menu a {
-                color: #666;
-                text-decoration: none;
-                font-size: 13px;
             }
 
             /* 手机端内容区 */
@@ -445,24 +425,14 @@
                 color: white;
             }
 
-            .hero h1 {
-                font-size: 28px;
-                margin-bottom: 12px;
-            }
-
-            .hero p {
-                font-size: 14px;
-            }
+            .hero h1 { font-size: 28px; margin-bottom: 12px; }
+            .hero p { font-size: 14px; }
 
             .products {
                 padding: 32px 16px;
             }
 
-            .products h2 {
-                text-align: center;
-                margin-bottom: 24px;
-                font-size: 20px;
-            }
+            .products h2 { text-align: center; margin-bottom: 24px; font-size: 20px; }
 
             .product-card {
                 background: #f9f9f9;
@@ -472,128 +442,76 @@
                 text-align: center;
             }
 
-            .product-card h3 {
-                margin-bottom: 8px;
-            }
+            .product-card h3 { margin-bottom: 8px; }
 
-            .product-card p {
-                color: #666;
-                font-size: 14px;
-            }
-        }
-
-        /* 电脑端内容区 */
-        @media (min-width: 769px) {
-            .hero {
-                padding: 80px 20px;
-                text-align: center;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-            }
-
-            .hero h1 {
-                font-size: 48px;
-                margin-bottom: 16px;
-            }
-
-            .hero p {
-                font-size: 18px;
-            }
-
-            .products {
-                padding: 60px 40px;
-                max-width: 1400px;
-                margin: 0 auto;
-            }
-
-            .products h2 {
-                text-align: center;
-                margin-bottom: 40px;
-                font-size: 32px;
-            }
-
-            .product-grid {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 30px;
-            }
-
-            .product-card {
-                background: #f9f9f9;
-                border-radius: 12px;
-                padding: 32px 24px;
-                text-align: center;
-                transition: transform 0.2s;
-            }
-
-            .product-card:hover {
-                transform: translateY(-4px);
-            }
-
-            .product-card h3 {
-                font-size: 20px;
-                margin-bottom: 12px;
-            }
-
-            .copyright {
-                text-align: center;
-                padding: 24px;
-                font-size: 12px;
-                color: #999;
+            /* 手机端底部 - 不悬浮，只有备案信息 */
+            .mobile-bottom {
                 background: #f8f8f8;
+                padding: 20px 16px;
+                margin-top: 40px;
+                text-align: center;
                 border-top: 1px solid #e8e8e8;
             }
+
+            .mobile-bottom .copyright {
+                font-size: 11px;
+                color: #999;
+            }
         }
 
-        /* 通用 */
-        a {
-            text-decoration: none;
-        }
+        /* 电脑端内容区通用 */
+        .product-card p { color: #666; font-size: 14px; }
+        a { text-decoration: none; }
     </style>
 </head>
 <body>
-    <!-- 电脑端导航 -->
-    <div class="top-nav-desktop" id="desktopTopNav">
-        <div class="nav-container">
-            <div class="desktop-logo" id="desktopLogo">
-                <span>ZHAMIT</span>
+    <!-- 电脑端导航 (>=768px 显示) -->
+    <div class="top-nav desktop-only" id="desktopNav">
+        <div class="container">
+            <div class="logo-area" id="desktopLogo">
+                <span class="logo-text">ZHAMIT</span>
             </div>
-            <ul class="desktop-nav-menu" id="desktopNavMenu"></ul>
-            <div class="nav-right">
-                <div class="language-selector">
-                    <button class="language-btn" id="langBtn">🌐 语言 ▼</button>
-                    <div class="language-dropdown" id="langDropdown">
+            <ul class="nav-menu" id="desktopNavMenu"></ul>
+            <div class="toolbar">
+                <div class="lang-dropdown">
+                    <button class="lang-btn" id="desktopLangBtn">🌐</button>
+                    <div class="lang-menu" id="desktopLangMenu">
                         <a href="#" data-lang="en">English</a>
                         <a href="#" data-lang="es">Español</a>
                         <a href="#" data-lang="ar">العربية</a>
                     </div>
                 </div>
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="搜索...">
-                    <button id="searchBtn">🔍</button>
+                    <button class="search-btn" id="desktopSearchBtn">🔍</button>
+                    <div class="search-input">
+                        <input type="text" id="desktopSearchInput" placeholder="搜索...">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 手机端上导航 -->
-    <div class="mobile-top-nav" id="mobileTopNav">
+    <!-- 手机端导航 (<=767px 显示) -->
+    <div class="top-nav mobile-only" id="mobileNav">
         <button class="hamburger" id="hamburgerBtn">
             <span></span>
             <span></span>
             <span></span>
         </button>
         <div class="mobile-logo" id="mobileLogo">ZHAMIT</div>
-        <div style="width: 30px;"></div>
+        <div class="mobile-toolbar">
+            <button class="mobile-lang-btn" id="mobileLangBtn">🌐</button>
+            <button class="mobile-search-btn" id="mobileSearchBtn">🔍</button>
+        </div>
     </div>
 
     <!-- 手机端侧滑菜单 -->
-    <div class="mobile-menu-overlay" id="mobileMenu">
+    <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <h3>菜单</h3>
             <button class="close-menu" id="closeMenuBtn">✕</button>
         </div>
-        <div class="mobile-menu-list" id="mobileMenuList"></div>
+        <div class="menu-list" id="mobileMenuList"></div>
     </div>
 
     <!-- 主内容 -->
@@ -604,67 +522,49 @@
         </section>
         <section class="products">
             <h2>精选产品</h2>
-            <div class="product-grid" id="productGrid">
-                <div class="product-card">
-                    <h3>家居用品</h3>
-                    <p>高品质家居好物，现货供应</p>
-                </div>
-                <div class="product-card">
-                    <h3>厨房用品</h3>
-                    <p>实用美观，可定制包装</p>
-                </div>
-                <div class="product-card">
-                    <h3>装饰摆件</h3>
-                    <p>限量款式，每周更新</p>
-                </div>
+            <div class="product-grid">
+                <div class="product-card"><h3>家居用品</h3><p>高品质家居好物，现货供应</p></div>
+                <div class="product-card"><h3>厨房用品</h3><p>实用美观，可定制包装</p></div>
+                <div class="product-card"><h3>装饰摆件</h3><p>限量款式，每周更新</p></div>
             </div>
         </section>
     </main>
 
     <!-- 电脑端下导航 -->
-    <div class="bottom-nav-desktop" id="desktopBottomNav">
-        <div class="nav-container">
+    <div class="bottom-nav desktop-only" id="desktopBottomNav">
+        <div class="container">
             <div class="bottom-logo" id="bottomLogo">
                 <span>ZHAMIT</span>
             </div>
-            <ul class="bottom-nav-menu" id="desktopBottomMenu"></ul>
+            <ul class="bottom-menu" id="desktopBottomMenu"></ul>
         </div>
     </div>
 
-    <!-- 手机端下导航 -->
-    <div class="mobile-bottom-nav" id="mobileBottomNav">
-        <div class="mobile-bottom-logo" id="mobileBottomLogo">
-            <span>ZHAMIT</span>
+    <!-- 手机端底部（只有备案信息） -->
+    <div class="mobile-bottom mobile-only">
+        <div class="copyright">
+            © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
         </div>
-        <div class="mobile-bottom-menu" id="mobileBottomMenu"></div>
-    </div>
-
-    <div class="copyright">
-        © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
     </div>
 
     <script>
-        // 导航数据（将从 API 加载）
         let navData = [];
 
-        // 加载导航数据
         async function loadNavData() {
             try {
                 const res = await fetch('/api/nav');
                 navData = await res.json();
                 renderAllNav();
             } catch(e) {
-                // 使用默认数据
                 navData = [
                     { id: 1, name: '首页', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
                     { id: 2, name: '产品', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
                     { id: 3, name: '家居用品', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
                     { id: 4, name: '厨房用品', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
-                    { id: 5, name: '关于我们', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
-                    { id: 6, name: '联系我们', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' },
+                    { id: 5, name: '关于', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
+                    { id: 6, name: '联系', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' },
                     { id: 10, name: '关于我们', url: '/about', parent_id: 0, sort_order: 1, location: 'bottom' },
-                    { id: 11, name: '联系方式', url: '/contact', parent_id: 0, sort_order: 2, location: 'bottom' },
-                    { id: 12, name: '公司简介', url: '/about', parent_id: 10, sort_order: 1, location: 'bottom' }
+                    { id: 11, name: '联系方式', url: '/contact', parent_id: 0, sort_order: 2, location: 'bottom' }
                 ];
                 renderAllNav();
             }
@@ -674,186 +574,133 @@
             renderDesktopTopNav();
             renderDesktopBottomNav();
             renderMobileMenu();
-            renderMobileBottomNav();
         }
 
-        // 电脑端上导航
         function renderDesktopTopNav() {
             const container = document.getElementById('desktopNavMenu');
-            const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             if (!container) return;
-            
+            const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             container.innerHTML = topItems.map(parent => {
                 const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                 if (children.length) {
                     return `<li>
                         <a href="${parent.url}">${escapeHtml(parent.name)}</a>
-                        <div class="dropdown">
-                            ${children.map(child => `<a href="${child.url}">${escapeHtml(child.name)}</a>`).join('')}
-                        </div>
+                        <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
                     </li>`;
                 }
                 return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
             }).join('');
         }
 
-        // 电脑端下导航
         function renderDesktopBottomNav() {
             const container = document.getElementById('desktopBottomMenu');
-            const bottomItems = navData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             if (!container) return;
-            
+            const bottomItems = navData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             container.innerHTML = bottomItems.map(parent => {
                 const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                 if (children.length) {
                     return `<li>
                         <a href="${parent.url}">${escapeHtml(parent.name)}</a>
-                        <div class="bottom-dropdown">
-                            ${children.map(child => `<a href="${child.url}">${escapeHtml(child.name)}</a>`).join('')}
-                        </div>
+                        <div class="bottom-submenu">${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
                     </li>`;
                 }
                 return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
             }).join('');
         }
 
-        // 手机端侧滑菜单（支持二级展开）
         function renderMobileMenu() {
             const container = document.getElementById('mobileMenuList');
-            const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             if (!container) return;
-            
+            const topItems = navData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             container.innerHTML = topItems.map(parent => {
                 const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                 if (children.length) {
-                    return `<div class="mobile-menu-item">
-                        <div class="mobile-menu-parent">
+                    return `<div class="menu-item">
+                        <div class="menu-parent">
                             <span>${escapeHtml(parent.name)}</span>
                             <button class="toggle-sub" data-parent="${parent.id}">+</button>
                         </div>
-                        <div class="mobile-submenu" data-sub="${parent.id}">
-                            ${children.map(child => `<a href="${child.url}">${escapeHtml(child.name)}</a>`).join('')}
+                        <div class="submenu" data-sub="${parent.id}">
+                            ${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
                         </div>
                     </div>`;
                 }
-                return `<a href="${parent.url}" class="mobile-menu-single">${escapeHtml(parent.name)}</a>`;
+                return `<a href="${parent.url}" class="menu-single">${escapeHtml(parent.name)}</a>`;
             }).join('');
             
-            // 绑定子菜单展开事件
             document.querySelectorAll('.toggle-sub').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const parentId = btn.dataset.parent;
-                    const submenu = document.querySelector(`.mobile-submenu[data-sub="${parentId}"]`);
-                    if (submenu) {
-                        submenu.classList.toggle('open');
-                        btn.textContent = submenu.classList.contains('open') ? '−' : '+';
+                    const sub = document.querySelector(`.submenu[data-sub="${parentId}"]`);
+                    if (sub) {
+                        sub.classList.toggle('open');
+                        btn.textContent = sub.classList.contains('open') ? '−' : '+';
                     }
                 });
             });
         }
 
-        // 手机端下导航
-        function renderMobileBottomNav() {
-            const container = document.getElementById('mobileBottomMenu');
-            const bottomItems = navData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-            if (!container) return;
-            
-            // 扁平化显示所有底部链接（主分类+子分类）
-            const allBottomLinks = [];
-            bottomItems.forEach(parent => {
-                allBottomLinks.push({ name: parent.name, url: parent.url });
-                const children = navData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                children.forEach(child => {
-                    allBottomLinks.push({ name: child.name, url: child.url });
-                });
-            });
-            
-            container.innerHTML = allBottomLinks.map(link => `<a href="${link.url}">${escapeHtml(link.name)}</a>`).join('');
-        }
-
-        // 加载站点设置（Logo）
         async function loadSettings() {
             try {
                 const res = await fetch('/api/settings');
                 const settings = await res.json();
-                
-                // 更新各处 Logo
+                const logoText = settings.brand_text || 'ZHAMIT';
                 const desktopLogo = document.getElementById('desktopLogo');
                 const mobileLogo = document.getElementById('mobileLogo');
                 const bottomLogo = document.getElementById('bottomLogo');
-                const mobileBottomLogo = document.getElementById('mobileBottomLogo');
-                
-                if (settings.logo_type === 'image' && settings.logo_url) {
-                    const logoImg = `<img src="${settings.logo_url}" alt="${settings.logo_alt}" style="height:36px;">`;
-                    if (desktopLogo) desktopLogo.innerHTML = logoImg;
-                    if (mobileLogo) mobileLogo.innerHTML = logoImg;
-                    if (bottomLogo) bottomLogo.innerHTML = logoImg;
-                    if (mobileBottomLogo) mobileBottomLogo.innerHTML = logoImg;
-                } else {
-                    const brandText = settings.brand_text || 'ZHAMIT';
-                    if (desktopLogo) desktopLogo.innerHTML = `<span style="font-size:20px; font-weight:600;">${escapeHtml(brandText)}</span>`;
-                    if (mobileLogo) mobileLogo.textContent = brandText;
-                    if (bottomLogo) bottomLogo.innerHTML = `<span>${escapeHtml(brandText)}</span>`;
-                    if (mobileBottomLogo) mobileBottomLogo.innerHTML = `<span>${escapeHtml(brandText)}</span>`;
-                }
+                if (desktopLogo) desktopLogo.innerHTML = `<span class="logo-text">${escapeHtml(logoText)}</span>`;
+                if (mobileLogo) mobileLogo.textContent = logoText;
+                if (bottomLogo) bottomLogo.innerHTML = `<span>${escapeHtml(logoText)}</span>`;
             } catch(e) {}
         }
 
-        // 搜索功能
-        function setupSearch() {
-            const searchBtn = document.getElementById('searchBtn');
-            const searchInput = document.getElementById('searchInput');
-            if (searchBtn && searchInput) {
-                searchBtn.addEventListener('click', () => {
-                    const query = searchInput.value.trim();
-                    if (query) {
-                        window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                    }
-                });
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        const query = searchInput.value.trim();
-                        if (query) {
-                            window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                        }
-                    }
-                });
+        function setupMobileMenu() {
+            const hamburger = document.getElementById('hamburgerBtn');
+            const sideMenu = document.getElementById('sideMenu');
+            const closeBtn = document.getElementById('closeMenuBtn');
+            if (hamburger && sideMenu) {
+                hamburger.addEventListener('click', () => sideMenu.classList.add('open'));
+                if (closeBtn) closeBtn.addEventListener('click', () => sideMenu.classList.remove('open'));
+                sideMenu.addEventListener('click', (e) => { if (e.target === sideMenu) sideMenu.classList.remove('open'); });
             }
         }
 
-        // 语言切换
         function setupLanguage() {
-            document.querySelectorAll('.language-dropdown a').forEach(link => {
+            const setLang = (lang) => {
+                document.cookie = `lang=${lang}; path=/; max-age=2592000`;
+                location.reload();
+            };
+            document.querySelectorAll('[data-lang]').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const lang = link.dataset.lang;
-                    document.cookie = `lang=${lang}; path=/; max-age=2592000`;
-                    location.reload();
+                    setLang(link.dataset.lang);
                 });
             });
         }
 
-        // 手机端菜单控制
-        function setupMobileMenu() {
-            const hamburger = document.getElementById('hamburgerBtn');
-            const mobileMenu = document.getElementById('mobileMenu');
-            const closeBtn = document.getElementById('closeMenuBtn');
+        function setupSearch() {
+            const desktopSearchBtn = document.getElementById('desktopSearchBtn');
+            const desktopSearchInput = document.getElementById('desktopSearchInput');
+            const mobileSearchBtn = document.getElementById('mobileSearchBtn');
             
-            if (hamburger && mobileMenu) {
-                hamburger.addEventListener('click', () => {
-                    mobileMenu.classList.add('open');
+            const doSearch = (query) => {
+                if (query.trim()) window.location.href = `/search?q=${encodeURIComponent(query.trim())}`;
+            };
+            
+            if (desktopSearchBtn && desktopSearchInput) {
+                desktopSearchBtn.addEventListener('click', () => {
+                    const input = desktopSearchInput.parentElement.querySelector('input');
+                    doSearch(input.value);
                 });
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => {
-                        mobileMenu.classList.remove('open');
-                    });
-                }
-                // 点击菜单外部关闭
-                mobileMenu.addEventListener('click', (e) => {
-                    if (e.target === mobileMenu) {
-                        mobileMenu.classList.remove('open');
-                    }
+                desktopSearchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') doSearch(e.target.value);
+                });
+            }
+            if (mobileSearchBtn) {
+                mobileSearchBtn.addEventListener('click', () => {
+                    const query = prompt('搜索内容：');
+                    if (query) doSearch(query);
                 });
             }
         }
@@ -863,12 +710,11 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
-        // 初始化
         loadNavData();
         loadSettings();
-        setupSearch();
-        setupLanguage();
         setupMobileMenu();
+        setupLanguage();
+        setupSearch();
     </script>
 </body>
 </html>
