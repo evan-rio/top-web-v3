@@ -492,6 +492,8 @@ function getLangDisplay(lang) {
 
 // AI 翻译 HTML - 自动检测源语言
 async function translateHtmlWithAI(html, targetLang, env) {
+  console.log('开始翻译，目标语言:', targetLang);
+  console.log('AI 绑定存在:', !!env.AI);
   if (!env.AI) {
     console.error('AI binding not found');
     return html;
