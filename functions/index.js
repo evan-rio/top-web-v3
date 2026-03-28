@@ -1,4 +1,4 @@
-// functions/index.js - 第一步：只读取数据库，不翻译
+// functions/index.js - 第二步：完整 HTML 渲染，不翻译
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -10,39 +10,64 @@ export async function onRequest(context) {
     return context.next();
   }
   
-  // 简单的 HTML 测试
+  // 获取导航数据
+  let navData = [];
+  try {
+    const stmt = env.DB.prepare('SELECT * FROM nav_menus WHERE status = 1 ORDER BY location, parent_id, sort_order LIMIT 10');
+    const rows = await stmt.all();
+    navData = rows.results || [];
+  } catch (e) {
+    console.error('数据库错误:', e);
+  }
+  
+  // 生成简单的导航 HTML
+  const topNav = navData.filter(i => i.location === 'top');
+  const topParents = topNav.filter(i => i.parent_id === 0);
+  const topHtml = topParents.map(parent => {
+    return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
+  }).join('');
+  
   const html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZHAMIT Test</title>
+    <title>ZHAMIT</title>
     <style>
-        body { font-family: system-ui; padding: 40px; max-width: 800px; margin: 0 auto; }
-        .success { color: green; }
-        .error { color: red; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui; }
+        .top-nav { background: #1a1a1a; color: white; padding: 15px 20px; }
+        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-menu a { color: white; text-decoration: none; }
+        main { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .footer { background: #f5f5f5; padding: 20px; text-align: center; margin-top: 40px; }
     </style>
 </head>
 <body>
-    <h1>ZHAMIT 框架测试</h1>
-    <div id="result">测试数据库连接...</div>
+    <div class="top-nav">
+        <ul class="nav-menu">
+            ${topHtml}
+        </ul>
+    </div>
     
-    <script>
-        async function testDB() {
-            try {
-                const res = await fetch('/api/nav');
-                const data = await res.json();
-                document.getElementById('result').innerHTML = '<span class="success">✅ 数据库连接成功！导航数据: ' + JSON.stringify(data) + '</span>';
-            } catch(e) {
-                document.getElementById('result').innerHTML = '<span class="error">❌ 数据库连接失败: ' + e.message + '</span>';
-            }
-        }
-        testDB();
-    </script>
+    <main>
+        <h1>欢迎访问 ZHAMIT</h1>
+        <p>这是测试页面。如果看到导航菜单，说明数据库连接成功。</p>
+        <p>导航数据: ${JSON.stringify(navData)}</p>
+    </main>
+    
+    <div class="footer">
+        © 2025 ZHAMIT. All rights reserved.
+    </div>
 </body>
 </html>`;
   
   return new Response(html, {
     headers: { 'Content-Type': 'text/html; charset=utf-8' }
   });
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
