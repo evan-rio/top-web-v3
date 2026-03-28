@@ -164,3 +164,18 @@
         uploadArea.addEventListener('dragleave', () => {
             uploadArea.style.borderColor = '#ddd';
         });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ddd';
+            const files = Array.from(e.dataTransfer.files);
+            uploadFiles(files);
+        });
+        fileInput.addEventListener('change', (e) => {
+            uploadFiles(Array.from(e.target.files));
+            fileInput.value = '';
+        });
+        
+        loadImages();
+    </script>
+</body>
+</html>
