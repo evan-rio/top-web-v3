@@ -6,12 +6,12 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const path = url.pathname;
   
-  // 跳过 API 和静态资源（交给 Pages 默认处理）
+  // 跳过 API
   if (path.startsWith('/api/')) {
     return next();
   }
   
-  // 静态资源交给 Pages 默认处理，不经过 R2
+  // 静态资源交给 Pages 默认处理
   if (path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|webp)$/)) {
     return next();
   }
