@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewfit=cover">
     <title>ZHAMIT - 专业家居贸易</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -223,8 +223,8 @@
     </div>
 
     <script>
-        // 多语言文案（英文原文 + 中文备用）
-        const texts = {
+        // 多语言文案
+        const translations = {
             en: {
                 company: 'ZHAMIT',
                 heroTitle: 'ZHAMIT',
@@ -252,13 +252,7 @@
                 menuTitle: '菜单',
                 searchPlaceholder: '搜索...',
                 copyright: '© 2025 义乌哲觅贸易有限公司 版权所有'
-            }
-        };
-
-        // 扩展西班牙语和阿拉伯语（后续可继续添加）
-        const translations = {
-            en: texts.en,
-            zh: texts.zh,
+            },
             es: {
                 company: 'ZHAMIT',
                 heroTitle: 'ZHAMIT',
@@ -292,18 +286,12 @@
         let currentLang = 'en';
         let rawNavData = [];
 
-        // 检测浏览器语言
+        // 检测语言
         function detectLanguage() {
-            // 优先使用 Cookie 中保存的语言
             const cookieMatch = document.cookie.match(/lang=([^;]+)/);
-            if (cookieMatch && translations[cookieMatch[1]]) {
-                return cookieMatch[1];
-            }
-            // 其次检测浏览器语言
+            if (cookieMatch && translations[cookieMatch[1]]) return cookieMatch[1];
             const browserLang = navigator.language.split('-')[0];
-            if (translations[browserLang]) {
-                return browserLang;
-            }
+            if (translations[browserLang]) return browserLang;
             return 'en';
         }
 
@@ -313,13 +301,6 @@
             currentLang = lang;
             document.cookie = `lang=${lang}; path=/; max-age=2592000`;
             refreshAllContent();
-        }
-
-        // 翻译单个文本（暂时用预置翻译，后续可接入 AI）
-        async function translateText(text, targetLang) {
-            if (targetLang === 'en') return text;
-            // 暂时使用预置翻译，后续可以接入 AI API
-            return text; // 占位，实际由 refreshAllContent 处理
         }
 
         // 刷新所有内容
@@ -390,22 +371,22 @@
             if (langDesktop) langDesktop.textContent = currentLang.toUpperCase();
             if (langMobile) langMobile.textContent = currentLang.toUpperCase();
             
-            // 更新导航菜单（需要翻译数据库中的菜单名）
+            // 重新渲染导航
             renderNavMenus();
             renderFooterNav();
         }
 
-        // 翻译导航菜单项（从数据库读取，根据当前语言翻译）
-        async function translateNavItem(name) {
-            // 简单映射，后续可接入 AI
-            const translationsMap = {
-                en: { '首页': 'Home', '产品': 'Products', '关于我们': 'About', '联系我们': 'Contact' },
-                zh: { 'Home': '首页', 'Products': '产品', 'About': '关于我们', 'Contact': '联系我们' },
+        // 翻译菜单项
+        function translateMenuItem(name) {
+            // 简单映射表
+            const map = {
+                en: { '首页': 'Home', '产品': 'Products', '关于我们': 'About', '联系我们': 'Contact', 'Home': 'Home', 'Products': 'Products', 'About': 'About', 'Contact': 'Contact' },
+                zh: { 'Home': '首页', 'Products': '产品', 'About': '关于我们', 'Contact': '联系我们', '首页': '首页', '产品': '产品', '关于我们': '关于我们', '联系我们': '联系我们' },
                 es: { 'Home': 'Inicio', 'Products': 'Productos', 'About': 'Sobre', 'Contact': 'Contacto' },
                 ar: { 'Home': 'الرئيسية', 'Products': 'المنتجات', 'About': 'معلومات عنا', 'Contact': 'اتصل بنا' }
             };
-            const map = translationsMap[currentLang];
-            if (map && map[name]) return map[name];
+            const langMap = map[currentLang];
+            if (langMap && langMap[name]) return langMap[name];
             return name;
         }
 
@@ -422,49 +403,38 @@
             
             const topItems = rawNavData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             
-            // 翻译所有菜单项
-            const translatedItems = [];
-            for (const parent of topItems) {
-                const translatedName = await translateNavItem(parent.name);
-                const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                const translatedChildren = [];
-                for (const child of children) {
-                    translatedChildren.push({
-                        name: await translateNavItem(child.name),
-                        url: child.url
-                    });
-                }
-                translatedItems.push({ ...parent, translatedName, translatedChildren });
-            }
-            
             // 电脑端
             if (desktopNav) {
-                desktopNav.innerHTML = translatedItems.map(parent => {
-                    if (parent.translatedChildren.length) {
+                desktopNav.innerHTML = topItems.map(parent => {
+                    const translatedName = translateMenuItem(parent.name);
+                    const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                    if (children.length) {
                         return `<li>
-                            <a href="${parent.url}">${escapeHtml(parent.translatedName)}</a>
-                            <div class="dropdown">${parent.translatedChildren.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
+                            <a href="${parent.url}">${escapeHtml(translatedName)}</a>
+                            <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(translateMenuItem(c.name))}</a>`).join('')}</div>
                         </li>`;
                     }
-                    return `<li><a href="${parent.url}">${escapeHtml(parent.translatedName)}</a></li>`;
+                    return `<li><a href="${parent.url}">${escapeHtml(translatedName)}</a></li>`;
                 }).join('');
             }
             
             // 手机端
             if (mobileMenu) {
-                mobileMenu.innerHTML = translatedItems.map(parent => {
-                    if (parent.translatedChildren.length) {
+                mobileMenu.innerHTML = topItems.map(parent => {
+                    const translatedName = translateMenuItem(parent.name);
+                    const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                    if (children.length) {
                         return `<div class="menu-item">
                             <div class="menu-parent">
-                                <span>${escapeHtml(parent.translatedName)}</span>
+                                <span>${escapeHtml(translatedName)}</span>
                                 <button class="toggle-sub" data-parent="${parent.id}">+</button>
                             </div>
                             <div class="submenu" data-sub="${parent.id}">
-                                ${parent.translatedChildren.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
+                                ${children.map(c => `<a href="${c.url}">${escapeHtml(translateMenuItem(c.name))}</a>`).join('')}
                             </div>
                         </div>`;
                     }
-                    return `<a href="${parent.url}" class="menu-single">${escapeHtml(parent.translatedName)}</a>`;
+                    return `<a href="${parent.url}" class="menu-single">${escapeHtml(translatedName)}</a>`;
                 }).join('');
                 
                 document.querySelectorAll('.toggle-sub').forEach(btn => {
@@ -505,29 +475,17 @@
             let rightColumnsHtml = '';
             
             if (bottomParents.length) {
-                const translatedParents = [];
-                for (const parent of bottomParents) {
-                    const translatedName = await translateNavItem(parent.name);
+                rightColumnsHtml = bottomParents.map(parent => {
+                    const translatedName = translateMenuItem(parent.name);
                     const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                    const translatedChildren = [];
-                    for (const child of children) {
-                        translatedChildren.push({
-                            name: await translateNavItem(child.name),
-                            url: child.url
-                        });
-                    }
-                    translatedParents.push({ ...parent, translatedName, translatedChildren });
-                }
-                
-                rightColumnsHtml = translatedParents.map(parent => {
-                    if (parent.translatedChildren.length) {
+                    if (children.length) {
                         return `<div class="footer-col">
-                            <h4>${escapeHtml(parent.translatedName)}</h4>
-                            ${parent.translatedChildren.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
+                            <h4>${escapeHtml(translatedName)}</h4>
+                            ${children.map(c => `<a href="${c.url}">${escapeHtml(translateMenuItem(c.name))}</a>`).join('')}
                         </div>`;
                     }
                     return `<div class="footer-col">
-                        <h4>${escapeHtml(parent.translatedName)}</h4>
+                        <h4>${escapeHtml(translatedName)}</h4>
                     </div>`;
                 }).join('');
             } else {
@@ -560,10 +518,11 @@
             try {
                 const res = await fetch('/api/nav');
                 rawNavData = await res.json();
-                await renderNavMenus();
-                await renderFooterNav();
+                renderNavMenus();
+                renderFooterNav();
             } catch(e) {
                 console.error('加载导航失败', e);
+                // 默认导航
                 rawNavData = [
                     { id: 1, name: 'Home', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
                     { id: 2, name: 'Products', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
@@ -572,8 +531,8 @@
                     { id: 5, name: 'About', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
                     { id: 6, name: 'Contact', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' }
                 ];
-                await renderNavMenus();
-                await renderFooterNav();
+                renderNavMenus();
+                renderFooterNav();
             }
         }
 
