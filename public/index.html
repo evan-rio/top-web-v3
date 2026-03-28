@@ -223,8 +223,8 @@
     </div>
 
     <script>
-        // ========== 多语言文案（包含完整的翻译映射） ==========
-        const translations = {
+        // 多语言文案（英文原文 + 中文备用）
+        const texts = {
             en: {
                 company: 'ZHAMIT',
                 heroTitle: 'ZHAMIT',
@@ -236,7 +236,8 @@
                     { name: 'Decorations', desc: 'Limited editions, updated weekly' }
                 ],
                 menuTitle: 'Menu',
-                searchPlaceholder: 'Search...'
+                searchPlaceholder: 'Search...',
+                copyright: '© 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.'
             },
             zh: {
                 company: '哲觅贸易',
@@ -249,8 +250,15 @@
                     { name: '装饰摆件', desc: '限量款式，每周更新' }
                 ],
                 menuTitle: '菜单',
-                searchPlaceholder: '搜索...'
-            },
+                searchPlaceholder: '搜索...',
+                copyright: '© 2025 义乌哲觅贸易有限公司 版权所有'
+            }
+        };
+
+        // 扩展西班牙语和阿拉伯语（后续可继续添加）
+        const translations = {
+            en: texts.en,
+            zh: texts.zh,
             es: {
                 company: 'ZHAMIT',
                 heroTitle: 'ZHAMIT',
@@ -262,7 +270,8 @@
                     { name: 'Decoraciones', desc: 'Ediciones limitadas, actualizadas semanalmente' }
                 ],
                 menuTitle: 'Menú',
-                searchPlaceholder: 'Buscar...'
+                searchPlaceholder: 'Buscar...',
+                copyright: '© 2025 YIWU ZHAMIT TRADING LIMITED. Todos los derechos reservados.'
             },
             ar: {
                 company: 'ZHAMIT',
@@ -275,229 +284,133 @@
                     { name: 'ديكورات', desc: 'إصدارات محدودة، تحديث أسبوعي' }
                 ],
                 menuTitle: 'القائمة',
-                searchPlaceholder: 'بحث...'
+                searchPlaceholder: 'بحث...',
+                copyright: '© 2025 ييوو زاميت للتجارة المحدودة. جميع الحقوق محفوظة.'
             }
         };
-
-                        const navTranslationMap = {
-            en: {
-                // 中文 → 英文
-                '首页': 'Home',
-                '产品': 'Products',
-                '关于我们': 'About Us',
-                '关于': 'About',
-                '联系我们': 'Contact Us',
-                '联系方式': 'Contact',
-                '联系': 'Contact',
-                '公司简介': 'Company Profile',
-                '发展历程': 'History',
-                '家居用品': 'Home Goods',
-                '厨房用品': 'Kitchenware',
-                '装饰摆件': 'Decorations',
-                // 英文到英文（保持不变）
-                'Home': 'Home',
-                'Products': 'Products',
-                'About': 'About',
-                'About Us': 'About Us',
-                'Contact': 'Contact',
-                'Contact Us': 'Contact Us',
-                'Home Goods': 'Home Goods',
-                'Kitchenware': 'Kitchenware',
-                'Decorations': 'Decorations',
-                'Company Profile': 'Company Profile',
-                'History': 'History'
-            },
-            zh: {
-                // 英文 → 中文
-                'Home': '首页',
-                'Products': '产品',
-                'About': '关于我们',
-                'Contact': '联系方式',      // 关键：Contact → 联系方式
-                'Contact Us': '联系我们',
-                'About Us': '关于我们',
-                'Home Goods': '家居用品',
-                'Kitchenware': '厨房用品',
-                'Decorations': '装饰摆件',
-                'Company Profile': '公司简介',
-                'History': '发展历程',
-                // 中文到中文（保持不变）
-                '首页': '首页',
-                '产品': '产品',
-                '关于我们': '关于我们',
-                '联系我们': '联系我们',
-                '联系方式': '联系方式',
-                '公司简介': '公司简介',
-                '发展历程': '发展历程',
-                '家居用品': '家居用品',
-                '厨房用品': '厨房用品',
-                '装饰摆件': '装饰摆件'
-            },
-            es: {
-                'Home': 'Inicio',
-                'Products': 'Productos',
-                'About': 'Sobre Nosotros',
-                'Contact': 'Contacto',
-                'Contact Us': 'Contacto',
-                'About Us': 'Sobre Nosotros',
-                'Home Goods': 'Artículos para el hogar',
-                'Kitchenware': 'Utensilios de cocina',
-                'Decorations': 'Decoraciones',
-                'Company Profile': 'Perfil de la empresa',
-                'History': 'Historia',
-                '首页': 'Inicio',
-                '产品': 'Productos',
-                '关于我们': 'Sobre Nosotros',
-                '联系我们': 'Contacto',
-                '联系方式': 'Contacto',
-                '公司简介': 'Perfil de la empresa',
-                '发展历程': 'Historia',
-                '家居用品': 'Artículos para el hogar',
-                '厨房用品': 'Utensilios de cocina',
-                '装饰摆件': 'Decoraciones'
-            },
-            ar: {
-                'Home': 'الرئيسية',
-                'Products': 'المنتجات',
-                'About': 'معلومات عنا',
-                'Contact': 'اتصل بنا',
-                'Contact Us': 'اتصل بنا',
-                'About Us': 'معلومات عنا',
-                'Home Goods': 'أدوات منزلية',
-                'Kitchenware': 'أدوات المطبخ',
-                'Decorations': 'ديكورات',
-                'Company Profile': 'ملف الشركة',
-                'History': 'التاريخ',
-                '首页': 'الرئيسية',
-                '产品': 'المنتجات',
-                '关于我们': 'معلومات عنا',
-                '联系我们': 'اتصل بنا',
-                '联系方式': 'اتصل بنا',
-                '公司简介': 'ملف الشركة',
-                '发展历程': 'التاريخ',
-                '家居用品': 'أدوات منزلية',
-                '厨房用品': 'أدوات المطبخ',
-                '装饰摆件': 'ديكورات'
-            }
-        };
-
-        function translateNavItem(originalName) {
-            if (!originalName) return '';
-            const map = navTranslationMap[currentLang];
-            if (map && map[originalName]) return map[originalName];
-            // 如果找不到翻译，返回原词
-            return originalName;
-        }
 
         let currentLang = 'en';
         let rawNavData = [];
 
+        // 检测浏览器语言
         function detectLanguage() {
+            // 优先使用 Cookie 中保存的语言
             const cookieMatch = document.cookie.match(/lang=([^;]+)/);
-            if (cookieMatch && translations[cookieMatch[1]]) return cookieMatch[1];
+            if (cookieMatch && translations[cookieMatch[1]]) {
+                return cookieMatch[1];
+            }
+            // 其次检测浏览器语言
             const browserLang = navigator.language.split('-')[0];
-            if (translations[browserLang]) return browserLang;
+            if (translations[browserLang]) {
+                return browserLang;
+            }
             return 'en';
         }
 
+        // 切换语言
         function setLanguage(lang) {
             if (!translations[lang]) return;
             currentLang = lang;
             document.cookie = `lang=${lang}; path=/; max-age=2592000`;
-            window.location.reload();
+            refreshAllContent();
         }
 
-        function renderContent() {
+        // 翻译单个文本（暂时用预置翻译，后续可接入 AI）
+        async function translateText(text, targetLang) {
+            if (targetLang === 'en') return text;
+            // 暂时使用预置翻译，后续可以接入 AI API
+            return text; // 占位，实际由 refreshAllContent 处理
+        }
+
+        // 刷新所有内容
+        function refreshAllContent() {
             const t = translations[currentLang];
             if (!t) return;
             
-            document.querySelectorAll('#companyName, #mobileCompanyName').forEach(el => { if (el) el.textContent = t.company; });
-            document.querySelectorAll('#heroTitle, #mobileHeroTitle').forEach(el => { if (el) el.textContent = t.heroTitle; });
-            document.querySelectorAll('#heroSubtitle, #mobileHeroSubtitle').forEach(el => { if (el) el.textContent = t.heroSubtitle; });
-            document.querySelectorAll('#productsTitle, #mobileProductsTitle').forEach(el => { if (el) el.textContent = t.productsTitle; });
+            // 更新公司名称
+            document.querySelectorAll('#companyName, #mobileCompanyName').forEach(el => {
+                if (el) el.textContent = t.company;
+            });
             
+            // 更新英雄区
+            const heroTitle = document.getElementById('heroTitle');
+            const heroSubtitle = document.getElementById('heroSubtitle');
+            const mobileHeroTitle = document.getElementById('mobileHeroTitle');
+            const mobileHeroSubtitle = document.getElementById('mobileHeroSubtitle');
+            if (heroTitle) heroTitle.textContent = t.heroTitle;
+            if (heroSubtitle) heroSubtitle.textContent = t.heroSubtitle;
+            if (mobileHeroTitle) mobileHeroTitle.textContent = t.heroTitle;
+            if (mobileHeroSubtitle) mobileHeroSubtitle.textContent = t.heroSubtitle;
+            
+            // 更新产品标题
+            const productsTitle = document.getElementById('productsTitle');
+            const mobileProductsTitle = document.getElementById('mobileProductsTitle');
+            if (productsTitle) productsTitle.textContent = t.productsTitle;
+            if (mobileProductsTitle) mobileProductsTitle.textContent = t.productsTitle;
+            
+            // 更新产品列表
+            const productGrid = document.getElementById('productGrid');
+            const mobileProductGrid = document.getElementById('mobileProductGrid');
+            if (productGrid) {
+                productGrid.innerHTML = t.products.map(p => `
+                    <div class="product-card">
+                        <h3>${escapeHtml(p.name)}</h3>
+                        <p>${escapeHtml(p.desc)}</p>
+                    </div>
+                `).join('');
+            }
+            if (mobileProductGrid) {
+                mobileProductGrid.innerHTML = t.products.map(p => `
+                    <div class="product-card">
+                        <h3>${escapeHtml(p.name)}</h3>
+                        <p>${escapeHtml(p.desc)}</p>
+                    </div>
+                `).join('');
+            }
+            
+            // 更新菜单标题
             const menuHeader = document.getElementById('menuHeaderTitle');
             if (menuHeader) menuHeader.textContent = t.menuTitle;
             
-            const productGrids = [document.getElementById('productGrid'), document.getElementById('mobileProductGrid')];
-            productGrids.forEach(grid => {
-                if (grid) {
-                    grid.innerHTML = t.products.map(p => `
-                        <div class="product-card">
-                            <h3>${escapeHtml(p.name)}</h3>
-                            <p>${escapeHtml(p.desc)}</p>
-                        </div>
-                    `).join('');
-                }
-            });
+            // 更新版权
+            const copyright = document.getElementById('footerCopyright');
+            const mobileCopyright = document.getElementById('mobileFooterCopyright');
+            if (copyright) copyright.textContent = t.copyright;
+            if (mobileCopyright) mobileCopyright.textContent = t.copyright;
             
-            document.querySelectorAll('#currentLangDesktop, #mobileCurrentLang').forEach(el => { if (el) el.textContent = currentLang.toUpperCase(); });
+            // 更新搜索框占位符
+            const desktopSearch = document.getElementById('searchInputDesktop');
+            const mobileSearch = document.getElementById('mobileSearchInput');
+            if (desktopSearch) desktopSearch.placeholder = t.searchPlaceholder;
+            if (mobileSearch) mobileSearch.placeholder = t.searchPlaceholder;
             
-            const desktopInput = document.getElementById('searchInputDesktop');
-            if (desktopInput) desktopInput.placeholder = t.searchPlaceholder || 'Search...';
-            const mobileSearchInput = document.getElementById('mobileSearchInput');
-            if (mobileSearchInput) mobileSearchInput.placeholder = t.searchPlaceholder || 'Search...';
+            // 更新语言显示
+            const langDesktop = document.getElementById('currentLangDesktop');
+            const langMobile = document.getElementById('mobileCurrentLang');
+            if (langDesktop) langDesktop.textContent = currentLang.toUpperCase();
+            if (langMobile) langMobile.textContent = currentLang.toUpperCase();
+            
+            // 更新导航菜单（需要翻译数据库中的菜单名）
+            renderNavMenus();
+            renderFooterNav();
         }
 
-        // 渲染底部导航（保持之前的好看布局：左侧公司名+描述，右侧菜单）
-        function renderFooterNav() {
-            const footerContainer = document.getElementById('footerNav');
-            const mobileFooterContainer = document.getElementById('mobileFooterNav');
-            
-            if (!footerContainer && !mobileFooterContainer) return;
-            
-            // 获取公司名称
-            const companyName = translations[currentLang]?.company || 'ZHAMIT';
-            const companyDesc = translations[currentLang]?.heroSubtitle || 'Professional trading company based in Yiwu, China';
-            
-            // 获取底部导航数据（location='bottom' 且 parent_id=0 的为主菜单）
-            const bottomParents = rawNavData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-            
-            let leftColumnHtml = `<div class="footer-col">
-                <div class="footer-logo">${escapeHtml(companyName)}</div>
-                <p>${escapeHtml(companyDesc)}</p>
-            </div>`;
-            
-            let rightColumnsHtml = '';
-            
-            if (bottomParents.length) {
-                // 有底部导航数据，显示它们
-                rightColumnsHtml = bottomParents.map(parent => {
-                    const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                    const translatedName = translateNavItem(parent.name);
-                    if (children.length) {
-                        return `<div class="footer-col">
-                            <h4>${escapeHtml(translatedName)}</h4>
-                            ${children.map(child => `<a href="${child.url}">${escapeHtml(translateNavItem(child.name))}</a>`).join('')}
-                        </div>`;
-                    }
-                    return `<div class="footer-col">
-                        <h4>${escapeHtml(translatedName)}</h4>
-                    </div>`;
-                }).join('');
-            } else {
-                // 默认底部导航（如果没有数据）
-                rightColumnsHtml = `
-                    <div class="footer-col">
-                        <h4>Quick Links</h4>
-                        <a href="/about">About</a>
-                        <a href="/contact">Contact</a>
-                    </div>
-                    <div class="footer-col">
-                        <h4>Contact</h4>
-                        <a href="mailto:info@zhamit.com">info@zhamit.com</a>
-                        <a href="tel:+8657912345678">+86 579 12345678</a>
-                    </div>
-                `;
-            }
-            
-            const footerHtml = leftColumnHtml + rightColumnsHtml;
-            
-            if (footerContainer) footerContainer.innerHTML = footerHtml;
-            if (mobileFooterContainer) mobileFooterContainer.innerHTML = footerHtml;
+        // 翻译导航菜单项（从数据库读取，根据当前语言翻译）
+        async function translateNavItem(name) {
+            // 简单映射，后续可接入 AI
+            const translationsMap = {
+                en: { '首页': 'Home', '产品': 'Products', '关于我们': 'About', '联系我们': 'Contact' },
+                zh: { 'Home': '首页', 'Products': '产品', 'About': '关于我们', 'Contact': '联系我们' },
+                es: { 'Home': 'Inicio', 'Products': 'Productos', 'About': 'Sobre', 'Contact': 'Contacto' },
+                ar: { 'Home': 'الرئيسية', 'Products': 'المنتجات', 'About': 'معلومات عنا', 'Contact': 'اتصل بنا' }
+            };
+            const map = translationsMap[currentLang];
+            if (map && map[name]) return map[name];
+            return name;
         }
 
-        // 渲染顶部导航
-        function renderNavMenus() {
+        // 渲染导航菜单
+        async function renderNavMenus() {
             const desktopNav = document.getElementById('navMenu');
             const mobileMenu = document.getElementById('mobileMenuList');
             
@@ -509,38 +422,49 @@
             
             const topItems = rawNavData.filter(i => i.location === 'top' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             
+            // 翻译所有菜单项
+            const translatedItems = [];
+            for (const parent of topItems) {
+                const translatedName = await translateNavItem(parent.name);
+                const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                const translatedChildren = [];
+                for (const child of children) {
+                    translatedChildren.push({
+                        name: await translateNavItem(child.name),
+                        url: child.url
+                    });
+                }
+                translatedItems.push({ ...parent, translatedName, translatedChildren });
+            }
+            
             // 电脑端
             if (desktopNav) {
-                desktopNav.innerHTML = topItems.map(parent => {
-                    const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                    const translatedName = translateNavItem(parent.name);
-                    if (children.length) {
+                desktopNav.innerHTML = translatedItems.map(parent => {
+                    if (parent.translatedChildren.length) {
                         return `<li>
-                            <a href="${parent.url}">${escapeHtml(translatedName)}</a>
-                            <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(translateNavItem(c.name))}</a>`).join('')}</div>
+                            <a href="${parent.url}">${escapeHtml(parent.translatedName)}</a>
+                            <div class="dropdown">${parent.translatedChildren.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
                         </li>`;
                     }
-                    return `<li><a href="${parent.url}">${escapeHtml(translatedName)}</a></li>`;
+                    return `<li><a href="${parent.url}">${escapeHtml(parent.translatedName)}</a></li>`;
                 }).join('');
             }
             
             // 手机端
             if (mobileMenu) {
-                mobileMenu.innerHTML = topItems.map(parent => {
-                    const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-                    const translatedName = translateNavItem(parent.name);
-                    if (children.length) {
+                mobileMenu.innerHTML = translatedItems.map(parent => {
+                    if (parent.translatedChildren.length) {
                         return `<div class="menu-item">
                             <div class="menu-parent">
-                                <span>${escapeHtml(translatedName)}</span>
+                                <span>${escapeHtml(parent.translatedName)}</span>
                                 <button class="toggle-sub" data-parent="${parent.id}">+</button>
                             </div>
                             <div class="submenu" data-sub="${parent.id}">
-                                ${children.map(c => `<a href="${c.url}">${escapeHtml(translateNavItem(c.name))}</a>`).join('')}
+                                ${parent.translatedChildren.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
                             </div>
                         </div>`;
                     }
-                    return `<a href="${parent.url}" class="menu-single">${escapeHtml(translatedName)}</a>`;
+                    return `<a href="${parent.url}" class="menu-single">${escapeHtml(parent.translatedName)}</a>`;
                 }).join('');
                 
                 document.querySelectorAll('.toggle-sub').forEach(btn => {
@@ -560,25 +484,96 @@
             }
         }
 
+        // 渲染底部导航
+        async function renderFooterNav() {
+            const footerContainer = document.getElementById('footerNav');
+            const mobileFooterContainer = document.getElementById('mobileFooterNav');
+            
+            if (!footerContainer && !mobileFooterContainer) return;
+            
+            const t = translations[currentLang];
+            const companyName = t.company;
+            const companyDesc = t.heroSubtitle;
+            
+            const bottomParents = rawNavData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
+            
+            let leftColumnHtml = `<div class="footer-col">
+                <div class="footer-logo">${escapeHtml(companyName)}</div>
+                <p>${escapeHtml(companyDesc)}</p>
+            </div>`;
+            
+            let rightColumnsHtml = '';
+            
+            if (bottomParents.length) {
+                const translatedParents = [];
+                for (const parent of bottomParents) {
+                    const translatedName = await translateNavItem(parent.name);
+                    const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+                    const translatedChildren = [];
+                    for (const child of children) {
+                        translatedChildren.push({
+                            name: await translateNavItem(child.name),
+                            url: child.url
+                        });
+                    }
+                    translatedParents.push({ ...parent, translatedName, translatedChildren });
+                }
+                
+                rightColumnsHtml = translatedParents.map(parent => {
+                    if (parent.translatedChildren.length) {
+                        return `<div class="footer-col">
+                            <h4>${escapeHtml(parent.translatedName)}</h4>
+                            ${parent.translatedChildren.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
+                        </div>`;
+                    }
+                    return `<div class="footer-col">
+                        <h4>${escapeHtml(parent.translatedName)}</h4>
+                    </div>`;
+                }).join('');
+            } else {
+                // 默认底部
+                const quickLinks = currentLang === 'zh' ? '快速链接' : (currentLang === 'es' ? 'Enlaces Rápidos' : (currentLang === 'ar' ? 'روابط سريعة' : 'Quick Links'));
+                const about = currentLang === 'zh' ? '关于我们' : (currentLang === 'es' ? 'Sobre' : (currentLang === 'ar' ? 'معلومات عنا' : 'About'));
+                const contact = currentLang === 'zh' ? '联系我们' : (currentLang === 'es' ? 'Contacto' : (currentLang === 'ar' ? 'اتصل بنا' : 'Contact'));
+                const contactInfo = currentLang === 'zh' ? '联系方式' : (currentLang === 'es' ? 'Información de Contacto' : (currentLang === 'ar' ? 'معلومات الاتصال' : 'Contact Info'));
+                rightColumnsHtml = `
+                    <div class="footer-col">
+                        <h4>${escapeHtml(quickLinks)}</h4>
+                        <a href="/about">${escapeHtml(about)}</a>
+                        <a href="/contact">${escapeHtml(contact)}</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>${escapeHtml(contactInfo)}</h4>
+                        <a href="mailto:info@zhamit.com">info@zhamit.com</a>
+                        <a href="tel:+8657912345678">+86 579 12345678</a>
+                    </div>
+                `;
+            }
+            
+            const footerHtml = leftColumnHtml + rightColumnsHtml;
+            if (footerContainer) footerContainer.innerHTML = footerHtml;
+            if (mobileFooterContainer) mobileFooterContainer.innerHTML = footerHtml;
+        }
+
+        // 加载导航数据
         async function loadNavData() {
             try {
                 const res = await fetch('/api/nav');
                 rawNavData = await res.json();
-                renderNavMenus();
-                renderFooterNav();
+                await renderNavMenus();
+                await renderFooterNav();
             } catch(e) {
                 console.error('加载导航失败', e);
-                // 默认导航数据
                 rawNavData = [
-                    { id: 1, name: '首页', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
-                    { id: 2, name: '产品', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
-                    { id: 3, name: '家居用品', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
-                    { id: 4, name: '厨房用品', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
-                    { id: 5, name: '关于我们', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
-                    { id: 6, name: '联系我们', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' }
+                    { id: 1, name: 'Home', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
+                    { id: 2, name: 'Products', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
+                    { id: 3, name: 'Home Goods', url: '/category/home', parent_id: 2, sort_order: 1, location: 'top' },
+                    { id: 4, name: 'Kitchenware', url: '/category/kitchen', parent_id: 2, sort_order: 2, location: 'top' },
+                    { id: 5, name: 'About', url: '/about', parent_id: 0, sort_order: 3, location: 'top' },
+                    { id: 6, name: 'Contact', url: '/contact', parent_id: 0, sort_order: 4, location: 'top' }
                 ];
-                renderNavMenus();
-                renderFooterNav();
+                await renderNavMenus();
+                await renderFooterNav();
             }
         }
 
@@ -594,8 +589,7 @@
                 });
                 modal.querySelectorAll('.lang-modal-option').forEach(opt => {
                     opt.addEventListener('click', () => {
-                        const lang = opt.dataset.lang;
-                        if (lang) setLanguage(lang);
+                        setLanguage(opt.dataset.lang);
                         modal.classList.remove('show');
                     });
                 });
@@ -607,6 +601,17 @@
             }
         }
 
+        // 电脑端语言选择
+        function setupDesktopLang() {
+            document.querySelectorAll('#langMenuDesktop a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setLanguage(link.dataset.lang);
+                });
+            });
+        }
+
+        // 手机端搜索
         function setupMobileSearch() {
             const searchBtn = document.getElementById('mobileSearchBtn');
             const searchModal = document.getElementById('searchModal');
@@ -617,8 +622,6 @@
                 searchBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    const t = translations[currentLang];
-                    if (searchInput) searchInput.placeholder = t.searchPlaceholder || 'Search...';
                     searchModal.classList.toggle('show');
                     if (searchInput) searchInput.focus();
                 });
@@ -648,12 +651,6 @@
             if (searchIcon) searchIcon.addEventListener('click', () => { const input = document.getElementById('searchInputDesktop'); if (input) doSearch(input.value); });
         }
 
-        function setupDesktopLang() {
-            document.querySelectorAll('#langMenuDesktop a').forEach(link => {
-                link.addEventListener('click', (e) => { e.preventDefault(); setLanguage(link.dataset.lang); });
-            });
-        }
-
         function setupMobileMenu() {
             const hamburger = document.getElementById('hamburgerBtn');
             const sideMenu = document.getElementById('sideMenu');
@@ -670,8 +667,9 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
+        // 初始化
         currentLang = detectLanguage();
-        renderContent();
+        refreshAllContent();
         loadNavData();
         setupDesktopLang();
         setupMobileLang();
