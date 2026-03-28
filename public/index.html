@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewfit=cover">
-    <title>ZHAMIT - 专业家居贸易</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ZHAMIT - Professional Trading Company</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; line-height: 1.5; color: #1a1a1a; background: #fff; }
@@ -112,7 +112,7 @@
         <div class="top-nav">
             <div class="container">
                 <div class="logo-area">
-                    <span class="company-name" id="companyName">ZHAMIT</span>
+                    <span class="company-name">ZHAMIT</span>
                 </div>
                 <ul class="nav-menu" id="navMenu"></ul>
                 <div class="toolbar">
@@ -144,18 +144,31 @@
 
         <main>
             <section class="hero">
-                <h1 id="heroTitle">ZHAMIT</h1>
-                <p id="heroSubtitle">专业家居贸易公司 · 源自中国义乌</p>
+                <h1>ZHAMIT</h1>
+                <p>Professional Trading Company · From Yiwu, China</p>
             </section>
             <section class="products">
-                <h2 id="productsTitle">精选产品</h2>
-                <div class="product-grid" id="productGrid"></div>
+                <h2>Featured Products</h2>
+                <div class="product-grid" id="productGrid">
+                    <div class="product-card">
+                        <h3>Home Goods</h3>
+                        <p>High-quality home goods, in stock</p>
+                    </div>
+                    <div class="product-card">
+                        <h3>Kitchenware</h3>
+                        <p>Practical & beautiful, custom packaging available</p>
+                    </div>
+                    <div class="product-card">
+                        <h3>Decorations</h3>
+                        <p>Limited editions, updated weekly</p>
+                    </div>
+                </div>
             </section>
         </main>
 
         <div class="footer-nav">
             <div class="container" id="footerNav"></div>
-            <div class="footer-bottom" id="footerCopyright">
+            <div class="footer-bottom">
                 © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
             </div>
         </div>
@@ -169,7 +182,7 @@
                 <span></span>
                 <span></span>
             </button>
-            <div class="mobile-logo" id="mobileCompanyName">ZHAMIT</div>
+            <div class="mobile-logo">ZHAMIT</div>
             <div class="mobile-toolbar">
                 <button class="mobile-lang-btn" id="mobileLangBtn">
                     🌐 <span id="mobileCurrentLang">EN</span>
@@ -197,7 +210,7 @@
 
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
-                <h3 id="menuHeaderTitle">菜单</h3>
+                <h3>Menu</h3>
                 <button class="close-menu" id="closeMenuBtn">✕</button>
             </div>
             <div class="menu-list" id="mobileMenuList"></div>
@@ -205,192 +218,56 @@
 
         <main>
             <section class="hero">
-                <h1 id="mobileHeroTitle">ZHAMIT</h1>
-                <p id="mobileHeroSubtitle">专业家居贸易公司 · 源自中国义乌</p>
+                <h1>ZHAMIT</h1>
+                <p>Professional Trading Company · From Yiwu, China</p>
             </section>
             <section class="products">
-                <h2 id="mobileProductsTitle">精选产品</h2>
-                <div class="product-grid" id="mobileProductGrid"></div>
+                <h2>Featured Products</h2>
+                <div class="product-grid" id="mobileProductGrid">
+                    <div class="product-card">
+                        <h3>Home Goods</h3>
+                        <p>High-quality home goods, in stock</p>
+                    </div>
+                    <div class="product-card">
+                        <h3>Kitchenware</h3>
+                        <p>Practical & beautiful, custom packaging available</p>
+                    </div>
+                    <div class="product-card">
+                        <h3>Decorations</h3>
+                        <p>Limited editions, updated weekly</p>
+                    </div>
+                </div>
             </section>
         </main>
 
         <div class="footer-nav">
             <div class="container" id="mobileFooterNav"></div>
-            <div class="footer-bottom" id="mobileFooterCopyright">
+            <div class="footer-bottom">
                 © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
             </div>
         </div>
     </div>
 
     <script>
-        // 多语言文案
-        const translations = {
-            en: {
-                company: 'ZHAMIT',
-                heroTitle: 'ZHAMIT',
-                heroSubtitle: 'Professional Trading Company · From Yiwu, China',
-                productsTitle: 'Featured Products',
-                products: [
-                    { name: 'Home Goods', desc: 'High-quality home goods, in stock' },
-                    { name: 'Kitchenware', desc: 'Practical & beautiful, custom packaging available' },
-                    { name: 'Decorations', desc: 'Limited editions, updated weekly' }
-                ],
-                menuTitle: 'Menu',
-                searchPlaceholder: 'Search...',
-                copyright: '© 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.'
-            },
-            zh: {
-                company: '哲觅贸易',
-                heroTitle: '哲觅贸易',
-                heroSubtitle: '专业家居贸易公司 · 源自中国义乌',
-                productsTitle: '精选产品',
-                products: [
-                    { name: '家居用品', desc: '高品质家居好物，现货供应' },
-                    { name: '厨房用品', desc: '实用美观，可定制包装' },
-                    { name: '装饰摆件', desc: '限量款式，每周更新' }
-                ],
-                menuTitle: '菜单',
-                searchPlaceholder: '搜索...',
-                copyright: '© 2025 义乌哲觅贸易有限公司 版权所有'
-            },
-            es: {
-                company: 'ZHAMIT',
-                heroTitle: 'ZHAMIT',
-                heroSubtitle: 'Empresa Comercial Profesional · Desde Yiwu, China',
-                productsTitle: 'Productos Destacados',
-                products: [
-                    { name: 'Artículos para el hogar', desc: 'Productos de alta calidad, en stock' },
-                    { name: 'Utensilios de cocina', desc: 'Prácticos y hermosos, embalaje personalizado' },
-                    { name: 'Decoraciones', desc: 'Ediciones limitadas, actualizadas semanalmente' }
-                ],
-                menuTitle: 'Menú',
-                searchPlaceholder: 'Buscar...',
-                copyright: '© 2025 YIWU ZHAMIT TRADING LIMITED. Todos los derechos reservados.'
-            },
-            ar: {
-                company: 'ZHAMIT',
-                heroTitle: 'ZHAMIT',
-                heroSubtitle: 'شركة تجارية محترفة · من ييوو، الصين',
-                productsTitle: 'المنتجات المميزة',
-                products: [
-                    { name: 'أدوات منزلية', desc: 'منتجات عالية الجودة، متوفرة في المخزون' },
-                    { name: 'أدوات المطبخ', desc: 'عملية وجميلة، تغليف مخصص' },
-                    { name: 'ديكورات', desc: 'إصدارات محدودة، تحديث أسبوعي' }
-                ],
-                menuTitle: 'القائمة',
-                searchPlaceholder: 'بحث...',
-                copyright: '© 2025 ييوو زاميت للتجارة المحدودة. جميع الحقوق محفوظة.'
-            }
-        };
-
         let currentLang = 'en';
         let rawNavData = [];
 
-        // 检测语言
+        // 检测语言（从 Cookie 或浏览器）
         function detectLanguage() {
             const cookieMatch = document.cookie.match(/lang=([^;]+)/);
-            if (cookieMatch && translations[cookieMatch[1]]) return cookieMatch[1];
+            if (cookieMatch) return cookieMatch[1];
             const browserLang = navigator.language.split('-')[0];
-            if (translations[browserLang]) return browserLang;
+            if (['en', 'zh', 'es', 'ar'].includes(browserLang)) return browserLang;
             return 'en';
         }
 
-        // 切换语言
+        // 切换语言（刷新页面，让 _middleware 重新翻译）
         function setLanguage(lang) {
-            if (!translations[lang]) return;
-            currentLang = lang;
             document.cookie = `lang=${lang}; path=/; max-age=2592000`;
-            refreshAllContent();
+            window.location.reload();
         }
 
-        // 刷新所有内容
-        function refreshAllContent() {
-            const t = translations[currentLang];
-            if (!t) return;
-            
-            // 更新公司名称
-            document.querySelectorAll('#companyName, #mobileCompanyName').forEach(el => {
-                if (el) el.textContent = t.company;
-            });
-            
-            // 更新英雄区
-            const heroTitle = document.getElementById('heroTitle');
-            const heroSubtitle = document.getElementById('heroSubtitle');
-            const mobileHeroTitle = document.getElementById('mobileHeroTitle');
-            const mobileHeroSubtitle = document.getElementById('mobileHeroSubtitle');
-            if (heroTitle) heroTitle.textContent = t.heroTitle;
-            if (heroSubtitle) heroSubtitle.textContent = t.heroSubtitle;
-            if (mobileHeroTitle) mobileHeroTitle.textContent = t.heroTitle;
-            if (mobileHeroSubtitle) mobileHeroSubtitle.textContent = t.heroSubtitle;
-            
-            // 更新产品标题
-            const productsTitle = document.getElementById('productsTitle');
-            const mobileProductsTitle = document.getElementById('mobileProductsTitle');
-            if (productsTitle) productsTitle.textContent = t.productsTitle;
-            if (mobileProductsTitle) mobileProductsTitle.textContent = t.productsTitle;
-            
-            // 更新产品列表
-            const productGrid = document.getElementById('productGrid');
-            const mobileProductGrid = document.getElementById('mobileProductGrid');
-            if (productGrid) {
-                productGrid.innerHTML = t.products.map(p => `
-                    <div class="product-card">
-                        <h3>${escapeHtml(p.name)}</h3>
-                        <p>${escapeHtml(p.desc)}</p>
-                    </div>
-                `).join('');
-            }
-            if (mobileProductGrid) {
-                mobileProductGrid.innerHTML = t.products.map(p => `
-                    <div class="product-card">
-                        <h3>${escapeHtml(p.name)}</h3>
-                        <p>${escapeHtml(p.desc)}</p>
-                    </div>
-                `).join('');
-            }
-            
-            // 更新菜单标题
-            const menuHeader = document.getElementById('menuHeaderTitle');
-            if (menuHeader) menuHeader.textContent = t.menuTitle;
-            
-            // 更新版权
-            const copyright = document.getElementById('footerCopyright');
-            const mobileCopyright = document.getElementById('mobileFooterCopyright');
-            if (copyright) copyright.textContent = t.copyright;
-            if (mobileCopyright) mobileCopyright.textContent = t.copyright;
-            
-            // 更新搜索框占位符
-            const desktopSearch = document.getElementById('searchInputDesktop');
-            const mobileSearch = document.getElementById('mobileSearchInput');
-            if (desktopSearch) desktopSearch.placeholder = t.searchPlaceholder;
-            if (mobileSearch) mobileSearch.placeholder = t.searchPlaceholder;
-            
-            // 更新语言显示
-            const langDesktop = document.getElementById('currentLangDesktop');
-            const langMobile = document.getElementById('mobileCurrentLang');
-            if (langDesktop) langDesktop.textContent = currentLang.toUpperCase();
-            if (langMobile) langMobile.textContent = currentLang.toUpperCase();
-            
-            // 重新渲染导航
-            renderNavMenus();
-            renderFooterNav();
-        }
-
-        // 翻译菜单项
-        function translateMenuItem(name) {
-            // 简单映射表
-            const map = {
-                en: { '首页': 'Home', '产品': 'Products', '关于我们': 'About', '联系我们': 'Contact', 'Home': 'Home', 'Products': 'Products', 'About': 'About', 'Contact': 'Contact' },
-                zh: { 'Home': '首页', 'Products': '产品', 'About': '关于我们', 'Contact': '联系我们', '首页': '首页', '产品': '产品', '关于我们': '关于我们', '联系我们': '联系我们' },
-                es: { 'Home': 'Inicio', 'Products': 'Productos', 'About': 'Sobre', 'Contact': 'Contacto' },
-                ar: { 'Home': 'الرئيسية', 'Products': 'المنتجات', 'About': 'معلومات عنا', 'Contact': 'اتصل بنا' }
-            };
-            const langMap = map[currentLang];
-            if (langMap && langMap[name]) return langMap[name];
-            return name;
-        }
-
-        // 渲染导航菜单
+        // 渲染导航菜单（从数据库加载，保持英文原文）
         async function renderNavMenus() {
             const desktopNav = document.getElementById('navMenu');
             const mobileMenu = document.getElementById('mobileMenuList');
@@ -406,35 +283,33 @@
             // 电脑端
             if (desktopNav) {
                 desktopNav.innerHTML = topItems.map(parent => {
-                    const translatedName = translateMenuItem(parent.name);
                     const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                     if (children.length) {
                         return `<li>
-                            <a href="${parent.url}">${escapeHtml(translatedName)}</a>
-                            <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(translateMenuItem(c.name))}</a>`).join('')}</div>
+                            <a href="${parent.url}">${escapeHtml(parent.name)}</a>
+                            <div class="dropdown">${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}</div>
                         </li>`;
                     }
-                    return `<li><a href="${parent.url}">${escapeHtml(translatedName)}</a></li>`;
+                    return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
                 }).join('');
             }
             
             // 手机端
             if (mobileMenu) {
                 mobileMenu.innerHTML = topItems.map(parent => {
-                    const translatedName = translateMenuItem(parent.name);
                     const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                     if (children.length) {
                         return `<div class="menu-item">
                             <div class="menu-parent">
-                                <span>${escapeHtml(translatedName)}</span>
+                                <span>${escapeHtml(parent.name)}</span>
                                 <button class="toggle-sub" data-parent="${parent.id}">+</button>
                             </div>
                             <div class="submenu" data-sub="${parent.id}">
-                                ${children.map(c => `<a href="${c.url}">${escapeHtml(translateMenuItem(c.name))}</a>`).join('')}
+                                ${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
                             </div>
                         </div>`;
                     }
-                    return `<a href="${parent.url}" class="menu-single">${escapeHtml(translatedName)}</a>`;
+                    return `<a href="${parent.url}" class="menu-single">${escapeHtml(parent.name)}</a>`;
                 }).join('');
                 
                 document.querySelectorAll('.toggle-sub').forEach(btn => {
@@ -461,47 +336,37 @@
             
             if (!footerContainer && !mobileFooterContainer) return;
             
-            const t = translations[currentLang];
-            const companyName = t.company;
-            const companyDesc = t.heroSubtitle;
-            
             const bottomParents = rawNavData.filter(i => i.location === 'bottom' && i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
             
             let leftColumnHtml = `<div class="footer-col">
-                <div class="footer-logo">${escapeHtml(companyName)}</div>
-                <p>${escapeHtml(companyDesc)}</p>
+                <div class="footer-logo">ZHAMIT</div>
+                <p>Professional trading company based in Yiwu, China</p>
             </div>`;
             
             let rightColumnsHtml = '';
             
             if (bottomParents.length) {
                 rightColumnsHtml = bottomParents.map(parent => {
-                    const translatedName = translateMenuItem(parent.name);
                     const children = rawNavData.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
                     if (children.length) {
                         return `<div class="footer-col">
-                            <h4>${escapeHtml(translatedName)}</h4>
-                            ${children.map(c => `<a href="${c.url}">${escapeHtml(translateMenuItem(c.name))}</a>`).join('')}
+                            <h4>${escapeHtml(parent.name)}</h4>
+                            ${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
                         </div>`;
                     }
                     return `<div class="footer-col">
-                        <h4>${escapeHtml(translatedName)}</h4>
+                        <h4>${escapeHtml(parent.name)}</h4>
                     </div>`;
                 }).join('');
             } else {
-                // 默认底部
-                const quickLinks = currentLang === 'zh' ? '快速链接' : (currentLang === 'es' ? 'Enlaces Rápidos' : (currentLang === 'ar' ? 'روابط سريعة' : 'Quick Links'));
-                const about = currentLang === 'zh' ? '关于我们' : (currentLang === 'es' ? 'Sobre' : (currentLang === 'ar' ? 'معلومات عنا' : 'About'));
-                const contact = currentLang === 'zh' ? '联系我们' : (currentLang === 'es' ? 'Contacto' : (currentLang === 'ar' ? 'اتصل بنا' : 'Contact'));
-                const contactInfo = currentLang === 'zh' ? '联系方式' : (currentLang === 'es' ? 'Información de Contacto' : (currentLang === 'ar' ? 'معلومات الاتصال' : 'Contact Info'));
                 rightColumnsHtml = `
                     <div class="footer-col">
-                        <h4>${escapeHtml(quickLinks)}</h4>
-                        <a href="/about">${escapeHtml(about)}</a>
-                        <a href="/contact">${escapeHtml(contact)}</a>
+                        <h4>Quick Links</h4>
+                        <a href="/about">About</a>
+                        <a href="/contact">Contact</a>
                     </div>
                     <div class="footer-col">
-                        <h4>${escapeHtml(contactInfo)}</h4>
+                        <h4>Contact Info</h4>
                         <a href="mailto:info@zhamit.com">info@zhamit.com</a>
                         <a href="tel:+8657912345678">+86 579 12345678</a>
                     </div>
@@ -522,7 +387,6 @@
                 renderFooterNav();
             } catch(e) {
                 console.error('加载导航失败', e);
-                // 默认导航
                 rawNavData = [
                     { id: 1, name: 'Home', url: '/', parent_id: 0, sort_order: 1, location: 'top' },
                     { id: 2, name: 'Products', url: '#', parent_id: 0, sort_order: 2, location: 'top' },
@@ -626,9 +490,17 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
+        // 更新语言显示
+        function updateLangDisplay() {
+            const langDesktop = document.getElementById('currentLangDesktop');
+            const langMobile = document.getElementById('mobileCurrentLang');
+            if (langDesktop) langDesktop.textContent = currentLang.toUpperCase();
+            if (langMobile) langMobile.textContent = currentLang.toUpperCase();
+        }
+
         // 初始化
         currentLang = detectLanguage();
-        refreshAllContent();
+        updateLangDisplay();
         loadNavData();
         setupDesktopLang();
         setupMobileLang();
