@@ -1,19 +1,19 @@
 // functions/[[lang]].js
-// 带缓存的动态页面生成 + R2 图片支持
+// 带缓存的动态页面生成（不使用 R2）
 
 export async function onRequest(context) {
-  const { request, env } = context;
+  const { request, env, next } = context;
   const url = new URL(request.url);
   const path = url.pathname;
   
-  // 跳过 API 和静态资源
+  // 跳过 API 和静态资源（交给 Pages 默认处理）
   if (path.startsWith('/api/')) {
-    return context.next();
+    return next();
   }
   
-  // 静态资源从 R2 读取
+  // 静态资源交给 Pages 默认处理，不经过 R2
   if (path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|webp)$/)) {
-    return handleStatic(request, env, path);
+    return next();
   }
   
   // 解析语言和页面路径
@@ -55,40 +55,6 @@ export async function onRequest(context) {
   await caches.default.put(cacheKey, response.clone());
   
   return response;
-}
-
-// 处理静态资源（从 R2 读取）
-async function handleStatic(request, env, path) {
-  const key = path.substring(1); // 去掉开头的 /
-  const object = await env.ASSETS.get(key);
-  
-  if (!object) {
-    return new Response('Not Found', { status: 404 });
-  }
-  
-  const contentType = getContentType(path);
-  return new Response(object.body, {
-    headers: {
-      'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=86400'  // 静态资源缓存 1 天
-    }
-  });
-}
-
-function getContentType(path) {
-  const ext = path.split('.').pop();
-  const types = {
-    'css': 'text/css',
-    'js': 'application/javascript',
-    'png': 'image/png',
-    'jpg': 'image/jpeg',
-    'jpeg': 'image/jpeg',
-    'gif': 'image/gif',
-    'ico': 'image/x-icon',
-    'svg': 'image/svg+xml',
-    'webp': 'image/webp'
-  };
-  return types[ext] || 'application/octet-stream';
 }
 
 // 获取站点设置
