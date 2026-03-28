@@ -1,4 +1,4 @@
-// functions/index.js - 稳定版（无缓存，简化手机端）
+// functions/index.js - 最终版
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -21,80 +21,98 @@ export async function onRequest(context) {
     targetLang = acceptLang.split(',')[0].split('-')[0] || 'en';
   }
   
-  // 获取数据
-  let settings = { name: '哲觅贸易', description: '专业家居贸易公司 · 源自中国义乌' };
-  let navData = [];
-  let page = { title: settings.name, content: '<h1>欢迎</h1><p>欢迎访问我们的网站。</p>' };
+  // 如果是中文，直接返回
+  if (targetLang === 'zh') {
+    const html = await buildHTML(env, path);
+    return new Response(html, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' }
+    });
+  }
   
+  // 检查缓存
+  const cacheKey = `https://zhamit.com/${targetLang}${path}`;
+  const cached = await caches.default.match(cacheKey);
+  if (cached) {
+    return cached;
+  }
+  
+  // 生成并翻译
+  const html = await buildHTML(env, path);
+  const translated = await translateHtml(html, targetLang, env);
+  
+  // 缓存 1 小时
+  const response = new Response(translated, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' }
+  });
+  await caches.default.put(cacheKey, response.clone());
+  
+  return response;
+}
+
+async function buildHTML(env, path) {
+  // 获取站点设置
+  let settings = { name: '哲觅贸易', description: '专业家居贸易公司 · 源自中国义乌' };
   try {
-    const settingsStmt = env.DB.prepare('SELECT * FROM site_settings');
-    const settingsRows = await settingsStmt.all();
-    for (const row of settingsRows.results) {
+    const rows = await env.DB.prepare('SELECT * FROM site_settings').all();
+    for (const row of rows.results) {
       settings[row.key] = row.value_zh || row.value;
     }
   } catch (e) {}
   
+  // 获取导航
+  let navData = [];
   try {
-    const navStmt = env.DB.prepare('SELECT * FROM nav_menus WHERE status = 1 ORDER BY location, parent_id, sort_order');
-    const navRows = await navStmt.all();
-    navData = navRows.results.map(item => ({
+    const rows = await env.DB.prepare('SELECT * FROM nav_menus WHERE status = 1 ORDER BY location, parent_id, sort_order').all();
+    navData = rows.results.map(item => ({
       ...item,
       name: item.name_zh || item.name
     }));
   } catch (e) {}
   
+  // 获取页面内容
+  let page = { title: settings.name, content: '<h1>欢迎</h1><p>欢迎访问我们的网站。</p>' };
   try {
-    const pageStmt = env.DB.prepare('SELECT * FROM pages WHERE path = ? AND status = 1 LIMIT 1');
-    const pageResult = await pageStmt.bind(path === '/' ? '/' : path).first();
-    if (pageResult) {
-      page.title = pageResult.title_zh || pageResult.title;
-      page.content = pageResult.content_zh || pageResult.content;
+    const result = await env.DB.prepare('SELECT * FROM pages WHERE path = ? AND status = 1 LIMIT 1').bind(path === '/' ? '/' : path).first();
+    if (result) {
+      page.title = result.title_zh || result.title;
+      page.content = result.content_zh || result.content;
     }
   } catch (e) {}
   
-  // 生成顶部导航
+  // 构建顶部导航
   const topNav = navData.filter(i => i.location === 'top');
   const topParents = topNav.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
   let topHtml = '';
-  for (const parent of topParents) {
-    const children = topNav.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+  for (const p of topParents) {
+    const children = topNav.filter(i => i.parent_id === p.id).sort((a,b) => a.sort_order - b.sort_order);
     if (children.length) {
-      topHtml += `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a><ul class="dropdown">`;
-      for (const child of children) {
-        topHtml += `<li><a href="${child.url}">${escapeHtml(child.name)}</a></li>`;
-      }
+      topHtml += `<li><a href="${p.url}">${escapeHtml(p.name)}</a><ul class="dropdown">`;
+      for (const c of children) topHtml += `<li><a href="${c.url}">${escapeHtml(c.name)}</a></li>`;
       topHtml += `</ul></li>`;
     } else {
-      topHtml += `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
+      topHtml += `<li><a href="${p.url}">${escapeHtml(p.name)}</a></li>`;
     }
   }
   
-  // 生成底部导航
+  // 构建底部导航
   const bottomNav = navData.filter(i => i.location === 'bottom');
   const bottomParents = bottomNav.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
   let bottomHtml = '';
-  for (const parent of bottomParents) {
-    const children = bottomNav.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+  for (const p of bottomParents) {
+    const children = bottomNav.filter(i => i.parent_id === p.id).sort((a,b) => a.sort_order - b.sort_order);
     if (children.length) {
-      bottomHtml += `<div class="footer-col"><h4>${escapeHtml(parent.name)}</h4>`;
-      for (const child of children) {
-        bottomHtml += `<a href="${child.url}">${escapeHtml(child.name)}</a>`;
-      }
+      bottomHtml += `<div class="footer-col"><h4>${escapeHtml(p.name)}</h4>`;
+      for (const c of children) bottomHtml += `<a href="${c.url}">${escapeHtml(c.name)}</a>`;
       bottomHtml += `</div>`;
     } else {
-      bottomHtml += `<div class="footer-col"><h4>${escapeHtml(parent.name)}</h4></div>`;
+      bottomHtml += `<div class="footer-col"><h4>${escapeHtml(p.name)}</h4></div>`;
     }
   }
   
   const defaultBottom = `<div class="footer-col"><h4>快速链接</h4><a href="/about">关于我们</a><a href="/contact">联系我们</a></div><div class="footer-col"><h4>联系方式</h4><a href="mailto:info@zhamit.com">info@zhamit.com</a><a href="tel:+8657912345678">+86 579 12345678</a></div>`;
   
-  const langNames = {
-    en: 'EN', zh: '中文', es: 'ES', fr: 'FR', de: 'DE', ja: '日', ko: '韩', ar: 'عربي', ru: 'RU', pt: 'PT', it: 'IT'
-  };
-  const langDisplay = langNames[targetLang] || targetLang.toUpperCase();
-  
-  const html = `<!DOCTYPE html>
-<html lang="${targetLang}">
+  return `<!DOCTYPE html>
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -103,8 +121,9 @@ export async function onRequest(context) {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui; line-height: 1.5; }
         
+        /* 电脑端 */
         @media (min-width: 769px) {
-            .top-nav { background: #1a1a1a; color: white; padding: 0 20px; }
+            .top-nav { background: #1a1a1a; color: white; padding: 0 20px; position: sticky; top: 0; z-index: 100; }
             .top-nav .container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 70px; }
             .nav-menu { display: flex; gap: 30px; list-style: none; }
             .nav-menu a { color: white; text-decoration: none; }
@@ -118,18 +137,19 @@ export async function onRequest(context) {
             .lang-btn { background: none; border: none; color: white; cursor: pointer; font-size: 14px; }
             .lang-menu { position: absolute; top: 100%; right: 0; background: white; color: black; display: none; min-width: 100px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 100; }
             .lang-selector:hover .lang-menu { display: block; }
-            .lang-menu a { display: block; padding: 8px 16px; color: #333; text-decoration: none; font-size: 13px; }
+            .lang-menu a { display: block; padding: 8px 16px; color: #333; text-decoration: none; font-size: 13px; cursor: pointer; }
             .mobile-only { display: none !important; }
         }
         
+        /* 手机端 */
         @media (max-width: 768px) {
             .desktop-only { display: none !important; }
-            .top-nav { background: #1a1a1a; color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+            .top-nav { background: #1a1a1a; color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
             .hamburger { background: none; border: none; width: 28px; height: 28px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
             .hamburger span { display: block; width: 100%; height: 2px; background: white; border-radius: 2px; }
             .mobile-logo { font-size: 18px; font-weight: bold; }
             .mobile-toolbar { display: flex; gap: 12px; }
-            .mobile-lang-btn, .mobile-search-btn { background: none; border: none; color: white; font-size: 16px; cursor: pointer; }
+            .mobile-lang-btn, .mobile-search-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
             .side-menu { position: fixed; top: 0; left: 0; width: 85%; max-width: 300px; height: 100%; background: white; z-index: 300; transform: translateX(-100%); transition: transform 0.3s; overflow-y: auto; box-shadow: 2px 0 12px rgba(0,0,0,0.1); }
             .side-menu.open { transform: translateX(0); }
             .menu-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
@@ -142,6 +162,15 @@ export async function onRequest(context) {
             .submenu.open { display: block; }
             .submenu a { display: block; padding: 12px 20px; color: #666; text-decoration: none; font-size: 14px; }
             .menu-single { display: block; padding: 14px 20px; color: #333; text-decoration: none; font-size: 16px; border-bottom: 1px solid #f0f0f0; }
+            .lang-modal { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; z-index: 400; display: none; overflow: hidden; animation: slideUp 0.3s; }
+            .lang-modal.show { display: block; }
+            .lang-modal-header { padding: 16px; text-align: center; font-weight: bold; border-bottom: 1px solid #eee; }
+            .lang-modal-option { padding: 14px 20px; text-align: center; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+            .search-modal { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; z-index: 400; display: none; padding: 20px; animation: slideUp 0.3s; }
+            .search-modal.show { display: block; }
+            .search-modal input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 30px; font-size: 16px; margin-bottom: 12px; }
+            .search-modal button { width: 100%; padding: 12px; background: #1a1a1a; color: white; border: none; border-radius: 30px; font-size: 16px; cursor: pointer; }
+            @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         }
         
         main { max-width: 1200px; margin: 40px auto; padding: 0 20px; min-height: 50vh; }
@@ -160,26 +189,14 @@ export async function onRequest(context) {
     <div class="desktop-only">
         <div class="top-nav">
             <div class="container">
-                <div class="logo">${escapeHtml(settings.name)}</div>
+                <div class="logo">ZHAMIT</div>
                 <ul class="nav-menu">${topHtml}</ul>
                 <div class="toolbar">
                     <div class="lang-selector">
-                        <button class="lang-btn">🌐 ${langDisplay}</button>
-                        <div class="lang-menu">
-                            <a href="?lang=en">English</a>
-                            <a href="?lang=zh">中文</a>
-                            <a href="?lang=es">Español</a>
-                            <a href="?lang=fr">Français</a>
-                            <a href="?lang=de">Deutsch</a>
-                            <a href="?lang=ja">日本語</a>
-                            <a href="?lang=ko">한국어</a>
-                            <a href="?lang=ar">العربية</a>
-                            <a href="?lang=ru">Русский</a>
-                            <a href="?lang=pt">Português</a>
-                            <a href="?lang=it">Italiano</a>
-                        </div>
+                        <button class="lang-btn" id="desktopLangBtn">🌐 <span id="desktopLangDisplay">中文</span></button>
+                        <div class="lang-menu" id="desktopLangMenu"></div>
                     </div>
-                    <div class="search">🔍</div>
+                    <div class="search" id="desktopSearchBtn">🔍</div>
                 </div>
             </div>
         </div>
@@ -188,9 +205,9 @@ export async function onRequest(context) {
     <div class="mobile-only">
         <div class="top-nav">
             <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
-            <div class="mobile-logo">${escapeHtml(settings.name)}</div>
+            <div class="mobile-logo">ZHAMIT</div>
             <div class="mobile-toolbar">
-                <button class="mobile-lang-btn" id="mobileLangBtn">🌐 <span id="mobileLangDisplay">${langDisplay}</span></button>
+                <button class="mobile-lang-btn" id="mobileLangBtn">🌐</button>
                 <button class="mobile-search-btn" id="mobileSearchBtn">🔍</button>
             </div>
         </div>
@@ -201,6 +218,26 @@ export async function onRequest(context) {
                 <button class="close-menu" id="closeMenuBtn">✕</button>
             </div>
             <div class="menu-list" id="mobileMenuList"></div>
+        </div>
+        
+        <div class="lang-modal" id="langModal">
+            <div class="lang-modal-header">选择语言</div>
+            <div class="lang-modal-option" data-lang="en">English</div>
+            <div class="lang-modal-option" data-lang="zh">中文</div>
+            <div class="lang-modal-option" data-lang="es">Español</div>
+            <div class="lang-modal-option" data-lang="fr">Français</div>
+            <div class="lang-modal-option" data-lang="de">Deutsch</div>
+            <div class="lang-modal-option" data-lang="ja">日本語</div>
+            <div class="lang-modal-option" data-lang="ko">한국어</div>
+            <div class="lang-modal-option" data-lang="ar">العربية</div>
+            <div class="lang-modal-option" data-lang="ru">Русский</div>
+            <div class="lang-modal-option" data-lang="pt">Português</div>
+            <div class="lang-modal-option" data-lang="it">Italiano</div>
+        </div>
+        
+        <div class="search-modal" id="searchModal">
+            <input type="text" id="mobileSearchInput" placeholder="输入关键词...">
+            <button id="mobileSearchConfirm">搜索</button>
         </div>
     </div>
     
@@ -220,6 +257,37 @@ export async function onRequest(context) {
     </div>
     
     <script>
+        // 语言列表
+        const languages = [
+            { code: 'en', name: 'English' }, { code: 'zh', name: '中文' },
+            { code: 'es', name: 'Español' }, { code: 'fr', name: 'Français' },
+            { code: 'de', name: 'Deutsch' }, { code: 'ja', name: '日本語' },
+            { code: 'ko', name: '한국어' }, { code: 'ar', name: 'العربية' },
+            { code: 'ru', name: 'Русский' }, { code: 'pt', name: 'Português' },
+            { code: 'it', name: 'Italiano' }
+        ];
+        
+        const langNames = { en: 'EN', zh: '中文', es: 'ES', fr: 'FR', de: 'DE', ja: '日', ko: '韩', ar: 'عربي', ru: 'RU', pt: 'PT', it: 'IT' };
+        
+        function setLanguage(lang) {
+            document.cookie = 'lang=' + lang + '; path=/; max-age=2592000';
+            window.location.href = '?lang=' + lang;
+        }
+        
+        // 电脑端语言菜单
+        const desktopLangMenu = document.getElementById('desktopLangMenu');
+        if (desktopLangMenu) {
+            desktopLangMenu.innerHTML = languages.map(l => `<a href="#" onclick="setLanguage('${l.code}'); return false;">${l.name}</a>`).join('');
+        }
+        
+        // 获取当前语言
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentLang = urlParams.get('lang') || 'zh';
+        const desktopDisplay = document.getElementById('desktopLangDisplay');
+        const mobileLangBtn = document.getElementById('mobileLangBtn');
+        if (desktopDisplay) desktopDisplay.textContent = langNames[currentLang] || currentLang.toUpperCase();
+        if (mobileLangBtn) mobileLangBtn.innerHTML = '🌐 ' + (langNames[currentLang] || currentLang.toUpperCase());
+        
         // 手机端菜单
         const hamburger = document.getElementById('hamburgerBtn');
         const sideMenu = document.getElementById('sideMenu');
@@ -233,70 +301,92 @@ export async function onRequest(context) {
         // 手机端菜单内容
         const menuList = document.getElementById('mobileMenuList');
         if (menuList) {
-            menuList.innerHTML = \`${topHtml}\`;
-            // 处理二级菜单展开
-            const items = document.querySelectorAll('.nav-menu > li');
+            const topHtml = \`${topHtml}\`;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString('<ul>' + topHtml + '</ul>', 'text/html');
+            const items = doc.querySelectorAll('li');
             items.forEach(item => {
+                const link = item.querySelector('a');
                 const dropdown = item.querySelector('.dropdown');
                 if (dropdown) {
-                    const parentSpan = document.createElement('div');
-                    parentSpan.className = 'menu-parent';
-                    const link = item.querySelector('a');
-                    parentSpan.innerHTML = '<span>' + link.textContent + '</span><button class="toggle-sub">+</button>';
-                    const submenuDiv = document.createElement('div');
-                    submenuDiv.className = 'submenu';
-                    submenuDiv.innerHTML = dropdown.innerHTML;
-                    menuList.appendChild(parentSpan);
-                    menuList.appendChild(submenuDiv);
-                    const toggleBtn = parentSpan.querySelector('.toggle-sub');
-                    toggleBtn.addEventListener('click', () => {
-                        submenuDiv.classList.toggle('open');
-                        toggleBtn.textContent = submenuDiv.classList.contains('open') ? '−' : '+';
+                    const parentDiv = document.createElement('div');
+                    parentDiv.className = 'menu-parent';
+                    parentDiv.innerHTML = '<span>' + link.textContent + '</span><button class="toggle-sub">+</button>';
+                    const subDiv = document.createElement('div');
+                    subDiv.className = 'submenu';
+                    const subLinks = dropdown.querySelectorAll('a');
+                    subLinks.forEach(subLink => {
+                        const a = document.createElement('a');
+                        a.href = subLink.href;
+                        a.textContent = subLink.textContent;
+                        subDiv.appendChild(a);
+                    });
+                    menuList.appendChild(parentDiv);
+                    menuList.appendChild(subDiv);
+                    const toggle = parentDiv.querySelector('.toggle-sub');
+                    toggle.addEventListener('click', () => {
+                        subDiv.classList.toggle('open');
+                        toggle.textContent = subDiv.classList.contains('open') ? '−' : '+';
                     });
                 } else {
-                    const link = item.querySelector('a');
-                    const singleDiv = document.createElement('a');
-                    singleDiv.className = 'menu-single';
-                    singleDiv.href = link.href;
-                    singleDiv.textContent = link.textContent;
-                    menuList.appendChild(singleDiv);
+                    const a = document.createElement('a');
+                    a.className = 'menu-single';
+                    a.href = link.href;
+                    a.textContent = link.textContent;
+                    menuList.appendChild(a);
                 }
             });
         }
         
-        function setLanguage(lang) {
-            document.cookie = 'lang=' + lang + '; path=/; max-age=2592000';
-            window.location.href = '?lang=' + lang;
-        }
-        
         // 手机端语言选择
-        const mobileLangBtn = document.getElementById('mobileLangBtn');
-        if (mobileLangBtn) {
+        const langModal = document.getElementById('langModal');
+        if (mobileLangBtn && langModal) {
             mobileLangBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                const lang = prompt('选择语言 / Select Language:\\nEnglish (en)\\n中文 (zh)\\nEspañol (es)\\nFrançais (fr)\\nDeutsch (de)\\n日本語 (ja)\\n한국어 (ko)\\nالعربية (ar)');
-                if (lang && ['en','zh','es','fr','de','ja','ko','ar'].includes(lang)) {
-                    setLanguage(lang);
+                langModal.classList.add('show');
+            });
+            langModal.querySelectorAll('.lang-modal-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    setLanguage(opt.dataset.lang);
+                    langModal.classList.remove('show');
+                });
+            });
+            document.addEventListener('click', (e) => {
+                if (!langModal.contains(e.target) && e.target !== mobileLangBtn) {
+                    langModal.classList.remove('show');
                 }
             });
         }
         
         // 手机端搜索
+        const searchModal = document.getElementById('searchModal');
         const mobileSearchBtn = document.getElementById('mobileSearchBtn');
-        if (mobileSearchBtn) {
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const mobileSearchConfirm = document.getElementById('mobileSearchConfirm');
+        if (mobileSearchBtn && searchModal) {
             mobileSearchBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                const query = prompt('搜索:');
-                if (query && query.trim()) {
-                    window.location.href = '/search?q=' + encodeURIComponent(query.trim());
+                searchModal.classList.add('show');
+                if (mobileSearchInput) mobileSearchInput.focus();
+            });
+            const doSearch = () => {
+                if (mobileSearchInput && mobileSearchInput.value.trim()) {
+                    window.location.href = '/search?q=' + encodeURIComponent(mobileSearchInput.value.trim());
+                }
+            };
+            if (mobileSearchConfirm) mobileSearchConfirm.addEventListener('click', doSearch);
+            if (mobileSearchInput) mobileSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch(); });
+            document.addEventListener('click', (e) => {
+                if (!searchModal.contains(e.target) && e.target !== mobileSearchBtn) {
+                    searchModal.classList.remove('show');
                 }
             });
         }
         
         // 电脑端搜索
-        const searchBtn = document.querySelector('.search');
-        if (searchBtn) {
-            searchBtn.addEventListener('click', () => {
+        const desktopSearchBtn = document.getElementById('desktopSearchBtn');
+        if (desktopSearchBtn) {
+            desktopSearchBtn.addEventListener('click', () => {
                 const query = prompt('搜索:');
                 if (query && query.trim()) {
                     window.location.href = '/search?q=' + encodeURIComponent(query.trim());
@@ -306,26 +396,11 @@ export async function onRequest(context) {
     </script>
 </body>
 </html>`;
-  
-  // 如果目标语言是中文，直接返回
-  if (targetLang === 'zh') {
-    return new Response(html, {
-      headers: { 'Content-Type': 'text/html; charset=utf-8' }
-    });
-  }
-  
-  // 调用 AI 翻译
-  const translatedHtml = await translateHtml(html, targetLang, env);
-  
-  return new Response(translatedHtml, {
-    headers: { 'Content-Type': 'text/html; charset=utf-8' }
-  });
 }
 
 async function translateHtml(html, targetLang, env) {
   if (!env.AI) return html;
   
-  // 提取 body 内容
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   if (!bodyMatch) return html;
   
@@ -333,15 +408,15 @@ async function translateHtml(html, targetLang, env) {
   const beforeBody = html.substring(0, bodyMatch.index);
   const afterBody = html.substring(bodyMatch.index + bodyMatch[0].length);
   
-  // 提取所有文本块
   const texts = [];
   const placeholders = [];
   let temp = bodyContent;
   let idx = 0;
   
+  // 提取文本，跳过 ZHAMIT
   temp = bodyContent.replace(/>([^<]+)</g, (match, text) => {
     const trimmed = text.trim();
-    if (trimmed && trimmed.length > 2 && !trimmed.match(/^\d+$/) && !trimmed.includes('ZHAMIT')) {
+    if (trimmed && trimmed.length > 1 && !trimmed.match(/^\d+$/) && !trimmed.includes('ZHAMIT') && trimmed !== 'ZHAMIT') {
       const placeholder = `{{T_${idx}}}`;
       texts.push(trimmed);
       placeholders.push({ placeholder, original: trimmed });
@@ -351,7 +426,7 @@ async function translateHtml(html, targetLang, env) {
     return match;
   });
   
-  // 翻译每个文本块
+  // 翻译
   const translated = [];
   for (let i = 0; i < texts.length; i++) {
     try {
@@ -365,7 +440,6 @@ async function translateHtml(html, targetLang, env) {
     }
   }
   
-  // 替换回
   let result = temp;
   for (let i = 0; i < placeholders.length; i++) {
     result = result.replace(placeholders[i].placeholder, translated[i]);
