@@ -1,47 +1,49 @@
 // functions/index.js
-// 服务端渲染 + AI 翻译
+// AI 自动翻译框架 - 自动检测源语言，翻译成客户语言
 
 export async function onRequest(context) {
-  const { request, env, next } = context;
+  const { request, env } = context;
   const url = new URL(request.url);
   const path = url.pathname;
   
   // 跳过 API 和静态资源
   if (path.startsWith('/api/') || path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|webp)$/)) {
-    return next();
+    return context.next();
   }
   
-  // 获取用户语言
-  let targetLang = 'en';
-  const cookieMatch = request.headers.get('Cookie')?.match(/lang=([^;]+)/);
-  if (cookieMatch && ['en', 'zh', 'es', 'ar'].includes(cookieMatch[1])) {
-    targetLang = cookieMatch[1];
-  } else {
-    const acceptLang = request.headers.get('Accept-Language') || '';
-    if (acceptLang.includes('zh')) targetLang = 'zh';
-    else if (acceptLang.includes('es')) targetLang = 'es';
-    else if (acceptLang.includes('ar')) targetLang = 'ar';
+  // 获取客户语言
+  let targetLang = getClientLanguage(request);
+  
+  // 从数据库获取内容（可以是任何语言）
+  const settings = await getSiteSettings(env);
+  const navData = await getNavMenu(env);
+  let pageContent = await getPageByPath(env, path);
+  
+  // 如果页面不存在
+  if (!pageContent && path !== '/') {
+    pageContent = await getPageByPath(env, '404');
+    if (!pageContent) {
+      pageContent = { 
+        title: '页面未找到', 
+        content: '<h1>页面未找到</h1><p>您访问的页面不存在。</p>' 
+      };
+    }
   }
   
-  // 从数据库获取导航数据
-  let navData = [];
-  try {
-    const stmt = env.DB.prepare('SELECT * FROM nav_menus WHERE status = 1 ORDER BY location, parent_id, sort_order');
-    const result = await stmt.all();
-    navData = result.results || [];
-  } catch (e) {
-    console.error('获取导航失败', e);
+  // 生成原始 HTML（后台内容原样输出）
+  const originalHtml = generateHTML(settings, navData, pageContent, targetLang);
+  
+  // 如果客户语言是中文，直接返回原文（因为后台内容可能是中文）
+  if (targetLang === 'zh') {
+    return new Response(originalHtml, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300' }
+    });
   }
   
-  // 生成 HTML
-  let html = generateHTML(navData, targetLang);
+  // 调用 AI 翻译（自动检测源语言）
+  const translatedHtml = await translateHtmlWithAI(originalHtml, targetLang, env);
   
-  // 如果需要翻译，调用 AI
-  if (targetLang !== 'en') {
-    html = await translateWithAI(html, targetLang, env);
-  }
-  
-  return new Response(html, {
+  return new Response(translatedHtml, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-cache'
@@ -49,12 +51,73 @@ export async function onRequest(context) {
   });
 }
 
-function generateHTML(navData, lang) {
-  // 分离顶部和底部导航
+// 获取客户语言（支持任意语言）
+function getClientLanguage(request) {
+  const cookieMatch = request.headers.get('Cookie')?.match(/lang=([^;]+)/);
+  if (cookieMatch) {
+    return cookieMatch[1];
+  }
+  const acceptLang = request.headers.get('Accept-Language') || '';
+  const browserLang = acceptLang.split(',')[0].split('-')[0];
+  return browserLang || 'en';
+}
+
+// 获取站点设置
+async function getSiteSettings(env) {
+  try {
+    const stmt = env.DB.prepare('SELECT * FROM site_settings');
+    const rows = await stmt.all();
+    const settings = {
+      site_name: '哲觅贸易',
+      site_description: '专业家居贸易公司 · 源自中国义乌'
+    };
+    for (const row of rows.results) {
+      // 优先用中文，否则用第一个有值的字段
+      settings[row.key] = row.value_zh || row.value_en || row.value;
+    }
+    return settings;
+  } catch (e) {
+    return { site_name: '哲觅贸易', site_description: '专业家居贸易公司 · 源自中国义乌' };
+  }
+}
+
+// 获取导航菜单
+async function getNavMenu(env) {
+  try {
+    const stmt = env.DB.prepare('SELECT * FROM nav_menus WHERE status = 1 ORDER BY location, parent_id, sort_order');
+    const rows = await stmt.all();
+    return rows.results.map(item => ({
+      ...item,
+      name: item.name_zh || item.name_en || item.name
+    }));
+  } catch (e) {
+    return [];
+  }
+}
+
+// 获取页面内容
+async function getPageByPath(env, path) {
+  try {
+    const stmt = env.DB.prepare('SELECT * FROM pages WHERE path = ? AND status = 1 LIMIT 1');
+    const page = await stmt.bind(path).first();
+    if (!page) return null;
+    return {
+      ...page,
+      title: page.title_zh || page.title_en || page.title,
+      content: page.content_zh || page.content_en || page.content
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+// 生成原始 HTML（后台内容原样输出）
+function generateHTML(settings, navData, page, lang) {
+  const langDisplay = getLangDisplay(lang);
+  
   const topNav = navData.filter(i => i.location === 'top');
   const bottomNav = navData.filter(i => i.location === 'bottom');
   
-  // 构建顶部导航 HTML
   const topParents = topNav.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
   const topNavHtml = topParents.map(parent => {
     const children = topNav.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
@@ -67,43 +130,45 @@ function generateHTML(navData, lang) {
     return `<li><a href="${parent.url}">${escapeHtml(parent.name)}</a></li>`;
   }).join('');
   
-  // 构建底部导航 HTML
   const bottomParents = bottomNav.filter(i => i.parent_id === 0).sort((a,b) => a.sort_order - b.sort_order);
-  const bottomNavHtml = bottomParents.map(parent => {
-    const children = bottomNav.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
-    if (children.length) {
+  let bottomNavHtml = '';
+  if (bottomParents.length) {
+    bottomNavHtml = bottomParents.map(parent => {
+      const children = bottomNav.filter(i => i.parent_id === parent.id).sort((a,b) => a.sort_order - b.sort_order);
+      if (children.length) {
+        return `<div class="footer-col">
+          <h4>${escapeHtml(parent.name)}</h4>
+          ${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
+        </div>`;
+      }
       return `<div class="footer-col">
         <h4>${escapeHtml(parent.name)}</h4>
-        ${children.map(c => `<a href="${c.url}">${escapeHtml(c.name)}</a>`).join('')}
       </div>`;
-    }
-    return `<div class="footer-col">
-      <h4>${escapeHtml(parent.name)}</h4>
-    </div>`;
-  }).join('');
+    }).join('');
+  } else {
+    bottomNavHtml = `
+      <div class="footer-col">
+        <h4>快速链接</h4>
+        <a href="/about">关于我们</a>
+        <a href="/contact">联系我们</a>
+      </div>
+      <div class="footer-col">
+        <h4>联系方式</h4>
+        <a href="mailto:info@zhamit.com">info@zhamit.com</a>
+        <a href="tel:+8657912345678">+86 579 12345678</a>
+      </div>
+    `;
+  }
   
-  // 默认底部（如果没有数据）
-  const defaultBottom = bottomNavHtml || `
-    <div class="footer-col">
-      <h4>Quick Links</h4>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-    </div>
-    <div class="footer-col">
-      <h4>Contact Info</h4>
-      <a href="mailto:info@zhamit.com">info@zhamit.com</a>
-      <a href="tel:+8657912345678">+86 579 12345678</a>
-    </div>
-  `;
-  
-  const langDisplay = lang.toUpperCase();
+  const pageTitle = page?.title || settings.site_name;
+  const pageContent = page?.content || '<h1>欢迎</h1><p>欢迎访问我们的网站。</p>';
   
   return `<!DOCTYPE html>
-<html lang="${lang}">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ZHAMIT - Professional Trading Company</title>
+    <title>${escapeHtml(pageTitle)} - ${escapeHtml(settings.site_name)}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; line-height: 1.5; color: #1a1a1a; background: #fff; }
@@ -142,16 +207,7 @@ function generateHTML(navData, lang) {
             .footer-col a { display: block; color: #666; text-decoration: none; font-size: 14px; margin-bottom: 12px; transition: color 0.2s; }
             .footer-col a:hover { color: #1a1a1a; }
             .footer-bottom { max-width: 1400px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid #e8e8e8; text-align: center; font-size: 13px; color: #999; }
-            .hero { padding: 100px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-            .hero h1 { font-size: 56px; font-weight: 700; margin-bottom: 20px; }
-            .hero p { font-size: 18px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
-            .products { padding: 80px 40px; max-width: 1400px; margin: 0 auto; }
-            .products h2 { text-align: center; font-size: 36px; font-weight: 600; margin-bottom: 48px; }
-            .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-            .product-card { background: #f9f9f9; border-radius: 16px; padding: 40px 24px; text-align: center; transition: transform 0.2s; }
-            .product-card:hover { transform: translateY(-4px); }
-            .product-card h3 { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
-            .product-card p { color: #666; font-size: 15px; }
+            main { min-height: 50vh; padding: 40px; max-width: 1200px; margin: 0 auto; }
         }
 
         @media (max-width: 767px) {
@@ -187,23 +243,13 @@ function generateHTML(navData, lang) {
             .submenu.open { display: block; }
             .submenu a { display: block; padding: 12px 20px; color: #666; text-decoration: none; font-size: 14px; }
             .menu-single { display: block; padding: 14px 20px; color: #333; text-decoration: none; font-size: 16px; }
-            .hero { padding: 60px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-            .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
-            .hero p { font-size: 14px; opacity: 0.9; }
-            .products { padding: 48px 16px; }
-            .products h2 { text-align: center; font-size: 24px; font-weight: 600; margin-bottom: 24px; }
-            .product-card { background: #f9f9f9; border-radius: 12px; padding: 24px 16px; margin-bottom: 16px; text-align: center; }
-            .product-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-            .product-card p { color: #666; font-size: 13px; }
-            .footer-nav { background: #f8f8f8; padding: 40px 20px 24px; margin-top: 48px; }
-            .footer-nav .container { display: flex; flex-direction: column; gap: 32px; }
-            .footer-col { text-align: center; }
-            .footer-col .footer-logo { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; display: inline-block; }
-            .footer-col p { color: #666; font-size: 13px; margin-top: 4px; }
-            .footer-col h4 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; }
-            .footer-col a { display: block; color: #666; text-decoration: none; font-size: 13px; margin-bottom: 8px; }
-            .footer-bottom { text-align: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid #e8e8e8; font-size: 11px; color: #999; }
+            main { min-height: 50vh; padding: 20px; }
         }
+        
+        img { max-width: 100%; height: auto; }
+        .rich-text { line-height: 1.6; }
+        .rich-text h1, .rich-text h2, .rich-text h3 { margin: 1em 0 0.5em; }
+        .rich-text p { margin-bottom: 1em; }
     </style>
 </head>
 <body>
@@ -212,7 +258,7 @@ function generateHTML(navData, lang) {
         <div class="top-nav">
             <div class="container">
                 <div class="logo-area">
-                    <span class="company-name">ZHAMIT</span>
+                    <span class="company-name">${escapeHtml(settings.site_name)}</span>
                 </div>
                 <ul class="nav-menu">
                     ${topNavHtml}
@@ -220,13 +266,20 @@ function generateHTML(navData, lang) {
                 <div class="toolbar">
                     <div class="lang-selector">
                         <button class="lang-btn">
-                            🌐 <span>${langDisplay}</span>
+                            🌐 <span id="currentLangDisplay">${langDisplay}</span>
                         </button>
-                        <div class="lang-menu">
+                        <div class="lang-menu" id="langMenu">
                             <a href="#" onclick="setLanguage('en'); return false;">English</a>
                             <a href="#" onclick="setLanguage('zh'); return false;">中文</a>
                             <a href="#" onclick="setLanguage('es'); return false;">Español</a>
+                            <a href="#" onclick="setLanguage('fr'); return false;">Français</a>
+                            <a href="#" onclick="setLanguage('de'); return false;">Deutsch</a>
+                            <a href="#" onclick="setLanguage('ja'); return false;">日本語</a>
+                            <a href="#" onclick="setLanguage('ko'); return false;">한국어</a>
                             <a href="#" onclick="setLanguage('ar'); return false;">العربية</a>
+                            <a href="#" onclick="setLanguage('ru'); return false;">Русский</a>
+                            <a href="#" onclick="setLanguage('pt'); return false;">Português</a>
+                            <a href="#" onclick="setLanguage('it'); return false;">Italiano</a>
                         </div>
                     </div>
                     <div class="search-wrapper">
@@ -237,7 +290,7 @@ function generateHTML(navData, lang) {
                             </svg>
                         </button>
                         <div class="search-input-container">
-                            <input type="text" id="searchInputDesktop" placeholder="Search...">
+                            <input type="text" id="searchInputDesktop" placeholder="搜索...">
                         </div>
                     </div>
                 </div>
@@ -245,35 +298,21 @@ function generateHTML(navData, lang) {
         </div>
 
         <main>
-            <section class="hero">
-                <h1>ZHAMIT</h1>
-                <p>Professional Trading Company · From Yiwu, China</p>
-            </section>
-            <section class="products">
-                <h2>Featured Products</h2>
-                <div class="product-grid">
-                    <div class="product-card">
-                        <h3>Home Goods</h3>
-                        <p>High-quality home goods, in stock</p>
-                    </div>
-                    <div class="product-card">
-                        <h3>Kitchenware</h3>
-                        <p>Practical & beautiful, custom packaging available</p>
-                    </div>
-                    <div class="product-card">
-                        <h3>Decorations</h3>
-                        <p>Limited editions, updated weekly</p>
-                    </div>
-                </div>
-            </section>
+            <div class="rich-text">
+                ${pageContent}
+            </div>
         </main>
 
         <div class="footer-nav">
             <div class="container">
-                ${defaultBottom}
+                <div class="footer-col">
+                    <div class="footer-logo">${escapeHtml(settings.site_name)}</div>
+                    <p>${escapeHtml(settings.site_description)}</p>
+                </div>
+                ${bottomNavHtml}
             </div>
             <div class="footer-bottom">
-                © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
+                © 2025 ${escapeHtml(settings.site_name)}. 保留所有权利。
             </div>
         </div>
     </div>
@@ -286,10 +325,10 @@ function generateHTML(navData, lang) {
                 <span></span>
                 <span></span>
             </button>
-            <div class="mobile-logo">ZHAMIT</div>
+            <div class="mobile-logo">${escapeHtml(settings.site_name)}</div>
             <div class="mobile-toolbar">
                 <button class="mobile-lang-btn" id="mobileLangBtn">
-                    🌐 <span>${langDisplay}</span>
+                    🌐 <span id="mobileLangDisplay">${langDisplay}</span>
                 </button>
                 <button class="mobile-search-btn" id="mobileSearchBtn">
                     <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none">
@@ -304,17 +343,24 @@ function generateHTML(navData, lang) {
             <div class="lang-modal-option" onclick="setLanguage('en')">English</div>
             <div class="lang-modal-option" onclick="setLanguage('zh')">中文</div>
             <div class="lang-modal-option" onclick="setLanguage('es')">Español</div>
+            <div class="lang-modal-option" onclick="setLanguage('fr')">Français</div>
+            <div class="lang-modal-option" onclick="setLanguage('de')">Deutsch</div>
+            <div class="lang-modal-option" onclick="setLanguage('ja')">日本語</div>
+            <div class="lang-modal-option" onclick="setLanguage('ko')">한국어</div>
             <div class="lang-modal-option" onclick="setLanguage('ar')">العربية</div>
+            <div class="lang-modal-option" onclick="setLanguage('ru')">Русский</div>
+            <div class="lang-modal-option" onclick="setLanguage('pt')">Português</div>
+            <div class="lang-modal-option" onclick="setLanguage('it')">Italiano</div>
         </div>
 
         <div class="search-modal" id="searchModal">
-            <input type="text" id="mobileSearchInput" placeholder="Search...">
+            <input type="text" id="mobileSearchInput" placeholder="搜索...">
             <button id="mobileSearchConfirm">🔍</button>
         </div>
 
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
-                <h3>Menu</h3>
+                <h3>菜单</h3>
                 <button class="close-menu" id="closeMenuBtn">✕</button>
             </div>
             <div class="menu-list" id="mobileMenuList">
@@ -323,35 +369,21 @@ function generateHTML(navData, lang) {
         </div>
 
         <main>
-            <section class="hero">
-                <h1>ZHAMIT</h1>
-                <p>Professional Trading Company · From Yiwu, China</p>
-            </section>
-            <section class="products">
-                <h2>Featured Products</h2>
-                <div class="product-grid">
-                    <div class="product-card">
-                        <h3>Home Goods</h3>
-                        <p>High-quality home goods, in stock</p>
-                    </div>
-                    <div class="product-card">
-                        <h3>Kitchenware</h3>
-                        <p>Practical & beautiful, custom packaging available</p>
-                    </div>
-                    <div class="product-card">
-                        <h3>Decorations</h3>
-                        <p>Limited editions, updated weekly</p>
-                    </div>
-                </div>
-            </section>
+            <div class="rich-text">
+                ${pageContent}
+            </div>
         </main>
 
         <div class="footer-nav">
             <div class="container">
-                ${defaultBottom}
+                <div class="footer-col">
+                    <div class="footer-logo">${escapeHtml(settings.site_name)}</div>
+                    <p>${escapeHtml(settings.site_description)}</p>
+                </div>
+                ${bottomNavHtml}
             </div>
             <div class="footer-bottom">
-                © 2025 YIWU ZHAMIT TRADING LIMITED. All Rights Reserved.
+                © 2025 ${escapeHtml(settings.site_name)}. 保留所有权利。
             </div>
         </div>
     </div>
@@ -361,6 +393,16 @@ function generateHTML(navData, lang) {
             document.cookie = 'lang=' + lang + '; path=/; max-age=2592000';
             window.location.reload();
         }
+        
+        // 更新当前语言显示
+        const langMap = {
+            'en': 'EN', 'zh': '中文', 'es': 'ES', 'fr': 'FR', 'de': 'DE',
+            'ja': '日', 'ko': '韩', 'ar': 'عربي', 'ru': 'RU', 'pt': 'PT', 'it': 'IT'
+        };
+        const currentLang = '${lang}';
+        const displayLang = langMap[currentLang] || currentLang.toUpperCase();
+        document.getElementById('currentLangDisplay')?.textContent = displayLang;
+        document.getElementById('mobileLangDisplay')?.textContent = displayLang;
         
         // 手机端菜单
         const hamburger = document.getElementById('hamburgerBtn');
@@ -439,14 +481,23 @@ function generateHTML(navData, lang) {
 </html>`;
 }
 
-// AI 翻译函数
-async function translateWithAI(html, targetLang, env) {
+// 获取语言显示名称
+function getLangDisplay(lang) {
+  const map = {
+    'en': 'EN', 'zh': '中文', 'es': 'ES', 'fr': 'FR', 'de': 'DE',
+    'ja': '日', 'ko': '韩', 'ar': 'عربي', 'ru': 'RU', 'pt': 'PT', 'it': 'IT'
+  };
+  return map[lang] || lang.toUpperCase();
+}
+
+// AI 翻译 HTML - 自动检测源语言
+async function translateHtmlWithAI(html, targetLang, env) {
   if (!env.AI) {
     console.error('AI binding not found');
     return html;
   }
   
-  // 提取 body 内容进行翻译
+  // 提取 body 内容
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   if (!bodyMatch) return html;
   
@@ -454,12 +505,13 @@ async function translateWithAI(html, targetLang, env) {
   const beforeBody = html.substring(0, bodyMatch.index);
   const afterBody = html.substring(bodyMatch.index + bodyMatch[0].length);
   
-  // 提取所有文本节点（简化：用正则提取标签外的文本）
+  // 提取所有文本节点
   const textBlocks = [];
   const placeholders = [];
   let tempContent = bodyContent;
   let index = 0;
   
+  // 用正则提取标签外的文本
   tempContent = bodyContent.replace(/>([^<]+)</g, (match, text) => {
     const trimmed = text.trim();
     if (trimmed && !trimmed.match(/^[\d\s\W]+$/)) {
@@ -472,14 +524,14 @@ async function translateWithAI(html, targetLang, env) {
     return match;
   });
   
-  // 批量翻译
+  // 批量翻译 - 不指定 source_lang，让模型自动检测
   const translatedTexts = [];
   for (const block of textBlocks) {
     try {
       const response = await env.AI.run('@cf/meta/m2m100-1.2b', {
         text: block,
-        source_lang: 'en',
         target_lang: targetLang,
+        // source_lang 不传，模型自动检测
       });
       translatedTexts.push(response.translated_text || block);
     } catch (e) {
